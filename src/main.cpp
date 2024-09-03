@@ -105,6 +105,7 @@ competition Competition;
 
 int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVision8_objectIndex = 0;
 
+const float pi = 3.14159265359;
 float theta;
 float dist;
 
@@ -130,7 +131,7 @@ int whenStarted1() {
         Brain.Screen.print("Bluering");
       }
     }
-  wait(5, msec);
+    wait(5, msec);
   }
   return 0;
 }
@@ -141,9 +142,10 @@ int onauton_autonomous_0() {
   PID_theta(10);
   return 0;
 }
+
 void PID_dist(float dist) {
-  const kpdist = 0.1;
-  const kddist = 0.1;
+  const float kpdist = 0.1;
+  const float kddist = 0.1;
   float errordist = 100;
   float proportionaldist; 
   float derivativedist;
@@ -154,17 +156,17 @@ void PID_dist(float dist) {
     traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi / 180;
     errordist = dist - traveleddist;
     proportionaldist = (errordist * kpdist);
-    derviativedist = (preverrordist - errordist) * kddist;
+    derivativedist = (preverrordist - errordist) * kddist;
     leftdrive.spin(forward, proportionaldist + derivativedist, volt);
     rightdrive.spin(forward, proportionaldist + derivativedist, volt);
     preverrordist = errordist;
   }
   wait(5, msec);
-  
 }
+
 void PID_theta(float theta) {
-  const kptheta = 0.1;
-  const kdtheta = 0.1;
+  const float kptheta = 0.1;
+  const float kdtheta = 0.1;
   float errortheta = 100;
   float proportionaltheta; 
   float derivativetheta;
@@ -175,14 +177,14 @@ void PID_theta(float theta) {
     traveledtheta = Inertial9.rotation(degrees);
     errortheta = theta - traveledtheta;
     proportionaltheta = (errortheta * kptheta);
-    derviativetheta = (preverrortheta - errortheta) * kdtheta;
+    derivativetheta = (preverrortheta - errortheta) * kdtheta;
     leftdrive.spin(forward, -1 * (proportionaltheta + derivativetheta), volt);
     rightdrive.spin(forward, proportionaltheta + derivativetheta, volt);
     preverrortheta = errortheta;
   }
   wait(5, msec);
-  
 }
+
 // "when driver control" hat block
 int ondriver_drivercontrol_0() {
   return 0;
@@ -204,8 +206,6 @@ void VEXcode_auton_task() {
   return;
 }
 
-
-
 int main() {
   vex::competition::bStopTasksBetweenModes = false;
   Competition.autonomous(VEXcode_auton_task);
@@ -224,3 +224,4 @@ int main() {
 
   whenStarted1();
 }
+
