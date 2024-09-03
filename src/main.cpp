@@ -108,11 +108,76 @@ int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVis
 const float pi = 3.14159265359;
 float theta;
 float dist;
+float leftvelocity;
+float rightvelocity;
 
 // "when started" hat block
 int whenStarted1() {
-  Rotation10.setPosition(0.0, degrees);
+  return 0;
+}
+
+// "when autonomous" hat block
+int onauton_autonomous_0() {
+  PID_dist(10);
+  PID_theta(10);
+  return 0;
+}
+
+void PID_dist(float dist) {
+  const float kpdist = 0.1;
+  const float kddist = 0.1;
+  float errordist = 100;
+  float proportionaldist; 
+  float derivativedist;
+  float traveleddist;
+  float preverrordist = 0;
+
+  while (fabs(errordist) < 1) {
+    traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi / 180;
+    errordist = dist - traveleddist;
+    proportionaldist = (errordist * kpdist);
+    derivativedist = (preverrordist - errordist) * kddist;
+    leftdrive.spin(forward, proportionaldist + derivativedist, volt);
+    rightdrive.spin(forward, proportionaldist + derivativedist, volt);
+    preverrordist = errordist;
+  }
+  wait(5, msec);
+}
+
+void PID_theta(float theta) {
+  const float kptheta = 0.1;
+  const float kdtheta = 0.1;
+  float errortheta = 100;
+  float proportionaltheta; 
+  float derivativetheta;
+  float traveledtheta;
+  float preverrortheta = 0;
+
+  while (fabs(errortheta) < 1) {
+    traveledtheta = Inertial9.rotation(degrees);
+    errortheta = theta - traveledtheta;
+    proportionaltheta = (errortheta * kptheta);
+    derivativetheta = (preverrortheta - errortheta) * kdtheta;
+    leftdrive.spin(forward, -1 * (proportionaltheta + derivativetheta), volt);
+    rightdrive.spin(forward, proportionaltheta + derivativetheta, volt);
+    preverrortheta = errortheta;
+  }
+  wait(5, msec);
+}
+
+// "when driver control" hat block
+int ondriver_drivercontrol_0() {
   while (true) {
+    rightvelocity = Controller1.Axis2.position() * 0.7874015748;
+    leftvelocity = Controller1.Axis3.position() * 0.7874015748;
+    rightdrive.setVelocity(rightvelocity, percent);
+    leftdrive.setVelocity(leftvelocity, percent);
+    if (Controller1.ButtonR1.pressing()) {
+      intake.spin(forward, 100, percent);
+    }
+    if (Controller1.ButtonR2.pressing()) {
+      intake.stop();
+    }
     AIVision8.takeSnapshot(aivision::ALL_AIOBJS);
     if (AIVision8.objectCount > 0 && AIVision8.objects[AIVision8_objectIndex].width > 70.0) {
       if (AIVision8.objects[AIVision8_objectIndex].id == mobileGoal) {
@@ -136,65 +201,12 @@ int whenStarted1() {
   return 0;
 }
 
-// "when autonomous" hat block
-int onauton_autonomous_0() {
-  PID_dist(10);
-  PID_theta(10);
-  return 0;
-}
-
-void PID_dist(float dist) {
-  const float kpdist = 0.1;
-  const float kddist = 0.1;
-  float errordist = 100;
-  float proportionaldist; 
-  float derivativedist;
-  float traveleddist;
-  float preverrordist = 0;
-
-  while (abs(errordist) < 1) {
-    traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi / 180;
-    errordist = dist - traveleddist;
-    proportionaldist = (errordist * kpdist);
-    derivativedist = (preverrordist - errordist) * kddist;
-    leftdrive.spin(forward, proportionaldist + derivativedist, volt);
-    rightdrive.spin(forward, proportionaldist + derivativedist, volt);
-    preverrordist = errordist;
-  }
-  wait(5, msec);
-}
-
-void PID_theta(float theta) {
-  const float kptheta = 0.1;
-  const float kdtheta = 0.1;
-  float errortheta = 100;
-  float proportionaltheta; 
-  float derivativetheta;
-  float traveledtheta;
-  float preverrortheta = 0;
-
-  while (abs(errortheta) < 1) {
-    traveledtheta = Inertial9.rotation(degrees);
-    errortheta = theta - traveledtheta;
-    proportionaltheta = (errortheta * kptheta);
-    derivativetheta = (preverrortheta - errortheta) * kdtheta;
-    leftdrive.spin(forward, -1 * (proportionaltheta + derivativetheta), volt);
-    rightdrive.spin(forward, proportionaltheta + derivativetheta, volt);
-    preverrortheta = errortheta;
-  }
-  wait(5, msec);
-}
-
-// "when driver control" hat block
-int ondriver_drivercontrol_0() {
-  return 0;
-}
-
 void VEXcode_driver_task() {
   // Start the driver control tasks....
   vex::task drive0(ondriver_drivercontrol_0);
   while(Competition.isDriverControl() && Competition.isEnabled()) {this_thread::sleep_for(10);}
   drive0.stop();
+
   return;
 }
 
