@@ -1,0 +1,18 @@
+{
+	"project": {
+		"name": "test-real",
+		"slot": 1,
+		"description": "initial testing of 2530A robotic robot 1st tournament",
+		"platform": "V5",
+		"creationDate": "Tue, 03 Sep 2024 00:40:11 GMT",
+		"language": "cpp",
+		"sdkVersion": "V5_20240223_11_00_00",
+		"cpp": {
+			"includePath": []
+		}
+	},
+	"extension": {
+		"version": "0.5.0",
+		"json": 1
+	}
+}
