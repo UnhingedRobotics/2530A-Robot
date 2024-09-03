@@ -53,10 +53,9 @@ vex::aivision AIVision8(PORT8, aivision::ALL_AIOBJS);
 
 inertial Inertial9 = inertial(PORT9);
 
-rotation Rotation10 = rotation(PORT10, false);
+rotation leftwheelrotation = rotation(PORT10, false);
 
-rotation Rotation11 = rotation(PORT11, false);
-
+rotation backwheelrotation = rotation(PORT11, false);
 
 
 // generating and setting random seed
@@ -106,10 +105,18 @@ competition Competition;
 int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVision8_objectIndex = 0;
 
 const float pi = 3.14159265359;
+const float wheeldiameter = 3.25;
+const float odomwheeldiameter = 2;
+const float leftwheeldisplacement = 4;
+const float backwheeldisplacement = 4;
 float theta;
 float dist;
 float leftvelocity;
 float rightvelocity;
+float x;
+float y;
+bool tracking;
+
 
 // "when started" hat block
 int whenStarted1() {
@@ -120,6 +127,7 @@ int whenStarted1() {
 int onauton_autonomous_0() {
   PID_dist(10);
   PID_theta(10);
+  tracking = false;
   return 0;
 }
 
@@ -133,7 +141,7 @@ void PID_dist(float dist) {
   float preverrordist = 0;
 
   while (fabs(errordist) < 1) {
-    traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi / 180;
+    traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360;
     errordist = dist - traveleddist;
     proportionaldist = (errordist * kpdist);
     derivativedist = (preverrordist - errordist) * kddist;
@@ -163,6 +171,25 @@ void PID_theta(float theta) {
     preverrortheta = errortheta;
   }
   wait(5, msec);
+}
+
+void odometry() {
+  float leftwheeldist;
+  float backwheeldist;
+  float traveledodomtheta;
+  float thetanot = 90;
+  float prevx = 0;
+  float prevy = 0;
+  while (tracking) {
+    leftwheeldist = leftwheelrotation.position(rpm) * pi * odomwheeldiameter / 360;
+    backwheeldist = backwheelrotation.position(rpm) * pi * odomwheeldiameter / 360;
+	traveledodomtheta = (((Inertial9.rotation(degrees) + thetanot) * -1) % 360) * pi / 180;
+	x = prevx + 2 * (leftwheeldist / traveledodomtheta + leftwheeldisplacement) * sin(traveledodomtheta / 2) - 2 * (backwheeldist / traveledodomtheta - backwheeldisplacement) * cos(traveledodomtheta / 2);
+	y = prevy + 2 * (leftwheeldist / traveledodomtheta + leftwheeldisplacement) * cos(traveledodomtheta / 2) + 2 * (backwheeldist / traveledodomtheta - backwheeldisplacement) * sin(traveledodomtheta / 2);
+	prevx = x;
+	prevy = y;
+	thetanot = 0;
+  }
 }
 
 // "when driver control" hat block
