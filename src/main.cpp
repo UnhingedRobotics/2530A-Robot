@@ -177,15 +177,20 @@ void odometry() {
   float leftwheeldist;
   float backwheeldist;
   float traveledodomtheta;
+  float lefthypohypo;
+  float backhypohypo;
   float thetanot = 90;
   float prevx = 0;
   float prevy = 0;
   while (tracking) {
     leftwheeldist = leftwheelrotation.position(rpm) * pi * odomwheeldiameter / 360;
     backwheeldist = backwheelrotation.position(rpm) * pi * odomwheeldiameter / 360;
-	traveledodomtheta = (((Inertial9.rotation(degrees) + thetanot) * -1) % 360) * pi / 180;
-	x = prevx + 2 * (leftwheeldist / traveledodomtheta + leftwheeldisplacement) * sin(traveledodomtheta / 2) - 2 * (backwheeldist / traveledodomtheta - backwheeldisplacement) * cos(traveledodomtheta / 2);
-	y = prevy + 2 * (leftwheeldist / traveledodomtheta + leftwheeldisplacement) * cos(traveledodomtheta / 2) + 2 * (backwheeldist / traveledodomtheta - backwheeldisplacement) * sin(traveledodomtheta / 2);
+	traveledreverseodomtheta = (((Inertial9.rotation(degrees) + thetanot) * -1) % 360) * pi / 180;
+	traveledodomtheta = ((Inertial9.rotation(degrees) + thetanot) % 360) * pi / 180;
+	lefthypohypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
+	backhypohypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
+	x = prevx + lefthypohypo * cos(traveledodomtheta) - backhypohypo * sin(traveledodomtheta); 
+	y = prevy + lefthypohypo * sin(traveledodomtheta) + backhypohypo * cos(traveledodomtheta); 
 	prevx = x;
 	prevy = y;
 	thetanot = 0;
