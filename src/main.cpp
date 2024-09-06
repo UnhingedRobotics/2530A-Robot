@@ -23,16 +23,16 @@ enum gameElements {
 };
 
 controller Controller1 = controller(primary);
-motor intakeMotorA = motor(PORT2, ratio18_1, true);
-motor intakeMotorB = motor(PORT3, ratio18_1, false);
+motor intakeMotorA = motor(PORT17, ratio18_1, false);
+motor intakeMotorB = motor(PORT14, ratio18_1, true);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
-motor leftdriveMotorA = motor(PORT19, ratio6_1, false);
-motor leftdriveMotorB = motor(PORT20, ratio6_1, true);
+motor leftdriveMotorA = motor(PORT18, ratio6_1, true);
+motor leftdriveMotorB = motor(PORT19, ratio6_1, true);
 motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB);
 
-motor rightdriveMotorA = motor(PORT11, ratio6_1, false);
-motor rightdriveMotorB = motor(PORT12, ratio6_1, true);
+motor rightdriveMotorA = motor(PORT13, ratio6_1, false);
+motor rightdriveMotorB = motor(PORT12, ratio6_1, false);
 motor_group rightdrive = motor_group(rightdriveMotorA, rightdriveMotorB);
 
 // AI Vision Color Descriptions
@@ -90,11 +90,10 @@ const float leftwheeldisplacement = 4;
 const float backwheeldisplacement = 4;
 float theta;
 float dist;
-float leftvelocity;
-float rightvelocity;
 float x;
 float y;
 bool tracking;
+
 
 void PID_dist(float dist) {
   const float kpdist = 0.1;
@@ -104,6 +103,8 @@ void PID_dist(float dist) {
   float derivativedist;
   float traveleddist;
   float preverrordist = 0;
+  rightdrive.spin(forward);
+  leftdrive.spin(forward);
 
   while (fabs(errordist) < 1) {
     traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360;
@@ -125,6 +126,8 @@ void PID_theta(float theta) {
   float derivativetheta;
   float traveledtheta;
   float preverrortheta = 0;
+  rightdrive.spin(forward);
+  leftdrive.spin(forward);
 
   while (fabs(errortheta) < 1) {
     traveledtheta = Inertial13.rotation(degrees);
@@ -195,6 +198,8 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  rightdrive.setVelocity(0, percent);
+  leftdrive.setVelocity(0, percent);
   PID_dist(10);
   PID_theta(10);
   // ..........................................................................
@@ -213,13 +218,20 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // User control code here, inside the loop
+  rightdrive.spin(forward);
+  leftdrive.spin(forward);
+  rightdrive.setVelocity(0, percent);
+  leftdrive.setVelocity(0, percent);
+  constexpr int32_t DEADBAND = 20;
   while (1) {
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
-    rightvelocity = Controller1.Axis2.position() * 0.7874015748;
-    leftvelocity = Controller1.Axis3.position() * 0.7874015748;
+    int32_t rightvelocity = Controller1.Axis2.position();
+    int32_t leftvelocity = Controller1.Axis3.position();
+    if (abs(leftvelocity) < DEADBAND) leftvelocity = 0;
+    if (abs(rightvelocity) < DEADBAND) rightvelocity = 0;
+
     rightdrive.setVelocity(rightvelocity, percent);
     leftdrive.setVelocity(leftvelocity, percent);
     if (Controller1.ButtonR1.pressing()) {
