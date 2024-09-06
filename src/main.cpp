@@ -1,31 +1,19 @@
-#pragma region VEXcode Generated Robot Configuration
-// Make sure all required headers are included.
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#include <string.h>
-
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       Admin                                                     */
+/*    Created:      9/6/2024, 1:49:45 PM                                      */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
 
 #include "vex.h"
 
 using namespace vex;
 
-// Brain should be defined by default
+// A global instance of competition
+competition Competition;
 brain Brain;
-
-
-// START V5 MACROS
-#define waitUntil(condition)                                                   \
-  do {                                                                         \
-    wait(5, msec);                                                             \
-  } while (!(condition))
-
-#define repeat(iterations)                                                     \
-  for (int iterator = 0; iterator < iterations; iterator++)
-// END V5 MACROS
-
-
 // Robot configuration code.
 // AI Classification Competition Element IDs
 enum gameElements {
@@ -39,24 +27,25 @@ motor intakeMotorA = motor(PORT2, ratio18_1, true);
 motor intakeMotorB = motor(PORT3, ratio18_1, false);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
-motor leftdriveMotorA = motor(PORT4, ratio6_1, false);
-motor leftdriveMotorB = motor(PORT5, ratio6_1, false);
+motor leftdriveMotorA = motor(PORT19, ratio6_1, false);
+motor leftdriveMotorB = motor(PORT20, ratio6_1, true);
 motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB);
 
-motor rightdriveMotorA = motor(PORT6, ratio6_1, false);
-motor rightdriveMotorB = motor(PORT7, ratio6_1, false);
+motor rightdriveMotorA = motor(PORT11, ratio6_1, false);
+motor rightdriveMotorB = motor(PORT12, ratio6_1, true);
 motor_group rightdrive = motor_group(rightdriveMotorA, rightdriveMotorB);
 
 // AI Vision Color Descriptions
 // AI Vision Code Descriptions
 vex::aivision AIVision8(PORT8, aivision::ALL_AIOBJS);
 
-inertial Inertial9 = inertial(PORT9);
+inertial Inertial13 = inertial(PORT13);
 
 rotation leftwheelrotation = rotation(PORT10, false);
 
-rotation backwheelrotation = rotation(PORT11, false);
+rotation backwheelrotation = rotation(PORT18, false);
 
+digital_out goalclamp = digital_out(Brain.ThreeWirePort.H);
 
 // generating and setting random seed
 void initializeRandomSeed(){
@@ -92,16 +81,6 @@ void playVexcodeSound(const char *soundName) {
 // define variable for remote controller enable/disable
 bool RemoteControlCodeEnabled = true;
 
-#pragma endregion VEXcode Generated Robot Configuration
-
-// Include the V5 Library
-#include "vex.h"
-  
-// Allows for easier use of the VEX Library
-using namespace vex;
-
-competition Competition;
-
 int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVision8_objectIndex = 0;
 
 const float pi = 3.14159265359;
@@ -116,20 +95,6 @@ float rightvelocity;
 float x;
 float y;
 bool tracking;
-
-
-// "when started" hat block
-int whenStarted1() {
-  return 0;
-}
-
-// "when autonomous" hat block
-int onauton_autonomous_0() {
-  PID_dist(10);
-  PID_theta(10);
-  tracking = false;
-  return 0;
-}
 
 void PID_dist(float dist) {
   const float kpdist = 0.1;
@@ -162,7 +127,7 @@ void PID_theta(float theta) {
   float preverrortheta = 0;
 
   while (fabs(errortheta) < 1) {
-    traveledtheta = Inertial9.rotation(degrees);
+    traveledtheta = Inertial13.rotation(degrees);
     errortheta = theta - traveledtheta;
     proportionaltheta = (errortheta * kptheta);
     derivativetheta = (preverrortheta - errortheta) * kdtheta;
@@ -177,29 +142,82 @@ void odometry() {
   float leftwheeldist;
   float backwheeldist;
   float traveledodomtheta;
+  float traveledreverseodomtheta;
   float lefthypo;
   float backhypo;
   float thetanot = 90;
   float prevx = 0;
   float prevy = 0;
   while (tracking) {
-    leftwheeldist = leftwheelrotation.position(rpm) * pi * odomwheeldiameter / 360;
-    backwheeldist = backwheelrotation.position(rpm) * pi * odomwheeldiameter / 360;
-	traveledreverseodomtheta = (((Inertial9.rotation(degrees) + thetanot) * -1) % 360) * pi / 180;
-	traveledodomtheta = ((Inertial9.rotation(degrees) + thetanot) % 360) * pi / 180;
-	lefthypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
-	backhypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
-	x = prevx + lefthypo * cos(traveledodomtheta) - backhypo * sin(traveledodomtheta); 
-	y = prevy + lefthypo * sin(traveledodomtheta) + backhypo * cos(traveledodomtheta); 
-	prevx = x;
-	prevy = y;
-	thetanot = 0;
+    leftwheeldist = leftwheelrotation.position(degrees) * pi * odomwheeldiameter / 360;
+    backwheeldist = backwheelrotation.position(degrees) * pi * odomwheeldiameter / 360;
+    traveledreverseodomtheta = fmod((Inertial13.rotation(degrees) + thetanot) * -1, 360) * pi / 180;
+    traveledodomtheta = fmod((Inertial13.rotation(degrees) + thetanot), 360) * pi / 180;
+    lefthypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
+    backhypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
+    x = prevx + lefthypo * cos(traveledodomtheta) - backhypo * sin(traveledodomtheta); 
+    y = prevy + lefthypo * sin(traveledodomtheta) + backhypo * cos(traveledodomtheta); 
+    prevx = x;
+    prevy = y;
+    thetanot = 0;
   }
 }
 
-// "when driver control" hat block
-int ondriver_drivercontrol_0() {
-  while (true) {
+
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
+
+void pre_auton(void) {
+  tracking = false;
+  leftwheelrotation.setPosition(0, degrees);
+  backwheelrotation.setPosition(0, degrees);
+  Inertial13.setRotation(0, degrees);
+  Inertial13.setHeading(0, degrees);
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              Autonomous Task                              */
+/*                                                                           */
+/*  This task is used to control your robot during the autonomous phase of   */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+void autonomous(void) {
+  PID_dist(10);
+  PID_theta(10);
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              User Control Task                            */
+/*                                                                           */
+/*  This task is used to control your robot during the user control phase of */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+void usercontrol(void) {
+  // User control code here, inside the loop
+  while (1) {
+    // This is the main execution loop for the user control program.
+    // Each time through the loop your program should update motor + servo
+    // values based on feedback from the joysticks.
     rightvelocity = Controller1.Axis2.position() * 0.7874015748;
     leftvelocity = Controller1.Axis3.position() * 0.7874015748;
     rightdrive.setVelocity(rightvelocity, percent);
@@ -210,12 +228,23 @@ int ondriver_drivercontrol_0() {
     if (Controller1.ButtonR2.pressing()) {
       intake.stop();
     }
+    if (Controller1.ButtonR1.pressing()) {
+      intake.spin(forward, 100, percent);
+    }
+    if (Controller1.ButtonL1.pressing()) {
+      goalclamp.set(true);
+    }
+    if (Controller1.ButtonL2.pressing()) {
+      goalclamp.set(false);
+    }
     AIVision8.takeSnapshot(aivision::ALL_AIOBJS);
     if (AIVision8.objectCount > 0 && AIVision8.objects[AIVision8_objectIndex].width > 70.0) {
       if (AIVision8.objects[AIVision8_objectIndex].id == mobileGoal) {
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1, 1);
         Brain.Screen.print("Mobile Goal");
+        goalclamp.set(true);
+
       }
       if (AIVision8.objects[AIVision8_objectIndex].id == redRing) {
         Brain.Screen.clearScreen();
@@ -228,44 +257,32 @@ int ondriver_drivercontrol_0() {
         Brain.Screen.print("Bluering");
       }
     }
-    wait(5, msec);
+    else {
+      goalclamp.set(false);
+    }
+    // ........................................................................
+    // Insert user code here. This is where you use the joystick values to
+    // update your motors, etc.
+    // ........................................................................
+
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
   }
-  return 0;
 }
 
-void VEXcode_driver_task() {
-  // Start the driver control tasks....
-  vex::task drive0(ondriver_drivercontrol_0);
-  while(Competition.isDriverControl() && Competition.isEnabled()) {this_thread::sleep_for(10);}
-  drive0.stop();
-
-  return;
-}
-
-void VEXcode_auton_task() {
-  // Start the auton control tasks....
-  vex::task auto0(onauton_autonomous_0);
-  while(Competition.isAutonomous() && Competition.isEnabled()) {this_thread::sleep_for(10);}
-  auto0.stop();
-  return;
-}
-
+//
+// Main will set up the competition functions and callbacks.
+//
 int main() {
-  vex::competition::bStopTasksBetweenModes = false;
-  Competition.autonomous(VEXcode_auton_task);
-  Competition.drivercontrol(VEXcode_driver_task);
+  // Set up callbacks for autonomous and driver control periods.
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 
-  // Initializing Robot Configuration. DO NOT REMOVE!
-  vexcodeInit();
+  // Run the pre-autonomous function.
+  pre_auton();
 
-  // post event registration
-
-  // set default print color to black
-  printf("\033[30m");
-
-  // wait for rotation sensor to fully initialize
-  wait(30, msec);
-
-  whenStarted1();
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
+  }
 }
-
