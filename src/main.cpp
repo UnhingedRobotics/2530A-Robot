@@ -96,26 +96,40 @@ bool tracking;
 
 
 void PID_dist(float dist) {
-  const float kpdist = 5;
-  const float kddist = 5;
+  leftdrive.setPosition(0, degrees);
+  rightdrive.setPosition(0, degrees);
+  const float kpdist = 2;
+  const float kddist = 1;
   float errordist = 100;
-  float proportionaldist; 
-  float derivativedist;
-  float traveleddist;
+  bool first = true;
+  float proportionaldist = 0; 
+  float derivativedist = 0;
+  float traveleddist = 0;
   float preverrordist = 0;
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errordist) < 1) {
-    traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360;
+  while (fabs(errordist) > 0.1) {
+    if (first) {
+      traveleddist = 0;
+    }
+    else {
+      traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360;
+    }
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.print(traveleddist);
     errordist = dist - traveleddist;
     proportionaldist = (errordist * kpdist);
     derivativedist = (preverrordist - errordist) * kddist;
     leftdrive.spin(forward, proportionaldist + derivativedist, volt);
     rightdrive.spin(forward, proportionaldist + derivativedist, volt);
     preverrordist = errordist;
+    first = false;
     wait(5, msec);
   }
+  leftdrive.stop(brake);
+  rightdrive.stop(brake);
 }
 
 void PID_theta(float theta) {
@@ -129,7 +143,7 @@ void PID_theta(float theta) {
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errortheta) < 1) {
+  while (fabs(errortheta) > 1) {
     traveledtheta = Inertial13.rotation(degrees);
     errortheta = theta - traveledtheta;
     proportionaltheta = (errortheta * kptheta);
@@ -179,6 +193,8 @@ void odometry() {
 
 void pre_auton(void) {
   tracking = false;
+  leftdrive.setPosition(0, degrees);
+  rightdrive.setPosition(0, degrees);
   leftwheelrotation.setPosition(0, degrees);
   backwheelrotation.setPosition(0, degrees);
   Inertial13.setRotation(0, degrees);
@@ -200,7 +216,7 @@ void pre_auton(void) {
 void autonomous(void) {
   rightdrive.setVelocity(0, percent);
   leftdrive.setVelocity(0, percent);
-  PID_dist(3);
+  PID_dist(14);
   // PID_theta(90);
   // ..........................................................................
   // Insert autonomous user code here.
