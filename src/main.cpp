@@ -96,8 +96,8 @@ bool tracking;
 
 
 void PID_dist(float dist) {
-  const float kpdist = 0.1;
-  const float kddist = 0.1;
+  const float kpdist = 5;
+  const float kddist = 5;
   float errordist = 100;
   float proportionaldist; 
   float derivativedist;
@@ -114,8 +114,8 @@ void PID_dist(float dist) {
     leftdrive.spin(forward, proportionaldist + derivativedist, volt);
     rightdrive.spin(forward, proportionaldist + derivativedist, volt);
     preverrordist = errordist;
+    wait(5, msec);
   }
-  wait(5, msec);
 }
 
 void PID_theta(float theta) {
@@ -137,8 +137,8 @@ void PID_theta(float theta) {
     leftdrive.spin(forward, -1 * (proportionaltheta + derivativetheta), volt);
     rightdrive.spin(forward, proportionaltheta + derivativetheta, volt);
     preverrortheta = errortheta;
+    wait(5, msec);
   }
-  wait(5, msec);
 }
 
 void odometry() {
@@ -200,8 +200,8 @@ void pre_auton(void) {
 void autonomous(void) {
   rightdrive.setVelocity(0, percent);
   leftdrive.setVelocity(0, percent);
-  PID_dist(10);
-  PID_theta(10);
+  PID_dist(3);
+  // PID_theta(90);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -269,9 +269,9 @@ void usercontrol(void) {
         Brain.Screen.print("Bluering");
       }
     }
-    else {
-      goalclamp.set(false);
-    }
+    // else {
+      // goalclamp.set(false);
+    // }
     // ........................................................................
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
