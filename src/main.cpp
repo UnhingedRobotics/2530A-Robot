@@ -23,7 +23,7 @@ enum gameElements {
 };
 
 controller Controller1 = controller(primary);
-motor intakeMotorA = motor(PORT17, ratio6_1, false);
+motor intakeMotorA = motor(PORT20, ratio6_1, false);
 motor intakeMotorB = motor(PORT12, ratio6_1, true);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
@@ -32,18 +32,18 @@ motor leftdriveMotorB = motor(PORT19, ratio6_1, true);
 motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB);
 
 motor rightdriveMotorA = motor(PORT13, ratio6_1, false);
-motor rightdriveMotorB = motor(PORT14, ratio6_1, false);
+motor rightdriveMotorB = motor(PORT12, ratio6_1, false);
 motor_group rightdrive = motor_group(rightdriveMotorA, rightdriveMotorB);
 
 // AI Vision Color Descriptions
 // AI Vision Code Descriptions
-vex::aivision AIVision8(PORT8, aivision::ALL_AIOBJS);
+vex::aivision AIVision8(PORT11, aivision::ALL_AIOBJS);
 
 inertial Inertial13 = inertial(PORT15);
 
-rotation leftwheelrotation = rotation(PORT10, false);
+rotation leftwheelrotation = rotation(PORT16, false);
 
-rotation backwheelrotation = rotation(PORT18, false);
+rotation backwheelrotation = rotation(PORT17, false);
 
 digital_out goalclamp = digital_out(Brain.ThreeWirePort.H);
 
@@ -117,13 +117,13 @@ void PID_dist(float dist, float kpdist, float kddist, float kidist, float slewra
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errordist) > 0.1) {
+  while (fabs(errordist) > 0.1 || velocitydist > 2) {
     prevvelocitydist = velocitydist;
     if (firstdist) {
       traveleddist = 0;
     }
     else {
-      traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360 * 0.86111111111;
+      traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360 * 0.87192816635;
     }
     Brain.Screen.clearScreen();
     Brain.Screen.setCursor(1, 1);
@@ -135,7 +135,7 @@ void PID_dist(float dist, float kpdist, float kddist, float kidist, float slewra
     if (fabs(integraldist) > 50) {
       integraldist = 50;
     }
-    if (fabs(integraldist) < 0.5) {
+    if (fabs(integraldist) < 0.2) {
       integraldist = 0;
     }
     velocitydist = proportionaldist + derivativedist + integraldist;
@@ -151,11 +151,11 @@ void PID_dist(float dist, float kpdist, float kddist, float kidist, float slewra
     rightdrive.spin(forward, velocitydist, volt);
     preverrordist = errordist;
     firstdist = false;
-    wait(20, msec);
+    wait(5, msec);
     Brain.Screen.print(" time: %f", Brain.Timer.time(seconds));
   }
-  leftdrive.stop(coast);
-  rightdrive.stop(coast);
+  leftdrive.stop(brake);
+  rightdrive.stop(brake);
 }
 
 void PID_theta(float theta, float kptheta, float kdtheta, float kitheta) {
@@ -166,30 +166,31 @@ void PID_theta(float theta, float kptheta, float kdtheta, float kitheta) {
   float integraltheta = 0;
   float traveledtheta = 0;
   float preverrortheta = 0;
-  Inertial13.setRotation(0, degrees);
+  float velocitytheta = 0;
+  // Inertial13.setRotation(0, degrees);
   leftdrive.setPosition(0, degrees);
   rightdrive.setPosition(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errortheta) > 1.2) {
+  while (fabs(errortheta) > 0.22) {
     if (firsttheta) {
 	    traveledtheta = 0;
 	  }
 	  else {
       if (traveledtheta > 0) {
-	      traveledtheta = Inertial13.rotation(degrees) + 2;
+	      traveledtheta = Inertial13.rotation(degrees) + 1;
       }
       else {
         if (traveledtheta == 0) {
           if (theta < 0) {
-	          traveledtheta = Inertial13.rotation(degrees) - 2;
+	          traveledtheta = Inertial13.rotation(degrees) - 1;
           }
           else {
-	          traveledtheta = Inertial13.rotation(degrees) + 2;
+	          traveledtheta = Inertial13.rotation(degrees) + 1;
           }
         }
-	      traveledtheta = Inertial13.rotation(degrees) - 2;
+	      traveledtheta = Inertial13.rotation(degrees) - 1;
       }
 	  }
     Brain.Screen.clearScreen();
@@ -205,11 +206,12 @@ void PID_theta(float theta, float kptheta, float kdtheta, float kitheta) {
     if (fabs(integraltheta) < 2) {
       integraltheta = 0;
     }
-    leftdrive.spin(forward, (proportionaltheta + derivativetheta + integraltheta), volt);
-    rightdrive.spin(forward, -1 * (proportionaltheta + derivativetheta + integraltheta), volt);
+    velocitytheta = proportionaltheta + derivativetheta + integraltheta;
+    leftdrive.spin(forward, (velocitytheta), volt);
+    rightdrive.spin(forward, -1 * (velocitytheta), volt);
     preverrortheta = errortheta;
     firsttheta = false;
-    wait(20, msec);
+    wait(5, msec);
     Brain.Screen.print(" time: %f", Brain.Timer.time(seconds));
   }
   leftdrive.stop(coast);
@@ -277,10 +279,15 @@ void pre_auton(void) {
 void autonomous(void) {
   rightdrive.setVelocity(0, percent);
   leftdrive.setVelocity(0, percent);
-  // PID_dist(distance(inches), kp, kd);
-  PID_dist(36, 2, 1, 0.05, 25);
-  // PID_theta(global rotation(degrees), kp, kd);
-  // PID_theta(135, 0.22, 1.15, 0.07);
+  // PID_dist(distance(inches), kp, kd, ki, slewrate);
+  PID_dist(25, 6, 2.1, 0.05, 32);
+  wait(0.5, seconds);
+  // PID_theta(robot-centric rotation(degrees), kp, kd, ki);
+  PID_theta(-90, 0.22, 1.35, 0.2);
+  // wait(0.5, seconds);
+  PID_dist(26, 6, 2.1, 0.05, 32);
+  wait(0.5, seconds);
+  PID_theta(-180, 0.22, 1.35, 0.2);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
