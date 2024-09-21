@@ -23,29 +23,27 @@ enum gameElements {
 };
 
 controller Controller1 = controller(primary);
-motor intakeMotorA = motor(PORT20, ratio6_1, false);
-motor intakeMotorB = motor(PORT12, ratio6_1, true);
-motor_group intake = motor_group(intakeMotorA, intakeMotorB);
+motor intake = motor(PORT13, ratio18_1, false);
 
-motor leftdriveMotorA = motor(PORT18, ratio6_1, true);
-motor leftdriveMotorB = motor(PORT19, ratio6_1, true);
+motor leftdriveMotorA = motor(PORT15, ratio6_1, false);
+motor leftdriveMotorB = motor(PORT12, ratio6_1, false);
 motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB);
 
-motor rightdriveMotorA = motor(PORT13, ratio6_1, false);
-motor rightdriveMotorB = motor(PORT12, ratio6_1, false);
+motor rightdriveMotorA = motor(PORT14, ratio6_1, true);
+motor rightdriveMotorB = motor(PORT16, ratio6_1, true);
 motor_group rightdrive = motor_group(rightdriveMotorA, rightdriveMotorB);
 
 // AI Vision Color Descriptions
 // AI Vision Code Descriptions
-vex::aivision AIVision8(PORT11, aivision::ALL_AIOBJS);
+vex::aivision AIVision8(PORT3, aivision::ALL_AIOBJS);
 
-inertial Inertial13 = inertial(PORT15);
+inertial Inertial13 = inertial(PORT18);
 
-rotation leftwheelrotation = rotation(PORT16, false);
+rotation leftwheelrotation = rotation(PORT1, false);
 
-rotation backwheelrotation = rotation(PORT17, false);
+rotation backwheelrotation = rotation(PORT2, false);
 
-digital_out goalclamp = digital_out(Brain.ThreeWirePort.H);
+digital_out goalclamp = digital_out(Brain.ThreeWirePort.A);
 
 // generating and setting random seed
 void initializeRandomSeed(){
@@ -83,35 +81,35 @@ bool RemoteControlCodeEnabled = true;
 
 int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVision8_objectIndex = 0;
 
-const float pi = 3.14159265359;
-const float wheeldiameter = 3.25;
-const float odomwheeldiameter = 2;
-const float leftwheeldisplacement = 4;
-const float backwheeldisplacement = 4;
-float kpdist;
-float kddist;
-float kidist;
-float slewratedist;
-float kptheta;
-float kdtheta;
-float kitheta;
-float theta;
-float dist;
-float x;
-float y;
+const double pi = 3.14159265359;
+const double wheeldiameter = 3.25;
+const double odomwheeldiameter = 2;
+const double leftwheeldisplacement = 4;
+const double backwheeldisplacement = 4;
+double kpdist;
+double kddist;
+double kidist;
+double slewratedist;
+double kptheta;
+double kdtheta;
+double kitheta;
+double theta;
+double dist;
+double x;
+double y;
 bool tracking;
 
 
-void PID_dist(float dist, float kpdist, float kddist, float kidist, float slewratedist) {
+void PID_dist(double dist, double kpdist, double kddist, double kidist, double slewratedist) {
   bool firstdist = true;
-  float errordist = 100;
-  float proportionaldist = 0; 
-  float derivativedist = 0;
-  float integraldist = 0;
-  float traveleddist = 0;
-  float preverrordist = 0;
-  float velocitydist = 0;
-  float prevvelocitydist = 0;
+  double errordist = 100;
+  double proportionaldist = 0; 
+  double derivativedist = 0;
+  double integraldist = 0;
+  double traveleddist = 0;
+  double preverrordist = 0;
+  double velocitydist = 0;
+  double prevvelocitydist = 0;
   leftdrive.setPosition(0, degrees);
   rightdrive.setPosition(0, degrees);
   rightdrive.spin(forward);
@@ -132,10 +130,10 @@ void PID_dist(float dist, float kpdist, float kddist, float kidist, float slewra
     proportionaldist = (errordist * kpdist);
     derivativedist = (errordist - preverrordist) * kddist;
     integraldist = (errordist + preverrordist) * kitheta;
-    if (fabs(integraldist) > 50) {
-      integraldist = 50;
+    if (fabs(integraldist) > 12) {
+      integraldist = 12;
     }
-    if (fabs(integraldist) < 0.2) {
+    if (fabs(integraldist) < 1) {
       integraldist = 0;
     }
     velocitydist = proportionaldist + derivativedist + integraldist;
@@ -158,76 +156,107 @@ void PID_dist(float dist, float kpdist, float kddist, float kidist, float slewra
   rightdrive.stop(brake);
 }
 
-void PID_theta(float theta, float kptheta, float kdtheta, float kitheta) {
+void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
   bool firsttheta = true;
-  float errortheta = 100;
-  float proportionaltheta = 0; 
-  float derivativetheta = 0;
-  float integraltheta = 0;
-  float traveledtheta = 0;
-  float preverrortheta = 0;
-  float velocitytheta = 0;
+  double errortheta = 100;
+  double proportionaltheta = 0; 
+  double derivativetheta = 0;
+  double integraltheta = 0;
+  double traveledtheta = 0;
+  double preverrortheta = 0;
+  double velocitytheta = 0;
+  Inertial13.setRotation(0, degrees);
+  Inertial13.setHeading(0, degrees);
   // Inertial13.setRotation(0, degrees);
   leftdrive.setPosition(0, degrees);
   rightdrive.setPosition(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errortheta) > 0.22) {
+  while (fabs(errortheta) > 0.5) {
     if (firsttheta) {
 	    traveledtheta = 0;
 	  }
 	  else {
       if (traveledtheta > 0) {
-	      traveledtheta = Inertial13.rotation(degrees) + 1;
+	      traveledtheta = Inertial13.rotation(degrees);
       }
       else {
         if (traveledtheta == 0) {
           if (theta < 0) {
-	          traveledtheta = Inertial13.rotation(degrees) - 1;
+	          traveledtheta = Inertial13.rotation(degrees);
           }
           else {
-	          traveledtheta = Inertial13.rotation(degrees) + 1;
+	          traveledtheta = Inertial13.rotation(degrees);
           }
         }
-	      traveledtheta = Inertial13.rotation(degrees) - 1;
+	      traveledtheta = Inertial13.rotation(degrees);
       }
 	  }
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("rotation: %f", traveledtheta);
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print("rotation: %f", traveledtheta);
+    // Controller1.Screen.print("error: %f", errortheta);
     errortheta = theta - traveledtheta;
     proportionaltheta = (errortheta * kptheta);
     derivativetheta = (errortheta - preverrortheta) * kdtheta;
     integraltheta = (errortheta + preverrortheta) * kitheta;
-    if (fabs(integraltheta) > 50) {
-      integraltheta = 50;
+    if (integraltheta > 12) {
+      integraltheta = 12;
     }
-    if (fabs(integraltheta) < 2) {
+    if (integraltheta < 12) {
+      integraltheta = -12;
+    }
+    if (fabs(integraltheta) < 1) {
       integraltheta = 0;
+    }
+    if (theta > 0) {
+      if ((proportionaltheta + derivativetheta) < 0) {
+        if (fabs(derivativetheta) > 1) {
+          derivativetheta = -1 * proportionaltheta;
+        }
+      }
+    }
+    else {
+      if ((proportionaltheta + derivativetheta) > 0) {
+        if (fabs(derivativetheta) > 1) {
+          derivativetheta = -1 * proportionaltheta;
+        }
+      }
+    }
+
+    if (fabs(errortheta) < fabs(0.05 * theta)) {
+      integraltheta = 0;
+    }
+    else {
+      if (fabs(derivativetheta + proportionaltheta) < 1) {
+        integraltheta = 0;
+      }
     }
     velocitytheta = proportionaltheta + derivativetheta + integraltheta;
     leftdrive.spin(forward, (velocitytheta), volt);
     rightdrive.spin(forward, -1 * (velocitytheta), volt);
     preverrortheta = errortheta;
     firsttheta = false;
-    wait(5, msec);
-    Brain.Screen.print(" time: %f", Brain.Timer.time(seconds));
+    wait(2, msec);
+    // Controller1.Screen.print(" time: %f", Brain.Timer.time(seconds));
   }
+  leftdrive.spin(forward, 0, volt);
+  rightdrive.spin(forward, 0, volt);
   leftdrive.stop(coast);
   rightdrive.stop(coast);
 }
 
 void odometry() {
-  float leftwheeldist;
-  float backwheeldist;
-  float traveledodomtheta;
-  float traveledreverseodomtheta;
-  float lefthypo;
-  float backhypo;
-  float thetanot = 90;
-  float prevx = 0;
-  float prevy = 0;
+  double leftwheeldist;
+  double backwheeldist;
+  double traveledodomtheta;
+  double traveledreverseodomtheta;
+  double lefthypo;
+  double backhypo;
+  double thetanot = 90;
+  double prevx = 0;
+  double prevy = 0;
   while (tracking) {
     leftwheeldist = leftwheelrotation.position(degrees) * pi * odomwheeldiameter / 360;
     backwheeldist = backwheelrotation.position(degrees) * pi * odomwheeldiameter / 360;
@@ -260,6 +289,16 @@ void pre_auton(void) {
   rightdrive.setPosition(0, degrees);
   leftwheelrotation.setPosition(0, degrees);
   backwheelrotation.setPosition(0, degrees);
+  // Start calibration.
+  Inertial13.calibrate();
+  // Print that the Inertial Sensor is calibrating while
+  // waiting for it to finish calibrating.
+  while(Inertial13.isCalibrating()){
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.print("Inertial Calibrating");
+      wait(50, msec);
+  }
+
   Inertial13.setRotation(0, degrees);
   Inertial13.setHeading(0, degrees);
   // All activities that occur before the competition starts
@@ -279,15 +318,19 @@ void pre_auton(void) {
 void autonomous(void) {
   rightdrive.setVelocity(0, percent);
   leftdrive.setVelocity(0, percent);
+  while(Inertial13.isCalibrating()){
+      wait(50, msec);
+  }
+  
   // PID_dist(distance(inches), kp, kd, ki, slewrate);
-  PID_dist(25, 6, 2.1, 0.05, 32);
-  wait(0.5, seconds);
-  // PID_theta(robot-centric rotation(degrees), kp, kd, ki);
-  PID_theta(-90, 0.22, 1.35, 0.2);
+  // PID_dist(25, 6, 2.1, 0.05, 32);
   // wait(0.5, seconds);
-  PID_dist(26, 6, 2.1, 0.05, 32);
-  wait(0.5, seconds);
-  PID_theta(-180, 0.22, 1.35, 0.2);
+  // PID_theta(robot-centric rotation(degrees), kp, kd, ki);
+  PID_theta(-90, 0.17, 1.55, 0.08);
+  // wait(0.5, seconds);
+  // PID_dist(26, 6, 2.1, 0.05, 32);
+  // wait(0.5, seconds);
+  // PID_theta(-180, 0.22, 1.35, 0.2);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -304,6 +347,10 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  // Start calibration with the calibration time set to 3 seconds.
+  // Inertial13.calibrate(3);
+  Inertial13.setRotation(0, degrees);
+  Inertial13.setHeading(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
   rightdrive.setVelocity(0, percent);
@@ -363,6 +410,9 @@ void usercontrol(void) {
     // update your motors, etc.
     // ........................................................................
 
+    // Controller1.Screen.clearScreen();
+    // Controller1.Screen.setCursor(1, 1);
+    // Controller1.Screen.print("rotation: %f", Inertial13.rotation(degrees));
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
