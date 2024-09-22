@@ -23,25 +23,32 @@ enum gameElements {
 };
 
 controller Controller1 = controller(primary);
-motor intake = motor(PORT13, ratio18_1, false);
+motor intakeMotorA = motor(PORT13, ratio6_1, true);
+motor intakeMotorB = motor(PORT1, ratio6_1, false);
+motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
 motor leftdriveMotorA = motor(PORT15, ratio6_1, false);
 motor leftdriveMotorB = motor(PORT12, ratio6_1, false);
-motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB);
+motor leftdriveMotorC = motor(PORT13, ratio6_1, false);
+motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB, leftdriveMotorC);
 
 motor rightdriveMotorA = motor(PORT14, ratio6_1, true);
 motor rightdriveMotorB = motor(PORT16, ratio6_1, true);
-motor_group rightdrive = motor_group(rightdriveMotorA, rightdriveMotorB);
+motor rightdriveMotorC = motor(PORT19, ratio6_1, true);
+motor_group rightdrive = motor_group(rightdriveMotorA, rightdriveMotorB, rightdriveMotorC);
 
 // AI Vision Color Descriptions
 // AI Vision Code Descriptions
-vex::aivision AIVision8(PORT3, aivision::ALL_AIOBJS);
+vex::aivision AIVisionFront(PORT8, aivision::ALL_AIOBJS);
+vex::aivision AIVisionBack(PORT9, aivision::ALL_AIOBJS);
 
 inertial Inertial13 = inertial(PORT18);
 
-rotation leftwheelrotation = rotation(PORT1, false);
+rotation leftwheelrotation = rotation(PORT4, false);
 
 rotation backwheelrotation = rotation(PORT2, false);
+
+optical opticalSensor = optical(PORT3);
 
 digital_out goalclamp = digital_out(Brain.ThreeWirePort.A);
 
@@ -59,13 +66,11 @@ void initializeRandomSeed(){
 }
 
 
-
 void vexcodeInit() {
 
   //Initializing random seed.
   initializeRandomSeed(); 
 }
-
 
 // Helper to make playing sounds from the V5 in VEXcode easier and
 // keeps the code cleaner by making it clear what is happening.
@@ -74,12 +79,10 @@ void playVexcodeSound(const char *soundName) {
   wait(5, msec);
 }
 
-
-
 // define variable for remote controller enable/disable
 bool RemoteControlCodeEnabled = true;
 
-int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVision8_objectIndex = 0;
+int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVisionBack_objectIndex = 0;
 
 const double pi = 3.14159265359;
 const double wheeldiameter = 3.25;
@@ -165,15 +168,15 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
   double traveledtheta = 0;
   double preverrortheta = 0;
   double velocitytheta = 0;
-  Inertial13.setRotation(0, degrees);
-  Inertial13.setHeading(0, degrees);
+  // Inertial13.setRotation(0, degrees);
+  // Inertial13.setHeading(0, degrees);
   // Inertial13.setRotation(0, degrees);
   leftdrive.setPosition(0, degrees);
   rightdrive.setPosition(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errortheta) > 0.5) {
+  while (fabs(errortheta) > 0.2) {
     if (firsttheta) {
 	    traveledtheta = 0;
 	  }
@@ -194,45 +197,48 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
       }
 	  }
     Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(1, 1);
-    Controller1.Screen.print("rotation: %f", traveledtheta);
+    // Controller1.Screen.setCursor(1, 1);
+    // Controller1.Screen.print("rotation: %f", traveledtheta);
     // Controller1.Screen.print("error: %f", errortheta);
     errortheta = theta - traveledtheta;
     proportionaltheta = (errortheta * kptheta);
     derivativetheta = (errortheta - preverrortheta) * kdtheta;
     integraltheta = (errortheta + preverrortheta) * kitheta;
-    if (integraltheta > 12) {
-      integraltheta = 12;
+    if (integraltheta > 2) {
+      integraltheta = 2;
     }
-    if (integraltheta < 12) {
-      integraltheta = -12;
+    if (integraltheta < 2) {
+      integraltheta = -2;
     }
-    if (fabs(integraltheta) < 1) {
-      integraltheta = 0;
-    }
+    // if (fabs(integraltheta) < 0.5) {
+      // integraltheta = 0;
+    // }
     if (theta > 0) {
-      if ((proportionaltheta + derivativetheta) < 0) {
-        if (fabs(derivativetheta) > 1) {
+      if (derivativetheta < 0.5) {
+        if ((proportionaltheta + derivativetheta) < 0) {
           derivativetheta = -1 * proportionaltheta;
         }
       }
     }
     else {
-      if ((proportionaltheta + derivativetheta) > 0) {
-        if (fabs(derivativetheta) > 1) {
+      if (derivativetheta > 0.5) {
+        if ((proportionaltheta + derivativetheta) > 0) {
           derivativetheta = -1 * proportionaltheta;
         }
       }
     }
 
-    if (fabs(errortheta) < fabs(0.05 * theta)) {
-      integraltheta = 0;
-    }
-    else {
-      if (fabs(derivativetheta + proportionaltheta) < 1) {
+    if (fabs(errortheta) < fabs(0.1 * theta)) {
+      if (fabs(derivativetheta + proportionaltheta) > 1) {
         integraltheta = 0;
       }
     }
+    Controller1.Screen.setCursor(2, 1);
+    Controller1.Screen.print("integral: %f", integraltheta);
+    Controller1.Screen.setCursor(3, 1);
+    Controller1.Screen.print("proportional: %f", proportionaltheta);
+    Controller1.Screen.setCursor(4, 1);
+    Controller1.Screen.print("derivative: %f", derivativetheta);
     velocitytheta = proportionaltheta + derivativetheta + integraltheta;
     leftdrive.spin(forward, (velocitytheta), volt);
     rightdrive.spin(forward, -1 * (velocitytheta), volt);
@@ -326,7 +332,7 @@ void autonomous(void) {
   // PID_dist(25, 6, 2.1, 0.05, 32);
   // wait(0.5, seconds);
   // PID_theta(robot-centric rotation(degrees), kp, kd, ki);
-  PID_theta(-90, 0.17, 1.55, 0.08);
+  PID_theta(-90, 0.17, 1.55, 0.1);
   // wait(0.5, seconds);
   // PID_dist(26, 6, 2.1, 0.05, 32);
   // wait(0.5, seconds);
@@ -382,21 +388,21 @@ void usercontrol(void) {
     if (Controller1.ButtonL2.pressing()) {
       goalclamp.set(false);
     }
-    AIVision8.takeSnapshot(aivision::ALL_AIOBJS);
-    if (AIVision8.objectCount > 0 && AIVision8.objects[AIVision8_objectIndex].width > 70.0) {
-      if (AIVision8.objects[AIVision8_objectIndex].id == mobileGoal) {
+    AIVisionBack.takeSnapshot(aivision::ALL_AIOBJS);
+    if (AIVisionBack.objectCount > 0 && AIVisionBack.objects[AIVisionBack_objectIndex].width > 70.0) {
+      if (AIVisionBack.objects[AIVisionBack_objectIndex].id == mobileGoal) {
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1, 1);
         Brain.Screen.print("Mobile Goal");
         goalclamp.set(true);
 
       }
-      if (AIVision8.objects[AIVision8_objectIndex].id == redRing) {
+      if (AIVisionBack.objects[AIVisionBack_objectIndex].id == redRing) {
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1, 1);
         Brain.Screen.print("Redring");
       }
-      if (AIVision8.objects[AIVision8_objectIndex].id == blueRing) {
+      if (AIVisionBack.objects[AIVisionBack_objectIndex].id == blueRing) {
         Brain.Screen.clearScreen();
         Brain.Screen.setCursor(1, 1);
         Brain.Screen.print("Bluering");
