@@ -23,7 +23,7 @@ enum gameElements {
 };
 
 controller Controller1 = controller(primary);
-motor intakeMotorA = motor(PORT13, ratio6_1, true);
+motor intakeMotorA = motor(PORT4, ratio6_1, true);
 motor intakeMotorB = motor(PORT1, ratio6_1, false);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
@@ -374,8 +374,8 @@ void usercontrol(void) {
     rightvelocity = (rightvelocity != 0) ? (rightvelocity > 0 ? pow(rightvelocity, 2) : -pow(-rightvelocity, 2)) : 0;
 
     // Scale the velocity to a percentage range (0-100)
-    leftvelocity = std::min(std::max(leftvelocity / 127.0 * 100, -100.0), 100.0);
-    rightvelocity = std::min(std::max(rightvelocity / 127.0 * 100, -100.0), 100.0);
+    leftvelocity = fmin(fmax(leftvelocity / 127.0 * 100, -100.0), 100.0);
+    rightvelocity = fmin(fmax(rightvelocity / 127.0 * 100, -100.0), 100.0);
 
     rightdrive.setVelocity(rightvelocity, percent);
     leftdrive.setVelocity(leftvelocity, percent);
@@ -387,15 +387,16 @@ void usercontrol(void) {
       intakeVelocity = 30; // Start at 30%
     } else {
       // Scale intake based on the maximum drivetrain speed
-      int32_t maxDrivetrainSpeed = std::max(abs(rightvelocity), abs(leftvelocity));
+      int32_t maxDrivetrainSpeed = (abs(rightvelocity) + abs(leftvelocity)) / 2;
       intakeVelocity = 30 + (maxDrivetrainSpeed * (100 - 30) / 100); // Scale to 100%
     }
 
     // Set the intake velocity
     if (Controller1.ButtonR1.pressing()) {
       intake.spin(forward, intakeVelocity, percent);
-    } else {
-      intake.stop();
+    }
+    if (intake.velocity(percent) > 30) {
+      intake.spin(forward, intakeVelocity, percent);
     }
 
     if (Controller1.ButtonR2.pressing()) {
