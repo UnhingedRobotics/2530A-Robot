@@ -213,7 +213,7 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
     // if (fabs(integraltheta) < 0.5) {
       // integraltheta = 0;
     // }
-    if (theta > 0) {
+    if (errortheta > 0) {
       if (derivativetheta < 0.5) {
         if ((proportionaltheta + derivativetheta) < 0) {
           derivativetheta = -1 * proportionaltheta;
@@ -353,34 +353,53 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // Start calibration with the calibration time set to 3 seconds.
-  // Inertial13.calibrate(3);
   Inertial13.setRotation(0, degrees);
   Inertial13.setHeading(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
   rightdrive.setVelocity(0, percent);
   leftdrive.setVelocity(0, percent);
-  constexpr int32_t DEADBAND = 20;
+  constexpr int32_t DEADBAND = 5;
+
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
     int32_t rightvelocity = Controller1.Axis2.position();
     int32_t leftvelocity = Controller1.Axis3.position();
+
+    // Apply deadband
     if (abs(leftvelocity) < DEADBAND) leftvelocity = 0;
     if (abs(rightvelocity) < DEADBAND) rightvelocity = 0;
 
+    // Apply exponential scaling
+    leftvelocity = (leftvelocity != 0) ? (leftvelocity > 0 ? pow(leftvelocity, 2) : -pow(-leftvelocity, 2)) : 0;
+    rightvelocity = (rightvelocity != 0) ? (rightvelocity > 0 ? pow(rightvelocity, 2) : -pow(-rightvelocity, 2)) : 0;
+
+    // Scale the velocity to a percentage range (0-100)
+    leftvelocity = std::min(std::max(leftvelocity / 127.0 * 100, -100.0), 100.0);
+    rightvelocity = std::min(std::max(rightvelocity / 127.0 * 100, -100.0), 100.0);
+
     rightdrive.setVelocity(rightvelocity, percent);
     leftdrive.setVelocity(leftvelocity, percent);
-    if (Controller1.ButtonR1.pressing()) {
-      intake.spin(forward, 100, percent);
+
+    // Calculate intake velocity based on drivetrain speed
+    int32_t intakeVelocity;
+    if (rightvelocity == 0 && leftvelocity == 0) {
+      // Robot is stationary
+      intakeVelocity = 30; // Start at 30%
+    } else {
+      // Scale intake based on the maximum drivetrain speed
+      int32_t maxDrivetrainSpeed = std::max(abs(rightvelocity), abs(leftvelocity));
+      intakeVelocity = 30 + (maxDrivetrainSpeed * (100 - 30) / 100); // Scale to 100%
     }
-    if (Controller1.ButtonR2.pressing()) {
+
+    // Set the intake velocity
+    if (Controller1.ButtonR1.pressing()) {
+      intake.spin(forward, intakeVelocity, percent);
+    } else {
       intake.stop();
     }
-    if (Controller1.ButtonR1.pressing()) {
-      intake.spin(forward, 100, percent);
+
+    if (Controller1.ButtonR2.pressing()) {
+      intake.stop();
     }
     if (Controller1.ButtonL1.pressing()) {
       goalclamp.set(true);
@@ -388,6 +407,7 @@ void usercontrol(void) {
     if (Controller1.ButtonL2.pressing()) {
       goalclamp.set(false);
     }
+
     AIVisionBack.takeSnapshot(aivision::ALL_AIOBJS);
     if (AIVisionBack.objectCount > 0 && AIVisionBack.objects[AIVisionBack_objectIndex].width > 70.0) {
       if (AIVisionBack.objects[AIVisionBack_objectIndex].id == mobileGoal) {
@@ -395,7 +415,6 @@ void usercontrol(void) {
         Brain.Screen.setCursor(1, 1);
         Brain.Screen.print("Mobile Goal");
         goalclamp.set(true);
-
       }
       if (AIVisionBack.objects[AIVisionBack_objectIndex].id == redRing) {
         Brain.Screen.clearScreen();
@@ -408,19 +427,8 @@ void usercontrol(void) {
         Brain.Screen.print("Bluering");
       }
     }
-    // else {
-      // goalclamp.set(false);
-    // }
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
 
-    // Controller1.Screen.clearScreen();
-    // Controller1.Screen.setCursor(1, 1);
-    // Controller1.Screen.print("rotation: %f", Inertial13.rotation(degrees));
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+    wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
 
