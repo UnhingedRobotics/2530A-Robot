@@ -89,9 +89,11 @@ const double wheeldiameter = 3.25;
 const double odomwheeldiameter = 2;
 const double leftwheeldisplacement = 4;
 const double backwheeldisplacement = 4;
+const double rpmdrive = 450;
 double kpdist;
 double kddist;
 double kidist;
+double timeouttheta;
 double slewratedist;
 double kptheta;
 double kdtheta;
@@ -103,63 +105,79 @@ double y;
 bool tracking;
 
 
-void PID_dist(double dist, double kpdist, double kddist, double kidist, double slewratedist) {
+void PID_dist(double dist, double kpdist, double kddist, double kidist) {
   bool firstdist = true;
   double errordist = 100;
   double proportionaldist = 0; 
   double derivativedist = 0;
   double integraldist = 0;
-  double traveleddist = 0;
+  double traveldist = 0;
   double preverrordist = 0;
   double velocitydist = 0;
-  double prevvelocitydist = 0;
+
+  // Assuming the wheel diameter is in inches
+  // double wheelcircumference = pi * wheeldiameter; // Circumference in inches
+
+  // Calculate the time required to turn the specified angle
+
+  // double timeToMove = (fabs(dist)) * (wheelcircumference / (rpmdrive * 0.5 * 60.0)); // Time in seconds
   leftdrive.setPosition(0, degrees);
   rightdrive.setPosition(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errordist) > 0.1 || velocitydist > 2) {
-    prevvelocitydist = velocitydist;
+  // Start timer
+  double starttime = Brain.Timer.time(seconds);
+
+  while (fabs(errordist) > 0.05) {
+      // Timeout check
+      // if (Brain.Timer.time(seconds) - starttime > timeToMove) {
+          // break; // Exit the loop if the timeout is reached
+      // }
+
     if (firstdist) {
-      traveleddist = 0;
+      traveldist = 0;
     }
     else {
-      traveleddist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360 * 0.87192816635;
+      traveldist = (leftdrive.position(degrees) + rightdrive.position(degrees)) / 2 * pi * wheeldiameter / 360 * 0.87192816635;
     }
-    Brain.Screen.clearScreen();
-    Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print(traveleddist);
-    errordist = dist - traveleddist;
-    proportionaldist = (errordist * kpdist);
-    derivativedist = (errordist - preverrordist) * kddist;
-    integraldist = (errordist + preverrordist) * kitheta;
-    if (fabs(integraldist) > 12) {
-      integraldist = 12;
-    }
-    if (fabs(integraldist) < 1) {
-      integraldist = 0;
-    }
-    velocitydist = proportionaldist + derivativedist + integraldist;
-    if ((velocitydist - prevvelocitydist) > slewratedist) {
-      velocitydist = prevvelocitydist + slewratedist;
-    }
-    else {
-      if ((velocitydist - prevvelocitydist) < (-1 * slewratedist)) {
-        velocitydist = prevvelocitydist + slewratedist;
+      
+      Controller1.Screen.clearScreen();
+      // controller1.screen.setCursor(1, 1);
+      // controller1.screen.print("rotation: %f", traveldist);
+      // controller1.screen.print("error: %f", errordist);
+      errordist = dist - traveldist;
+      proportionaldist = (errordist * kpdist);
+      derivativedist = (errordist - preverrordist) * kddist;
+      integraldist = (errordist + preverrordist) * kidist;
+      if (integraldist > 3) {
+          integraldist = 3;
       }
-    }
-    leftdrive.spin(forward, velocitydist, volt);
-    rightdrive.spin(forward, velocitydist, volt);
-    preverrordist = errordist;
-    firstdist = false;
-    wait(5, msec);
-    Brain.Screen.print(" time: %f", Brain.Timer.time(seconds));
+      if (integraldist < -3) {
+          integraldist = -3;
+      }
+      
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.print("integral: %f", integraldist);
+      Controller1.Screen.setCursor(2, 1);
+      Controller1.Screen.print("proportional: %f", proportionaldist);
+      Controller1.Screen.setCursor(3, 1);
+      Controller1.Screen.print("derivative: %f", derivativedist);
+      velocitydist = proportionaldist + derivativedist + integraldist;
+      leftdrive.spin(forward, (velocitydist), volt);
+      rightdrive.spin(forward, (velocitydist), volt);
+      preverrordist = errordist;
+      firstdist = false;
+      wait(2, msec);
+      // controller1.screen.print(" time: %f", brain.timer.time(seconds));
+
   }
+  leftdrive.setVelocity(0, percent);
+  rightdrive.setVelocity(0, percent);
   leftdrive.stop(brake);
   rightdrive.stop(brake);
 }
-
-void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
+void PID_theta(double theta, double kptheta, double kdtheta, double kitheta, double timeouttheta) {
   bool firsttheta = true;
   double errortheta = 100;
   double proportionaltheta = 0; 
@@ -168,6 +186,7 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
   double traveledtheta = 0;
   double preverrortheta = 0;
   double velocitytheta = 0;
+  double starttime = Brain.Timer.time(seconds);
   // Inertial13.setRotation(0, degrees);
   // Inertial13.setHeading(0, degrees);
   // Inertial13.setRotation(0, degrees);
@@ -176,25 +195,15 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
   rightdrive.spin(forward);
   leftdrive.spin(forward);
 
-  while (fabs(errortheta) > 0.2) {
+  while (fabs(errortheta) > 1) {
+    if (Brain.Timer.time(seconds) - starttime > timeouttheta) {
+      break; // Exit the loop if the timeout is reached
+    }
     if (firsttheta) {
 	    traveledtheta = 0;
 	  }
 	  else {
-      if (traveledtheta > 0) {
-	      traveledtheta = Inertial13.rotation(degrees);
-      }
-      else {
-        if (traveledtheta == 0) {
-          if (theta < 0) {
-	          traveledtheta = Inertial13.rotation(degrees);
-          }
-          else {
-	          traveledtheta = Inertial13.rotation(degrees);
-          }
-        }
-	      traveledtheta = Inertial13.rotation(degrees);
-      }
+	    traveledtheta = Inertial13.rotation(degrees);
 	  }
     Controller1.Screen.clearScreen();
     // Controller1.Screen.setCursor(1, 1);
@@ -204,41 +213,18 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
     proportionaltheta = (errortheta * kptheta);
     derivativetheta = (errortheta - preverrortheta) * kdtheta;
     integraltheta = (errortheta + preverrortheta) * kitheta;
-    if (integraltheta > 2) {
-      integraltheta = 2;
+    if (integraltheta > 3) {
+        integraltheta = 3;
     }
-    if (integraltheta < 2) {
-      integraltheta = -2;
+    if (integraltheta < -3) {
+        integraltheta = -3;
     }
-    // if (fabs(integraltheta) < 0.5) {
-      // integraltheta = 0;
-    // }
-    if (errortheta > 0) {
-      if (derivativetheta < 0.5) {
-        if ((proportionaltheta + derivativetheta) < 0) {
-          derivativetheta = -1 * proportionaltheta;
-        }
-      }
-    }
-    else {
-      if (derivativetheta > 0.5) {
-        if ((proportionaltheta + derivativetheta) > 0) {
-          derivativetheta = -1 * proportionaltheta;
-        }
-      }
-    }
-
-    if (fabs(errortheta) < fabs(0.1 * theta)) {
-      if (fabs(derivativetheta + proportionaltheta) > 1) {
-        integraltheta = 0;
-      }
-    }
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print("theta: %f", traveledtheta);
     Controller1.Screen.setCursor(2, 1);
-    Controller1.Screen.print("integral: %f", integraltheta);
-    Controller1.Screen.setCursor(3, 1);
     Controller1.Screen.print("proportional: %f", proportionaltheta);
-    Controller1.Screen.setCursor(4, 1);
-    Controller1.Screen.print("derivative: %f", derivativetheta);
+    // Controller1.Screen.setCursor(3, 1);
+    // Controller1.Screen.print("derivative: %f", derivativetheta);
     velocitytheta = proportionaltheta + derivativetheta + integraltheta;
     leftdrive.spin(forward, (velocitytheta), volt);
     rightdrive.spin(forward, -1 * (velocitytheta), volt);
@@ -252,6 +238,8 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta) {
   leftdrive.stop(coast);
   rightdrive.stop(coast);
 }
+
+
 
 void odometry() {
   double leftwheeldist;
@@ -327,12 +315,43 @@ void autonomous(void) {
   while(Inertial13.isCalibrating()){
       wait(50, msec);
   }
-  
+  intake.stop(hold);
+  // PID_theta(-45, 1.7, 1.55, 0.1);
+
+  PID_theta(45, 0.12, 0.01, 0.01, 3); 
+
+  leftdrive.resetPosition();
+  rightdrive.resetPosition();
+  rightdrive.setVelocity(60, percent);
+  leftdrive.setVelocity(60, percent);
+  leftdrive.spinFor(reverse, 600, vex::rotationUnits::deg, false);
+  rightdrive.spinFor(reverse, 600, vex::rotationUnits::deg, true);
+  rightdrive.setVelocity(0, percent);
+  leftdrive.setVelocity(0, percent);
+  PID_theta(-45, 0.12, 0.01, 0.01, 3); 
+  rightdrive.setVelocity(60, percent);
+  leftdrive.setVelocity(60, percent);
+  leftdrive.spinFor(forward, 700, vex::rotationUnits::deg, false);
+  rightdrive.spinFor(forward, 700, vex::rotationUnits::deg, true);
+  rightdrive.setVelocity(0, percent);
+  leftdrive.setVelocity(0, percent);
+  // PID_dist(3, 1.1, 0.0, 0.00);
+
+  // PID_dist(-3, 0.7, 0.15, 0); 
+  // PID_theta(0, 0.05, 0.15, 0.05);
+  // PID_dist(6, 0.7, 0.15, 0);
+  // intake.spinFor(forward, 10, vex::rotationUnits::deg, true);
+  // intake.spinFor(reverse, 360, vex::rotationUnits::deg, false);
+  // PID_dist(-1, 0.7, 0.15, 0); 
+  // PID_dist(1, 0.7, 0.15, 0);
+  // PID_dist(-6, 0.7, 0.15, 0); 
+
+
   // PID_dist(distance(inches), kp, kd, ki, slewrate);
   // PID_dist(25, 6, 2.1, 0.05, 32);
   // wait(0.5, seconds);
   // PID_theta(robot-centric rotation(degrees), kp, kd, ki);
-  PID_theta(-90, 0.17, 1.55, 0.1);
+
   // wait(0.5, seconds);
   // PID_dist(26, 6, 2.1, 0.05, 32);
   // wait(0.5, seconds);
@@ -353,12 +372,18 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
+  double hue;
+  bool team = true; // blue team = true, red team= false
+  bool ring = false; // detects if wrong ring is detected
+  double intakepos;
   Inertial13.setRotation(0, degrees);
   Inertial13.setHeading(0, degrees);
   rightdrive.spin(forward);
   leftdrive.spin(forward);
   rightdrive.setVelocity(0, percent);
   leftdrive.setVelocity(0, percent);
+  intake.setPosition(0, degrees);
+  opticalSensor.setLightPower(100, percent);
   constexpr int32_t DEADBAND = 5;
 
   while (1) {
@@ -382,13 +407,48 @@ void usercontrol(void) {
 
     // Calculate intake velocity based on drivetrain speed
     int32_t intakeVelocity;
-    if (rightvelocity == 0 && leftvelocity == 0) {
-      // Robot is stationary
-      intakeVelocity = 30; // Start at 30%
-    } else {
-      // Scale intake based on the maximum drivetrain speed
-      int32_t maxDrivetrainSpeed = (abs(rightvelocity) + abs(leftvelocity)) / 2;
-      intakeVelocity = 30 + (maxDrivetrainSpeed * (100 - 30) / 100); // Scale to 100%
+    if (!ring) {
+      if (rightvelocity == 0 && leftvelocity == 0) {
+        // Robot is stationary
+        intakeVelocity = 30; // Start at 30%
+      } else {
+        // Scale intake based on the maximum drivetrain speed
+        int32_t maxDrivetrainSpeed = (abs(rightvelocity) + abs(leftvelocity)) / 2;
+        intakeVelocity = 30 + (maxDrivetrainSpeed * (100 - 30) / 100); // Scale to 100%
+      }
+    }
+    else {
+      if (22 <= intake.position(degrees)) {
+        intake.stop(brake);
+        ring = false;
+      }
+
+
+    }
+
+    hue = opticalSensor.hue();
+
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print(hue);
+    if (team) {
+      if (hue < 20) {
+        ring = true;
+        intake.resetPosition();
+      }
+      else {
+        if (!ring) {
+        ring = false;        
+        }
+      }
+    }
+    else {
+      if (hue < 200) {
+        ring = true;
+      }
+      else {
+        ring = false;
+      }
     }
 
     // Set the intake velocity
@@ -429,7 +489,7 @@ void usercontrol(void) {
       }
     }
 
-    wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources.
+    wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
 
