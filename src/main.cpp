@@ -324,6 +324,9 @@ void pre_auton(void) {
 	leftdrive.setPosition(0, degrees);
 	rightdrive.setPosition(0, degrees);
 	Inertial13.calibrate();
+	intake.stop(hold);
+	leftdrive.resetPosition();
+	rightdrive.resetPosition();
 	// Print that the Inertial Sensor is calibrating while
 	// waiting for it to finish calibrating.
 	while(Inertial13.isCalibrating()){
@@ -358,6 +361,10 @@ void autonomous(void) {
 	intake.stop(hold);
 	leftdrive.resetPosition();
 	rightdrive.resetPosition();
+	intakeon = false;
+	PID_theta = (45, 0.5, 0, 0, 6)
+	intakeon = true;
+	vex::thread intakeTast(intakeauto);
 	// PID_theta(robot-centric rotation(degrees), kp, kd, ki, average voltage(0-12));
 	// PID_dist(robot-centric distance(inches), kp, kd, ki, average voltage(0-12));
 	// intake.spinFor(forward, 10, vex::rotationUnits::deg, true);
