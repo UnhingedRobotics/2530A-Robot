@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------*/
+//*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       Admin                                                     */
@@ -69,7 +69,7 @@ void initializeRandomSeed(){
 void vexcodeInit() {
 
 	//Initializing random seed.
-	initializeRandomSeed(); 
+	initializeRandomSeed();
 }
 
 // Helper to make playing sounds from the V5 in VEXcode easier and
@@ -101,14 +101,14 @@ double kidist;
 void PID_dist(double dist, double kpdist, double kddist, double kidist, double averagevoltagedist) {
 	bool firstdist = true;
 	double errordist = 100;
-	double proportionaldist = 0; 
+	double proportionaldist = 0;
 	double derivativedist = 0;
 	double integraldist = 0;
 	double traveldist = 0;
 	double preverrordist = 0;
 	double velocitydist = 0;
 	double starttimedist = Brain.Timer.time(seconds);
-	double timeoutdist = fabs(dist / ((averagevoltagedist / 12) * rpmdrive * pi * wheeldiameter / 60)); 
+	double timeoutdist = fabs(dist / ((averagevoltagedist / 12) * rpmdrive * pi * wheeldiameter / 60));
 	leftdrive.resetPosition();
 	rightdrive.resetPosition();
 	rightdrive.spin(forward);
@@ -163,14 +163,14 @@ double theta;
 void PID_theta(double theta, double kptheta, double kdtheta, double kitheta, double averagevoltagetheta) {
 	bool firsttheta = true;
 	double errortheta = 100;
-	double proportionaltheta = 0; 
+	double proportionaltheta = 0;
 	double derivativetheta = 0;
 	double integraltheta = 0;
 	double traveledtheta = 0;
 	double preverrortheta = 0;
 	double velocitytheta = 0;
 	double starttimetheta = Brain.Timer.time(seconds);
-	double timeouttheta = fabs(theta * (pi / 180) / averagevoltagetheta / 12 * rpmdrive * 2 * pi / 60); 
+	double timeouttheta = fabs(theta * (pi / 180) / averagevoltagetheta / 12 * rpmdrive * 2 * pi / 60);
 	leftdrive.setPosition(0, degrees);
 	rightdrive.setPosition(0, degrees);
 	rightdrive.spin(forward);
@@ -231,10 +231,10 @@ void odometry() {
 		backwheeldist = backwheelrotation.position(degrees) * pi * odomwheeldiameter / 360;
 		traveledreverseodomtheta = fmod((Inertial13.rotation(degrees) + thetanot) * -1, 360) * pi / 180;
 		traveledodomtheta = fmod((Inertial13.rotation(degrees) + thetanot), 360) * pi / 180;
-		lefthypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
-		backhypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
-		x = prevx + lefthypo * cos(traveledodomtheta) - backhypo * sin(traveledodomtheta); 
-		y = prevy + lefthypo * sin(traveledodomtheta) + backhypo * cos(traveledodomtheta); 
+		lefthypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2);
+		backhypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2);
+		x = prevx + lefthypo * cos(traveledodomtheta) - backhypo * sin(traveledodomtheta);
+		y = prevy + lefthypo * sin(traveledodomtheta) + backhypo * cos(traveledodomtheta);
 		prevx = x;
 		prevy = y;
 		thetanot = 0;
@@ -288,7 +288,7 @@ void intakeauton() {
 			}
 			else {
 				if (ring) {
-					ring = false;        
+					ring = false;
 				}
 			}
 		}
@@ -376,12 +376,12 @@ void autonomous(void) {
   wait(1, seconds);
   goalclamp.set(true);
   wait(0.2, seconds);
-	PID_theta(-30, 0.15, 0.11, 0.04, 5);
+	PID_theta(30, 0.15, 0.11, 0.04, 5);
   wait(0.2, seconds);
 	PID_dist(52, 0.37, 0.09, 0, 5);
   wait(0.2, seconds);
   // leftdrive.spinFor(forward, 80, vex::rotationUnits::deg, false);
-	PID_theta(20, 0.7, 0.11, 0.04, 5);
+	PID_theta(-20, 0.7, 0.11, 0.04, 5);
 	PID_dist(14, 1.1, 0.09, 0, 5);
 	intake.spinFor(reverse, 80, vex::rotationUnits::deg, true);
   wait(0.2, seconds);
@@ -389,17 +389,17 @@ void autonomous(void) {
 	intake.spinFor(forward, 600, vex::rotationUnits::deg, false);
 	intake.stop(coast);
   wait(0.2, seconds);
-  PID_theta(-30, 0.7, 0.11, 0.04, 5);
+  PID_theta(30, 0.7, 0.11, 0.04, 5);
   wait(0.2, seconds);
 	PID_dist(-8, 0.6, 0.11, 0, 5);
   wait(0.2, seconds);
-	PID_theta(-100, 0.5, 0.11, 0.04, 5);
+	PID_theta(100, 0.5, 0.11, 0.04, 5);
   wait(0.2, seconds);
 	intakeon = true;
 	vex::thread intakeTast(intakeauton);
   PID_dist(26, 0.5, 0.11, 0, 5);
   wait(0.2, seconds);
-  PID_theta(-200, 0.3, 0.11, 0.04, 5);
+  PID_theta(200, 0.3, 0.11, 0.04, 5);
   wait(0.2, seconds);
 	PID_dist(20, 0.5, 0.09, 0, 5);
   intakeon = false;
@@ -499,7 +499,7 @@ void usercontrol(void) {
 			}
 			else {
 				if (ring) {
-					ring = false;        
+					ring = false;
 				}
 			}
 		}
