@@ -28,7 +28,7 @@ motor intakeMotorB = motor(PORT1, ratio6_1, false);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
 motor leftdriveMotorA = motor(PORT15, ratio6_1, false);
-motor leftdriveMotorB = motor(PORT12, ratio6_1, false);
+motor leftdriveMotorB = motor(PORT2, ratio6_1, false);
 motor leftdriveMotorC = motor(PORT13, ratio6_1, false);
 motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB, leftdriveMotorC);
 
@@ -46,7 +46,7 @@ inertial Inertial13 = inertial(PORT18);
 
 rotation leftwheelrotation = rotation(PORT4, false);
 
-rotation backwheelrotation = rotation(PORT2, false);
+rotation backwheelrotation = rotation(PORT12, false);
 
 optical opticalSensor = optical(PORT3);
 
@@ -108,15 +108,15 @@ void PID_dist(double dist, double kpdist, double kddist, double kidist, double a
 	double preverrordist = 0;
 	double velocitydist = 0;
 	double starttimedist = Brain.Timer.time(seconds);
-	double timeoutdist = dist / ((averagevoltagedist / 12) * rpmdrive * pi * wheeldiameter / 60); 
+	double timeoutdist = fabs(dist / ((averagevoltagedist / 12) * rpmdrive * pi * wheeldiameter / 60)); 
 	leftdrive.resetPosition();
 	rightdrive.resetPosition();
 	rightdrive.spin(forward);
 	leftdrive.spin(forward);
 
-	while (fabs(errordist) > 0.05) {
+	while (fabs(errordist) > 0.01) {
 
-		if (Brain.Timer.time(seconds) - starttimedist > timoutdist) {
+		if (Brain.Timer.time(seconds) - starttimedist > timeoutdist) {
 			break;
 		}
 		if (firstdist) {
@@ -149,8 +149,9 @@ void PID_dist(double dist, double kpdist, double kddist, double kidist, double a
 	}
 	leftdrive.spin(forward, 0, volt);
 	rightdrive.spin(forward, 0, volt);
-	leftdrive.stop(coast);
-	rightdrive.stop(coast);
+	leftdrive.stop(brake);
+	rightdrive.stop(brake);
+	errordist = 0;
 }
 
 double averagevoltagetheta;
@@ -169,14 +170,14 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta, dou
 	double preverrortheta = 0;
 	double velocitytheta = 0;
 	double starttimetheta = Brain.Timer.time(seconds);
-	double timeouttheta = theta * (pi / 180) / averagevoltagetheta / 12 * rpmdrive * 2 * pi / 60; 
+	double timeouttheta = fabs(theta * (pi / 180) / averagevoltagetheta / 12 * rpmdrive * 2 * pi / 60); 
 	leftdrive.setPosition(0, degrees);
 	rightdrive.setPosition(0, degrees);
 	rightdrive.spin(forward);
 	leftdrive.spin(forward);
 
-	while (fabs(errortheta) > 1) {
-		if (Brain.Timer.time(seconds) - starttimetheta > timouttheta) {
+	while (fabs(errortheta) > 0.05) {
+		if (Brain.Timer.time(seconds) - starttimetheta > timeouttheta) {
 			break;
 		}
 		if (firsttheta) {
@@ -207,8 +208,9 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta, dou
 	}
 	leftdrive.spin(forward, 0, volt);
 	rightdrive.spin(forward, 0, volt);
-	leftdrive.stop(coast);
-	rightdrive.stop(coast);
+	leftdrive.stop(brake);
+	rightdrive.stop(brake);
+	errortheta = 0;
 }
 
 double x;
@@ -242,7 +244,7 @@ void odometry() {
 double hue;
 bool intakeon;
 int32_t intakeVelocity;
-const bool team = true; // blue team = true, red team = false
+const bool team = false; // blue team = true, red team = false
 const int32_t jamtimeout = 3;
 int32_t starttimeintake = 0;
 double currentposintake;
@@ -253,7 +255,7 @@ void intakeauton() {
 	opticalSensor.setLightPower(100, percent);
 	while (intakeon) {
 		currentposintake = intake.position(degrees);
-		if (abs(abs(currentposintake) - abs(previousposintake)) < 5) {
+		if (fabs(fabs(currentposintake) - fabs(previousposintake)) < 5) {
 			if (starttimeintake == 0) {
 				starttimeintake = Brain.Timer.time(seconds);
 			}
@@ -274,6 +276,9 @@ void intakeauton() {
 				intake.stop(brake);
 				ring = false;
 			}
+      else {
+        intakeVelocity = 100; // Start at 30%
+      }
 		}
 
 		if (team) {
@@ -282,7 +287,7 @@ void intakeauton() {
 				intake.resetPosition();
 			}
 			else {
-				if (!ring) {
+				if (ring) {
 					ring = false;        
 				}
 			}
@@ -299,6 +304,7 @@ void intakeauton() {
 		previousposintake = currentposintake;
 		wait(10, msec);
 	}
+  intake.spin(forward, 0, percent);
 	intakeVelocity = 0;
 	hue = 0;
 	ring = false;
@@ -362,9 +368,42 @@ void autonomous(void) {
 	leftdrive.resetPosition();
 	rightdrive.resetPosition();
 	intakeon = false;
-	PID_theta = (45, 0.5, 0, 0, 6)
+	// intakeon = false;
+	// intakeon = true;
+	// vex::thread intakeTast(intakeauton);
+  goalclamp.set(false);
+	PID_dist(-38, 0.5, 0.09, 0, 5);
+  wait(1, seconds);
+  goalclamp.set(true);
+  wait(0.2, seconds);
+	PID_theta(-30, 0.15, 0.11, 0.04, 5);
+  wait(0.2, seconds);
+	PID_dist(52, 0.37, 0.09, 0, 5);
+  wait(0.2, seconds);
+  // leftdrive.spinFor(forward, 80, vex::rotationUnits::deg, false);
+	PID_theta(20, 0.7, 0.11, 0.04, 5);
+	PID_dist(14, 1.1, 0.09, 0, 5);
+	intake.spinFor(reverse, 80, vex::rotationUnits::deg, true);
+  wait(0.2, seconds);
+	PID_dist(-15, 1, 0.11, 0, 4);
+	intake.spinFor(forward, 600, vex::rotationUnits::deg, false);
+	intake.stop(coast);
+  wait(0.2, seconds);
+  PID_theta(-30, 0.7, 0.11, 0.04, 5);
+  wait(0.2, seconds);
+	PID_dist(-8, 0.6, 0.11, 0, 5);
+  wait(0.2, seconds);
+	PID_theta(-100, 0.5, 0.11, 0.04, 5);
+  wait(0.2, seconds);
 	intakeon = true;
-	vex::thread intakeTast(intakeauto);
+	vex::thread intakeTast(intakeauton);
+  PID_dist(26, 0.5, 0.11, 0, 5);
+  wait(0.2, seconds);
+  PID_theta(-200, 0.3, 0.11, 0.04, 5);
+  wait(0.2, seconds);
+	PID_dist(20, 0.5, 0.09, 0, 5);
+  intakeon = false;
+	// intakeon = false;
 	// PID_theta(robot-centric rotation(degrees), kp, kd, ki, average voltage(0-12));
 	// PID_dist(robot-centric distance(inches), kp, kd, ki, average voltage(0-12));
 	// intake.spinFor(forward, 10, vex::rotationUnits::deg, true);
@@ -419,7 +458,7 @@ void usercontrol(void) {
 		leftdrive.setVelocity(leftvelocity, percent);
 
 		currentposintake = intake.position(degrees);
-		if (abs(abs(currentposintake) - abs(previousposintake)) < 5) {
+		if (fabs(fabs(currentposintake) - fabs(previousposintake)) < 5) {
 			if (starttimeintake == 0) {
 				starttimeintake = Brain.Timer.time(seconds);
 			}
@@ -444,7 +483,7 @@ void usercontrol(void) {
 			}
 		}
 		else {
-			if (22 <= intake.position(degrees)) {
+			if (21 <= intake.position(degrees)) {
 				intake.stop(brake);
 				ring = false;
 			}
@@ -459,7 +498,7 @@ void usercontrol(void) {
 				intake.resetPosition();
 			}
 			else {
-				if (!ring) {
+				if (ring) {
 					ring = false;        
 				}
 			}
@@ -509,7 +548,7 @@ void usercontrol(void) {
 		}
 		previousposintake = currentposintake;
 
-		wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources.
+		wait(5, msec); // Sleep the task for a short amount of time to prevent wasted resources.
 	}
 }
 
