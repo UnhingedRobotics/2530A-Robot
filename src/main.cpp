@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------*/
+//*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       Admin                                                     */
@@ -28,7 +28,7 @@ motor intakeMotorB = motor(PORT1, ratio6_1, false);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
 
 motor leftdriveMotorA = motor(PORT15, ratio6_1, false);
-motor leftdriveMotorB = motor(PORT12, ratio6_1, false);
+motor leftdriveMotorB = motor(PORT2, ratio6_1, false);
 motor leftdriveMotorC = motor(PORT13, ratio6_1, false);
 motor_group leftdrive = motor_group(leftdriveMotorA, leftdriveMotorB, leftdriveMotorC);
 
@@ -46,7 +46,7 @@ inertial Inertial13 = inertial(PORT18);
 
 rotation leftwheelrotation = rotation(PORT4, false);
 
-rotation backwheelrotation = rotation(PORT2, false);
+rotation backwheelrotation = rotation(PORT12, false);
 
 optical opticalSensor = optical(PORT3);
 
@@ -69,7 +69,7 @@ void initializeRandomSeed(){
 void vexcodeInit() {
 
 	//Initializing random seed.
-	initializeRandomSeed(); 
+	initializeRandomSeed();
 }
 
 // Helper to make playing sounds from the V5 in VEXcode easier and
@@ -101,22 +101,22 @@ double kidist;
 void PID_dist(double dist, double kpdist, double kddist, double kidist, double averagevoltagedist) {
 	bool firstdist = true;
 	double errordist = 100;
-	double proportionaldist = 0; 
+	double proportionaldist = 0;
 	double derivativedist = 0;
 	double integraldist = 0;
 	double traveldist = 0;
 	double preverrordist = 0;
 	double velocitydist = 0;
 	double starttimedist = Brain.Timer.time(seconds);
-	double timeoutdist = dist / ((averagevoltagedist / 12) * rpmdrive * pi * wheeldiameter / 60); 
+	double timeoutdist = fabs(dist / ((averagevoltagedist / 12) * rpmdrive * pi * wheeldiameter / 60));
 	leftdrive.resetPosition();
 	rightdrive.resetPosition();
 	rightdrive.spin(forward);
 	leftdrive.spin(forward);
 
-	while (fabs(errordist) > 0.05) {
+	while (fabs(errordist) > 0.01) {
 
-		if (Brain.Timer.time(seconds) - starttimedist > timoutdist) {
+		if (Brain.Timer.time(seconds) - starttimedist > timeoutdist) {
 			break;
 		}
 		if (firstdist) {
@@ -149,8 +149,9 @@ void PID_dist(double dist, double kpdist, double kddist, double kidist, double a
 	}
 	leftdrive.spin(forward, 0, volt);
 	rightdrive.spin(forward, 0, volt);
-	leftdrive.stop(coast);
-	rightdrive.stop(coast);
+	leftdrive.stop(brake);
+	rightdrive.stop(brake);
+	errordist = 0;
 }
 
 double averagevoltagetheta;
@@ -162,21 +163,21 @@ double theta;
 void PID_theta(double theta, double kptheta, double kdtheta, double kitheta, double averagevoltagetheta) {
 	bool firsttheta = true;
 	double errortheta = 100;
-	double proportionaltheta = 0; 
+	double proportionaltheta = 0;
 	double derivativetheta = 0;
 	double integraltheta = 0;
 	double traveledtheta = 0;
 	double preverrortheta = 0;
 	double velocitytheta = 0;
 	double starttimetheta = Brain.Timer.time(seconds);
-	double timeouttheta = theta * (pi / 180) / averagevoltagetheta / 12 * rpmdrive * 2 * pi / 60; 
+	double timeouttheta = fabs(theta * (pi / 180) / averagevoltagetheta / 12 * rpmdrive * 2 * pi / 60);
 	leftdrive.setPosition(0, degrees);
 	rightdrive.setPosition(0, degrees);
 	rightdrive.spin(forward);
 	leftdrive.spin(forward);
 
-	while (fabs(errortheta) > 1) {
-		if (Brain.Timer.time(seconds) - starttimetheta > timouttheta) {
+	while (fabs(errortheta) > 0.05) {
+		if (Brain.Timer.time(seconds) - starttimetheta > timeouttheta) {
 			break;
 		}
 		if (firsttheta) {
@@ -207,8 +208,9 @@ void PID_theta(double theta, double kptheta, double kdtheta, double kitheta, dou
 	}
 	leftdrive.spin(forward, 0, volt);
 	rightdrive.spin(forward, 0, volt);
-	leftdrive.stop(coast);
-	rightdrive.stop(coast);
+	leftdrive.stop(brake);
+	rightdrive.stop(brake);
+	errortheta = 0;
 }
 
 double x;
@@ -229,10 +231,10 @@ void odometry() {
 		backwheeldist = backwheelrotation.position(degrees) * pi * odomwheeldiameter / 360;
 		traveledreverseodomtheta = fmod((Inertial13.rotation(degrees) + thetanot) * -1, 360) * pi / 180;
 		traveledodomtheta = fmod((Inertial13.rotation(degrees) + thetanot), 360) * pi / 180;
-		lefthypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
-		backhypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2); 
-		x = prevx + lefthypo * cos(traveledodomtheta) - backhypo * sin(traveledodomtheta); 
-		y = prevy + lefthypo * sin(traveledodomtheta) + backhypo * cos(traveledodomtheta); 
+		lefthypo = 2 * (leftwheeldist / traveledreverseodomtheta + leftwheeldisplacement) * sin(traveledreverseodomtheta / 2);
+		backhypo = 2 * (backwheeldist / traveledreverseodomtheta - backwheeldisplacement) * sin(traveledreverseodomtheta / 2);
+		x = prevx + lefthypo * cos(traveledodomtheta) - backhypo * sin(traveledodomtheta);
+		y = prevy + lefthypo * sin(traveledodomtheta) + backhypo * cos(traveledodomtheta);
 		prevx = x;
 		prevy = y;
 		thetanot = 0;
@@ -244,22 +246,25 @@ bool intakeon;
 int32_t intakeVelocity;
 const bool team = true; // blue team = true, red team = false
 const int32_t jamtimeout = 3;
-int32_t starttimeintake = 0;
+double starttimeintake = 0;
+double starttimecolor = 0;
 double currentposintake;
 double previousposintake;
 bool ring = false; // detects if wrong ring is detected
 void intakeauton() {
-	intake.resetPosition();
 	opticalSensor.setLightPower(100, percent);
 	while (intakeon) {
 		currentposintake = intake.position(degrees);
-		if (abs(abs(currentposintake) - abs(previousposintake)) < 5) {
+		if (fabs(fabs(currentposintake) - fabs(previousposintake)) < 5) {
 			if (starttimeintake == 0) {
 				starttimeintake = Brain.Timer.time(seconds);
 			}
 			if (Brain.Timer.time(seconds) - starttimeintake >= jamtimeout) {
 				intake.stop(coast);
-				intake.spinFor(reverse, 30, vex::rotationUnits::deg, true);
+			  	intake.spin(forward, 0, percent);
+				wait(10, msec);
+				intake.spinFor(reverse, 80, vex::rotationUnits::deg, true);
+				// wait(100, msec);
 			}
 		}
 		else {
@@ -267,38 +272,41 @@ void intakeauton() {
 		}
 		hue = opticalSensor.hue();
 		if (!ring) {
-			intakeVelocity = 80; // Start at 30%
-		}
-		else {
-			if (22 <= intake.position(degrees)) {
-				intake.stop(brake);
-				ring = false;
-			}
-		}
 
-		if (team) {
-			if (hue < 20) {
-				ring = true;
-				intake.resetPosition();
-			}
-			else {
-				if (!ring) {
-					ring = false;        
+			if (team) {
+				if (hue < 20) {
+					ring = true;
+					starttimecolor = Brain.Timer.time(seconds);
+				}
+				else {
+					ring = false;
 				}
 			}
+			else {
+				if (hue > 170) {
+					ring = true;
+					starttimecolor = Brain.Timer.time(seconds);
+				}
+				else {
+					ring = false;
+				}
+			}
+			intakeVelocity = 55; // Start at 30%
+
 		}
 		else {
-			if (hue < 200) {
-				ring = true;
-			}
-			else {
-				ring = false;
-			}
+			intake.stop(brake);
+			wait(1.2, seconds);
+			intake.spin(forward, 100, percent);
+			ring = false;
 		}
+		Controller1.Screen.clearScreen();
+		Controller1.Screen.print(hue);
 		intake.spin(forward, intakeVelocity, percent);
 		previousposintake = currentposintake;
-		wait(10, msec);
+		wait(2, msec);
 	}
+  intake.spin(forward, 0, percent);
 	intakeVelocity = 0;
 	hue = 0;
 	ring = false;
@@ -351,7 +359,6 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-
 void autonomous(void) {
 	rightdrive.setVelocity(0, percent);
 	leftdrive.setVelocity(0, percent);
@@ -362,20 +369,14 @@ void autonomous(void) {
 	leftdrive.resetPosition();
 	rightdrive.resetPosition();
 	intakeon = false;
-	PID_theta = (45, 0.5, 0, 0, 6)
+  	goalclamp.set(false);
+	PID_dist(-46, 0.5, 0.09, 0, 5);
+ 	wait(1, seconds);
+  	goalclamp.set(true);
 	intakeon = true;
-	vex::thread intakeTast(intakeauto);
-	// PID_theta(robot-centric rotation(degrees), kp, kd, ki, average voltage(0-12));
-	// PID_dist(robot-centric distance(inches), kp, kd, ki, average voltage(0-12));
-	// intake.spinFor(forward, 10, vex::rotationUnits::deg, true);
-	// intake.spinFor(reverse, 360, vex::rotationUnits::deg, false);
-	// PID_dist(distance(inches), kp, kd, ki, slewrate);
-	// wait(0.5, seconds);
-
-	// wait(0.5, seconds);
-	// PID_dist(26, 6, 2.1, 0.05, 32);
-	// wait(0.5, seconds);
-	// PID_theta(-180, 0.22, 1.35, 0.2);
+	vex::thread intakeTast(intakeauton);
+  	wait(4, seconds);
+  	intakeon = false;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -389,129 +390,71 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-	Inertial13.setRotation(0, degrees);
-	Inertial13.setHeading(0, degrees);
-	rightdrive.spin(forward);
-	leftdrive.spin(forward);
-	rightdrive.setVelocity(0, percent);
-	leftdrive.setVelocity(0, percent);
-	intake.setPosition(0, degrees);
-	opticalSensor.setLightPower(100, percent);
-	constexpr int32_t DEADBAND = 5;
+    bool intakeready = false;
+    starttimecolor = 0;
+    Inertial13.setRotation(0, degrees);
+    Inertial13.setHeading(0, degrees);
+    rightdrive.spin(forward);
+    leftdrive.spin(forward);
+    rightdrive.setVelocity(0, percent);
+    leftdrive.setVelocity(0, percent);
+    intake.setPosition(0, degrees);
+    // opticalSensor.setLightPower(100, percent);
+    constexpr int32_t DEADBAND = 5;
 
-	while (1) {
-		int32_t rightvelocity = Controller1.Axis2.position();
-		int32_t leftvelocity = Controller1.Axis3.position();
+    while (1) {
+        int32_t rightvelocity = Controller1.Axis2.position();
+        int32_t leftvelocity = Controller1.Axis3.position();
 
-		// Apply deadband
-		if (abs(leftvelocity) < DEADBAND) leftvelocity = 0;
-		if (abs(rightvelocity) < DEADBAND) rightvelocity = 0;
+        // Apply deadband
+        if (abs(leftvelocity) < DEADBAND) leftvelocity = 0;
+        if (abs(rightvelocity) < DEADBAND) rightvelocity = 0;
+        // Apply exponential scaling
+        leftvelocity = (leftvelocity != 0) ? (leftvelocity > 0 ? pow(leftvelocity, 2) : -pow(-leftvelocity, 2)) : 0;
+        rightvelocity = (rightvelocity != 0) ? (rightvelocity > 0 ? pow(rightvelocity, 2) : -pow(-rightvelocity, 2)) : 0;
 
-		// Apply exponential scaling
-		leftvelocity = (leftvelocity != 0) ? (leftvelocity > 0 ? pow(leftvelocity, 2) : -pow(-leftvelocity, 2)) : 0;
-		rightvelocity = (rightvelocity != 0) ? (rightvelocity > 0 ? pow(rightvelocity, 2) : -pow(-rightvelocity, 2)) : 0;
+        // Scale the velocity to a percentage range (0-100)
+        leftvelocity = fmin(fmax(leftvelocity / 127.0 * 100, -100.0), 100.0);
+        rightvelocity = fmin(fmax(rightvelocity / 127.0 * 100, -100.0), 100.0);
+		intake.setVelocity(intakeVelocity, percent);
+        rightdrive.setVelocity(rightvelocity, percent);
+        leftdrive.setVelocity(leftvelocity, percent);
 
-		// Scale the velocity to a percentage range (0-100)
-		leftvelocity = fmin(fmax(leftvelocity / 127.0 * 100, -100.0), 100.0);
-		rightvelocity = fmin(fmax(rightvelocity / 127.0 * 100, -100.0), 100.0);
+        // Calculate intake velocity based on drivetrain speed
+        if (intakeready) {
+			intakeVelocity = 75; // Start at 30
+            }
+        else {
+            intakeVelocity = 0;
+        }
 
-		rightdrive.setVelocity(rightvelocity, percent);
-		leftdrive.setVelocity(leftvelocity, percent);
 
-		currentposintake = intake.position(degrees);
-		if (abs(abs(currentposintake) - abs(previousposintake)) < 5) {
-			if (starttimeintake == 0) {
-				starttimeintake = Brain.Timer.time(seconds);
-			}
-			if (Brain.Timer.time(seconds) - starttimeintake >= jamtimeout) {
-				intake.stop(coast);
-				intake.spinFor(reverse, 30, vex::rotationUnits::deg, true);
-			}
-		}
-		else {
-			starttimeintake = 0;
-		}
+        // Set the intake velocity
+        if (Controller1.ButtonR1.pressing()) {
+            intakeready = true;
+        }
 
-		// Calculate intake velocity based on drivetrain speed
-		if (!ring) {
-			if (rightvelocity == 0 && leftvelocity == 0) {
-				// Robot is stationary
-				intakeVelocity = 30; // Start at 30%
-			} else {
-				// Scale intake based on the maximum drivetrain speed
-				int32_t maxDrivetrainSpeed = (abs(rightvelocity) + abs(leftvelocity)) / 2;
-				intakeVelocity = 30 + (maxDrivetrainSpeed * (100 - 30) / 100); // Scale to 100%
-			}
-		}
-		else {
-			if (22 <= intake.position(degrees)) {
-				intake.stop(brake);
-				ring = false;
-			}
-			else {
-				intakeVelocity = 100;
-			}
-		}
-		hue = opticalSensor.hue();
-		if (team) {
-			if (hue < 20) {
-				ring = true;
-				intake.resetPosition();
-			}
-			else {
-				if (!ring) {
-					ring = false;        
-				}
-			}
-		}
-		else {
-			if (hue < 200) {
-				ring = true;
-			}
-			else {
-				ring = false;
-			}
-		}
-
-		// Set the intake velocity
-		if (Controller1.ButtonR1.pressing()) {
-			intake.spin(forward, intakeVelocity, percent);
-		}
-
-		if (Controller1.ButtonR2.pressing()) {
-			intake.stop();
-		}
-		if (Controller1.ButtonL1.pressing()) {
-			goalclamp.set(true);
-		}
-		if (Controller1.ButtonL2.pressing()) {
-			goalclamp.set(false);
-		}
-
-		AIVisionBack.takeSnapshot(aivision::ALL_AIOBJS);
-		if (AIVisionBack.objectCount > 0 && AIVisionBack.objects[AIVisionBack_objectIndex].width > 70.0) {
-			if (AIVisionBack.objects[AIVisionBack_objectIndex].id == mobileGoal) {
-				Brain.Screen.clearScreen();
-				Brain.Screen.setCursor(1, 1);
-				Brain.Screen.print("Mobile Goal");
-				goalclamp.set(true);
-			}
-			if (AIVisionBack.objects[AIVisionBack_objectIndex].id == redRing) {
-				Brain.Screen.clearScreen();
-				Brain.Screen.setCursor(1, 1);
-				Brain.Screen.print("Redring");
-			}
-			if (AIVisionBack.objects[AIVisionBack_objectIndex].id == blueRing) {
-				Brain.Screen.clearScreen();
-				Brain.Screen.setCursor(1, 1);
-				Brain.Screen.print("Bluering");
-			}
-		}
-		previousposintake = currentposintake;
-
-		wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources.
-	}
+        if (Controller1.ButtonR2.pressing()) {
+            intakeready = false;
+        }
+        if (Controller1.ButtonL1.pressing()) {
+            goalclamp.set(false);
+        }
+        if (Controller1.ButtonL2.pressing()) {
+            goalclamp.set(true);
+        }
+        if (Controller1.ButtonA.pressing()) {
+            ring = false;
+			starttimecolor = 0;
+        }
+        if (Controller1.ButtonB.pressing()) {
+			intake.spin(reverse, 50, percent);
+        }
+        // Sleep the task for a short amount of time to prevent wasted resources.
+        wait(5, msec);
+    }
 }
+
 
 //
 // Main will set up the competition functions and callbacks.
@@ -522,8 +465,10 @@ int main() {
 	Competition.drivercontrol(usercontrol);
 
 	// Run the pre-autonomous function.
-	pre_auton();
-
+	// pre_auton();
+	
+	intakeon = true;
+	vex::thread intakeTast(intakeauton);
 	// Prevent main from exiting with an infinite loop.
 	while (true) {
 		wait(100, msec);
