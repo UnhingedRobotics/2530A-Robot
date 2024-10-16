@@ -1,4 +1,4 @@
-/#include "vex.h"
+#include "vex.h"
 
 using namespace vex;
 competition Competition;
@@ -84,10 +84,10 @@ PORT17,
 //If you are using ZERO_TRACKER_ODOM, you ONLY need to adjust the FORWARD TRACKER CENTER DISTANCE.
 
 //FOR HOLONOMIC DRIVES ONLY: Input your drive motors by position. This is only necessary for holonomic drives, otherwise this section can be left alone.
-//LF:      //RF:
+//LF:      //RF:    
 PORT1,     -PORT2,
 
-//LB:      //RB:
+//LB:      //RB: 
 PORT3,     -PORT4,
 
 //If you are using position tracking, this is the Forward Tracker port (the tracker which runs parallel to the direction of the chassis).
@@ -182,11 +182,11 @@ void pre_auton() {
 
 void autonomous(void) {
   auto_started = true;
-  switch(current_auton_selection){
+  switch(current_auton_selection){ 
     case 0:
       drive_test();
       break;
-    case 1:
+    case 1:         
       drive_test();
       break;
     case 2:
@@ -278,7 +278,7 @@ void usercontrol(void) {
     }
     if (Controller1.ButtonL2.pressing()) {
       goalclamp.set(true);
-    }
+    }       
     chassis.control_tank();
 
     wait(20, msec); // Sleep the task for a short amount of time to
