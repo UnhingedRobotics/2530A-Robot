@@ -189,8 +189,8 @@ void autonomous(void) {
 void usercontrol(void) {
   opticalsensor.integrationTime(5);
   double hue;
-  double ring = false; //true = red, false = blue
-  double team = true; //true = red team, flase = blue team
+  bool ring = false; //true = red, false = blue
+  bool team = true; //true = red team, flase = blue team
   intake.spin(forward);
   intake.setVelocity(0, percent);
   // User control code here, inside the loop
