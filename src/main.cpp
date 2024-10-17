@@ -128,6 +128,8 @@ void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   default_constants();
+  intake.spin(forward);
+  intake.setVelocity(0, percent);
 
   while(!auto_started){
     Brain.Screen.clearScreen();
@@ -143,24 +145,6 @@ void pre_auton() {
         break;
       case 1:
         Brain.Screen.printAt(5, 140, "Auton 2");
-        break;
-      case 2:
-        Brain.Screen.printAt(5, 140, "Auton 3");
-        break;
-      case 3:
-        Brain.Screen.printAt(5, 140, "Auton 4");
-        break;
-      case 4:
-        Brain.Screen.printAt(5, 140, "Auton 5");
-        break;
-      case 5:
-        Brain.Screen.printAt(5, 140, "Auton 6");
-        break;
-      case 6:
-        Brain.Screen.printAt(5, 140, "Auton 7");
-        break;
-      case 7:
-        Brain.Screen.printAt(5, 140, "Auton 8");
         break;
     }
     if(Brain.Screen.pressing()){
@@ -206,6 +190,7 @@ void usercontrol(void) {
   opticalsensor.integrationTime(5);
   double hue;
   double ring = false; //true = red, false = blue
+  double team = true; //true = red team, flase = blue team
   intake.spin(forward);
   intake.setVelocity(0, percent);
   // User control code here, inside the loop
@@ -223,34 +208,44 @@ void usercontrol(void) {
       Controller1.Screen.print("blue");
       ring = false;
     }
-    if (ring) {
-      if (distancesensor.objectDistance(inches) < 2) {
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("object found");
-        wait(40, msec);
-        intake.stop(brake);
-        wait(20, msec);
-        intake.spin(forward);
-        intake.setVelocity(0, percent);
-        ring = false;
-      }
-    }
+	if (!team) {
+		if (ring) {
+			if (distancesensor.objectDistance(inches) < 2) {
+				Controller1.Screen.setCursor(1, 1);
+				Controller1.Screen.clearScreen();
+				Controller1.Screen.print("object found");
+				wait(40, msec);
+				intake.stop(brake);
+				wait(20, msec);
+				intake.spin(forward);
+				intake.setVelocity(0, percent);
+				ring = false;
+			}
+		}
+	
+	}
+	else {
+		if (!ring) {
+			if (distancesensor.objectDistance(inches) < 2) {
+				Controller1.Screen.setCursor(1, 1);
+				Controller1.Screen.clearScreen();
+				Controller1.Screen.print("object found");
+				wait(40, msec);
+				intake.stop(brake);
+				wait(20, msec);
+				intake.spin(forward);
+				intake.setVelocity(0, percent);
+				ring = false;
+			}
+		}
+	
+	}
     else {
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.print("blue");
       if (Controller1.ButtonR1.pressing()) {
         intake.setVelocity(80, percent);
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("moving");
       }
       if (Controller1.ButtonR2.pressing()) {
         intake.setVelocity(0, percent);
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("stop");
       }
     }
 
