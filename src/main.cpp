@@ -185,81 +185,76 @@ void autonomous(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-
 void usercontrol(void) {
   opticalsensor.integrationTime(5);
   double hue;
-  bool ring = false; //true = red, false = blue
-  bool team = true; //true = red team, flase = blue team
+  bool ring = false; // true = red, false = blue
+  bool team = true;  // true = red team, false = blue team
   intake.spin(forward);
   intake.setVelocity(0, percent);
+
   // User control code here, inside the loop
   while (1) {
     hue = opticalsensor.hue();
+
+    // Color detection logic
     if (hue < 30) {
       Controller1.Screen.setCursor(1, 1);
       Controller1.Screen.clearScreen();
       Controller1.Screen.print("red");
       ring = true;
-    }
-    if (hue > 170) {
+    } else if (hue > 170) {
       Controller1.Screen.setCursor(1, 1);
       Controller1.Screen.clearScreen();
       Controller1.Screen.print("blue");
       ring = false;
     }
-	if (!team) {
-		if (ring) {
-			if (distancesensor.objectDistance(inches) < 2) {
-				Controller1.Screen.setCursor(1, 1);
-				Controller1.Screen.clearScreen();
-				Controller1.Screen.print("object found");
-				wait(40, msec);
-				intake.stop(brake);
-				wait(20, msec);
-				intake.spin(forward);
-				intake.setVelocity(0, percent);
-				ring = false;
-			}
-		}
-	
-	}
-	else {
-		if (!ring) {
-			if (distancesensor.objectDistance(inches) < 2) {
-				Controller1.Screen.setCursor(1, 1);
-				Controller1.Screen.clearScreen();
-				Controller1.Screen.print("object found");
-				wait(40, msec);
-				intake.stop(brake);
-				wait(20, msec);
-				intake.spin(forward);
-				intake.setVelocity(0, percent);
-				ring = false;
-			}
-		}
-	
-	}
-    else {
-      if (Controller1.ButtonR1.pressing()) {
-        intake.setVelocity(80, percent);
-      }
-      if (Controller1.ButtonR2.pressing()) {
+
+    // Team and object detection logic
+    if (!team) {
+      if (ring && distancesensor.objectDistance(inches) < 2) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("object found");
+        wait(40, msec);
+        intake.stop(brake);
+        wait(20, msec);
+        intake.spin(forward);
         intake.setVelocity(0, percent);
+        ring = false;
+      }
+    } else {
+      if (!ring && distancesensor.objectDistance(inches) < 2) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("object found");
+        wait(40, msec);
+        intake.stop(brake);
+        wait(20, msec);
+        intake.spin(forward);
+        intake.setVelocity(0, percent);
+        ring = false;
       }
     }
 
+    // Intake velocity control
+    if (Controller1.ButtonR1.pressing()) {
+      intake.setVelocity(80, percent);
+    } else if (Controller1.ButtonR2.pressing()) {
+      intake.setVelocity(0, percent);
+    }
 
+    // Goal clamp control
     if (Controller1.ButtonL1.pressing()) {
       goalclamp.set(false);
-    }
-    if (Controller1.ButtonL2.pressing()) {
+    } else if (Controller1.ButtonL2.pressing()) {
       goalclamp.set(true);
-    }       
+    }
+
+    // Tank drive control
     chassis.control_tank();
 
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+    wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
 }
 
