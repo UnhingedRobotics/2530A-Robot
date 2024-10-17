@@ -164,9 +164,9 @@ void pre_auton() {
         break;
     }
     if(Brain.Screen.pressing()){
-      while(Brain.Screen.pressing()) {}
+      while(Controller1.ButtonA.pressing()) {}
       current_auton_selection ++;
-    } else if (current_auton_selection == 8){
+    } else if (current_auton_selection == 3){
       current_auton_selection = 0;
     }
     task::sleep(10);
