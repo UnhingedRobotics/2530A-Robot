@@ -190,6 +190,9 @@ void usercontrol(void) {
   double hue;
   bool ring = false; // true = red, false = blue
   bool team = true;  // true = red team, false = blue team
+  bool ringdetected = false;
+  bool intakeon = false;
+  int intakevelocity;
   intake.spin(forward);
   intake.setVelocity(0, percent);
 
@@ -198,18 +201,31 @@ void usercontrol(void) {
     hue = opticalsensor.hue();
 
     // Color detection logic
-    if (hue < 30) {
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.print("red");
-      ring = true;
-    } else if (hue > 170) {
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.print("blue");
-      ring = false;
+    if (opticalsensor.objectDetected()) {
+      if (hue < 30) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("red");
+        ring = true;
+      } else if (hue > 170) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("blue");
+        ring = false;
+      }
+      ringdetected = true;
+      intakevelocity = 80;
     }
 
+    if (intakeon) {
+      intake.setVelocity(intakevelocity, percent);
+      if (!ringdetected) {
+        intakevelocity = 60;
+      }
+    }
+    else {
+      intakevelocity = 0;
+    }
     // Team and object detection logic
     if (!team) {
       if (ring && distancesensor.objectDistance(inches) < 2) {
@@ -222,6 +238,7 @@ void usercontrol(void) {
         intake.spin(forward);
         intake.setVelocity(0, percent);
         ring = false;
+        ringdetected = false;
       }
     } else {
       if (!ring && distancesensor.objectDistance(inches) < 2) {
@@ -233,15 +250,17 @@ void usercontrol(void) {
         wait(20, msec);
         intake.spin(forward);
         intake.setVelocity(0, percent);
-        ring = false;
+        ring = true;
+        ringdetected = false;
       }
     }
 
     // Intake velocity control
     if (Controller1.ButtonR1.pressing()) {
-      intake.setVelocity(80, percent);
-    } else if (Controller1.ButtonR2.pressing()) {
-      intake.setVelocity(0, percent);
+      intakeon = true;
+    } 
+    if (Controller1.ButtonR2.pressing()) {
+      intakeon = false;
     }
 
     // Goal clamp control
