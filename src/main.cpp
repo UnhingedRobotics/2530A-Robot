@@ -259,15 +259,15 @@ void autonomous(void) {
 void usercontrol(void) {
   intake.spin(forward);
   intake.setVelocity(0, percent);
-  IntakeControl usercontrol;
+  IntakeControl intakeControl;
   // User control code here, inside the loop
   while (1) {
     // Intake velocity control
     if (Controller1.ButtonR1.pressing()) {
-      usercontrol.intakeon = true;
+      intakeControl.intakeon = true;
     } 
     if (Controller1.ButtonR2.pressing()) {
-      usercontrol.intakeon = false;
+      intakeControl.intakeon = false;
     }
 
     // Goal clamp control
@@ -279,7 +279,7 @@ void usercontrol(void) {
 
     // Tank drive control
     chassis.control_tank();
-    usercontrol.colorSorting();
+    intakeControl.colorSorting();
 
     wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
