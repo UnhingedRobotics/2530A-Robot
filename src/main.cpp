@@ -32,6 +32,76 @@ competition Competition;
 /*  already have configured your motors.                                     */
 /*---------------------------------------------------------------------------*/
 
+
+class IntakeControl {
+public:
+  double hue;
+  bool ring = false; // true = red, false = blue
+  bool team = true;  // true = red team, false = blue team
+  bool ringdetected = false;
+  bool intakeon = false;
+  int intakevelocity;
+  void colorSorting() {
+    hue = opticalsensor.hue();
+
+    // Color detection logic
+    if (opticalsensor.objectDetected()) {
+      if (hue < 30) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("red");
+        ring = true;
+      } else if (hue > 170) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("blue");
+        ring = false;
+      }
+      ringdetected = true;
+      intakevelocity = 80;
+    }
+
+    if (intakeon) {
+      intake.setVelocity(intakevelocity, percent);
+      if (!ringdetected) {
+        intakevelocity = 60;
+      }
+    }
+    else {
+      intakevelocity = 0;
+    }
+    // Team and object detection logic
+    if (!team) {
+      if (ring && distancesensor.objectDistance(inches) < 2) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("object found");
+        wait(40, msec);
+        intake.stop(brake);
+        wait(20, msec);
+        intake.spin(forward);
+        intake.setVelocity(0, percent);
+        ring = false;
+        ringdetected = false;
+      }
+    } else {
+      if (!ring && distancesensor.objectDistance(inches) < 2) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("object found");
+        wait(40, msec);
+        intake.stop(brake);
+        wait(20, msec);
+        intake.spin(forward);
+        intake.setVelocity(0, percent);
+        ring = true;
+        ringdetected = false;
+      }
+    }
+
+  }
+
+};
 Drive chassis(
 
 //Pick your drive setup from the list below:
@@ -129,6 +199,7 @@ void pre_auton() {
   vexcodeInit();
   default_constants();
   intake.spin(forward);
+  opticalsensor.integrationTime(5);
   intake.setVelocity(0, percent);
 
   while(!auto_started){
@@ -186,81 +257,17 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
-  opticalsensor.integrationTime(5);
-  double hue;
-  bool ring = false; // true = red, false = blue
-  bool team = true;  // true = red team, false = blue team
-  bool ringdetected = false;
-  bool intakeon = false;
-  int intakevelocity;
   intake.spin(forward);
   intake.setVelocity(0, percent);
-
+  IntakeControl usercontrol;
   // User control code here, inside the loop
   while (1) {
-    hue = opticalsensor.hue();
-
-    // Color detection logic
-    if (opticalsensor.objectDetected()) {
-      if (hue < 30) {
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("red");
-        ring = true;
-      } else if (hue > 170) {
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("blue");
-        ring = false;
-      }
-      ringdetected = true;
-      intakevelocity = 80;
-    }
-
-    if (intakeon) {
-      intake.setVelocity(intakevelocity, percent);
-      if (!ringdetected) {
-        intakevelocity = 60;
-      }
-    }
-    else {
-      intakevelocity = 0;
-    }
-    // Team and object detection logic
-    if (!team) {
-      if (ring && distancesensor.objectDistance(inches) < 2) {
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("object found");
-        wait(40, msec);
-        intake.stop(brake);
-        wait(20, msec);
-        intake.spin(forward);
-        intake.setVelocity(0, percent);
-        ring = false;
-        ringdetected = false;
-      }
-    } else {
-      if (!ring && distancesensor.objectDistance(inches) < 2) {
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("object found");
-        wait(40, msec);
-        intake.stop(brake);
-        wait(20, msec);
-        intake.spin(forward);
-        intake.setVelocity(0, percent);
-        ring = true;
-        ringdetected = false;
-      }
-    }
-
     // Intake velocity control
     if (Controller1.ButtonR1.pressing()) {
-      intakeon = true;
+      usercontrol.intakeon = true;
     } 
     if (Controller1.ButtonR2.pressing()) {
-      intakeon = false;
+      usercontrol.intakeon = false;
     }
 
     // Goal clamp control
@@ -272,6 +279,7 @@ void usercontrol(void) {
 
     // Tank drive control
     chassis.control_tank();
+    usercontrol.colorSorting();
 
     wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
