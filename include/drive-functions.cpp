@@ -10,5 +10,5 @@ public:
   bool ringdetected = false;
   bool intakeon = false;
   int intakevelocity;
-];
+};
 

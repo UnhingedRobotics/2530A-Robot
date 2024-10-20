@@ -3,15 +3,6 @@
 using namespace vex;
 competition Competition;
 
-// enum gameElements {
-	// mobileGoal,
-	// redRing,
-	// blueRing,
-// };
-
-// bool RemoteControlCodeEnabled = true;
-// int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVisionBack_objectIndex = 0;
-
 /*---------------------------------------------------------------------------*/
 /*                             VEXcode Config                                */
 /*                                                                           */

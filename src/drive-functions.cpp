@@ -15,7 +15,7 @@ class IntakeControl {
     hue = opticalsensor.hue();
 
     // Color detection logic
-    if (opticalsensor.objectDetected()) {
+    if (opticalsensor.isNearObject()) {
       if (hue < 30) {
         Controller1.Screen.setCursor(1, 1);
         Controller1.Screen.clearScreen();
