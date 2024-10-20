@@ -122,6 +122,7 @@ void pre_auton() {
   default_constants();
   intake.spin(forward);
   opticalsensor.integrationTime(5);
+  opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
 
   while(!auto_started){
@@ -182,6 +183,8 @@ void usercontrol(void) {
   intake.spin(forward);
   intake.setVelocity(0, percent);
   IntakeControl intakeControl;
+  opticalsensor.setLight(ledstate::on);
+  opticalsensor.setLightPower(100.0, percent);
   // User control code here, inside the loop
   while (1) {
     // Intake velocity control
@@ -203,7 +206,7 @@ void usercontrol(void) {
     chassis.control_tank();
     intakeControl.colorSorting();
 
-    wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources
+    wait(5, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
 }
 
