@@ -140,6 +140,7 @@ float deadband(float input, float width){
   if (std::fabs(input)<width){
     return(0);
   }
+  input = pow(x / 100.0, 2) * 100;
   return(input);
 }
 
