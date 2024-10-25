@@ -183,7 +183,7 @@ void usercontrol(void) {
   intake.spin(forward);
   intake.setVelocity(0, percent);
   IntakeControl intakeControl;
-  opticalsensor.setLight(ledstate::on);
+  opticalsensor.setLight(ledState::on);
   opticalsensor.setLightPower(100.0, percent);
   // User control code here, inside the loop
   while (1) {

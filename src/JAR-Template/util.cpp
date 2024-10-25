@@ -157,7 +157,12 @@ float deadband_squared(float input, float width){
   if (std::fabs(input)<width){
     return(0);
   }
-  input = pow(x / 100.0, 2) * 100;
+  if (input > 0) {
+    input = pow(input / 100.0, 2) * 100;
+  }
+  else {
+    input = pow(input / 100.0, 2) * -100;
+  }
   return(input);
 }
 
