@@ -1,15 +1,16 @@
 #pragma once
 
-class IntakeControl;
-
 class IntakeControl {
 public:
   double hue;
-  bool ring = false; // true = red, false = blue
-  bool team = true;  // true = red team, false = blue team
-  bool ringdetected = false;
-  bool intakeon = false;
+  bool ring;          // true = red, false = blue
+  bool team;          // true = red team, false = blue team
+  bool ringdetected;
+  bool intakeon;
   int intakevelocity;
-  colorSorting();
-};
 
+  // Constructor with an initializer list
+  IntakeControl();
+
+  void colorSorting();
+};
