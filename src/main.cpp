@@ -203,7 +203,7 @@ void usercontrol(void) {
     }
 
     // Tank drive control
-    chassis.control_tank();
+    chassis.control_tank_squared();
     intakeControl.colorSorting();
 
     wait(5, msec); // Sleep the task for a short amount of time to prevent wasted resources
