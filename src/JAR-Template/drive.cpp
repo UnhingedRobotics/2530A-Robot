@@ -696,6 +696,19 @@ void Drive::control_arcade(){
 }
 
 /**
+ * Controls a chassis with left stick throttle and right stick turning.
+ * Default deadband is 5.
+ * Also squares the movement to allow fine movements.
+ */
+
+void Drive::control_arcade_squared(){
+  float throttle = deadband_squared(controller(primary).Axis3.value(), 5);
+  float turn = deadband_squared(controller(primary).Axis1.value(), 5);
+  DriveL.spin(fwd, to_volt(throttle+turn), volt);
+  DriveR.spin(fwd, to_volt(throttle-turn), volt);
+}
+
+/**
  * Controls a chassis with left stick throttle and strafe, and right stick turning.
  * Default deadband is 5.
  */
@@ -711,6 +724,22 @@ void Drive::control_holonomic(){
 }
 
 /**
+ * Controls a chassis with left stick throttle and strafe, and right stick turning.
+ * Default deadband is 5.
+ * Also squares the movement to allow fine movements.
+ */
+
+void Drive::control_holonomic_squared(){
+  float throttle = deadband_squared(controller(primary).Axis3.value(), 5);
+  float turn = deadband_squared(controller(primary).Axis1.value(), 5);
+  float strafe = deadband_squared(controller(primary).Axis4.value(), 5);
+  DriveLF.spin(fwd, to_volt(throttle+turn+strafe), volt);
+  DriveRF.spin(fwd, to_volt(throttle-turn-strafe), volt);
+  DriveLB.spin(fwd, to_volt(throttle+turn-strafe), volt);
+  DriveRB.spin(fwd, to_volt(throttle-turn+strafe), volt);
+}
+
+/**
  * Controls a chassis with left stick left drive and right stick right drive.
  * Default deadband is 5.
  */
@@ -718,6 +747,19 @@ void Drive::control_holonomic(){
 void Drive::control_tank(){
   float leftthrottle = deadband(controller(primary).Axis3.value(), 5);
   float rightthrottle = deadband(controller(primary).Axis2.value(), 5);
+  DriveL.spin(fwd, to_volt(leftthrottle), volt);
+  DriveR.spin(fwd, to_volt(rightthrottle), volt);
+}
+
+/**
+ * Controls a chassis with left stick left drive and right stick right drive.
+ * Default deadband is 5.
+ * Also squares the movement to allow fine movements.
+ */
+
+void Drive::control_tank_squared(){
+  float leftthrottle = deadband_squared(controller(primary).Axis3.value(), 5);
+  float rightthrottle = deadband_squared(controller(primary).Axis2.value(), 5);
   DriveL.spin(fwd, to_volt(leftthrottle), volt);
   DriveR.spin(fwd, to_volt(rightthrottle), volt);
 }

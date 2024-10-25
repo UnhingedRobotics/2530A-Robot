@@ -140,6 +140,23 @@ float deadband(float input, float width){
   if (std::fabs(input)<width){
     return(0);
   }
+  return(input);
+}
+
+/**
+ * Deadband function for joystick control.
+ * If the joystick value is small, we should just consider it 0.
+ * 
+ * @param input The input joystick value.
+ * @param width Minimum value to not get zeroed out.
+ * @param input The input then get squared from the scale of 1 and changed back to the scale of velocity.
+ * @return The deadbanded value.
+ */
+
+float deadband_squared(float input, float width){
+  if (std::fabs(input)<width){
+    return(0);
+  }
   input = pow(x / 100.0, 2) * 100;
   return(input);
 }
