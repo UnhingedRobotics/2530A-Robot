@@ -19,6 +19,7 @@
 #include "v5_vcs.h"
 
 #include "robot-config.h"
+#include "drive-functions.h"
 #include "JAR-Template/odom.h"
 #include "JAR-Template/drive.h"
 #include "JAR-Template/util.h"
