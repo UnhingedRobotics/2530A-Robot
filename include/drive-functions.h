@@ -9,14 +9,25 @@ public:
   bool intakeon;
   int intakevelocity;
 
-  // Constructor with an initializer list
-  IntakeControl();
-
+  IntakeControl(); // Constructor with an initializer list
   void colorSorting();
+};
 
-  ArmControl();
+class ArmControl {
+public:
+  float arm_max_voltage;
+  float arm_kp;
+  float arm_ki;
+  float arm_kd;
+  float arm_starti;
+  float arm_settle_error;
+  float arm_settle_time;
+  float arm_timeout;
+
+  ArmControl(); // Constructor
+  void set_arm_constants(float arm_max_voltage, float arm_kp, float arm_ki, float arm_kd, float arm_starti);
   void move_to_angle(float angle);
-  void move_to_angle(float angle, float turn_max_voltage);
-  void move_to_angle(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout);
-  void move_to_angle(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+  void move_to_angle(float angle, float arm_max_voltage);
+  void move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout);
+  void move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti);
 };

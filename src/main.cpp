@@ -24,6 +24,7 @@ competition Competition;
 /*  already have configured your motors.                                     */
 /*---------------------------------------------------------------------------*/
 
+ArmControl armmotor; // Define armmotor here
 
 Drive chassis(
 

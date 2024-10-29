@@ -608,7 +608,7 @@ void Drive::drive_to_pose(float X_position, float Y_position, float angle, float
  * @param drive_min_voltage Minimum voltage on the drive, used for chaining movements.
  */
 void Drive::drive_to_pose_pursuit(float X_position, float Y_position) {
-    drive_to_pose_pursuit(X_position, Y_position, pure_pursuit_look_ahead, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+    drive_to_pose_pursuit(X_position, Y_position, look_ahead_distance, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
 }
 
 void Drive::drive_to_pose_pursuit(float X_position, float Y_position, float look_ahead_distance, float drive_min_voltage) {
@@ -623,12 +623,7 @@ void Drive::drive_to_pose_pursuit(float X_position, float Y_position, float look
     drive_to_pose_pursuit(X_position, Y_position, look_ahead_distance, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
 }
 
-void Drive::drive_to_pose_pursuit(
-    float goal_X, float goal_Y, float look_ahead_distance,
-    float drive_min_voltage, float drive_max_voltage, float heading_max_voltage,
-    float drive_settle_error, float drive_settle_time, float drive_timeout,
-    float drive_kp, float drive_ki, float drive_kd, float drive_starti,
-    float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
+void Drive::drive_to_pose_pursuit( float goal_X, float goal_Y, float look_ahead_distance, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
 
     constexpr float wheelbase = 13.25 /* specify your wheelbase constant here */;
     float goal_distance = hypot(goal_X - get_X_position(), goal_Y - get_Y_position());
