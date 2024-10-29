@@ -1,6 +1,6 @@
 #pragma once
 #include "JAR-Template/drive.h"
-
+#include "drive-functions.h"
 
 class ArmControl;
 class Drive;
