@@ -37,6 +37,9 @@ void default_constants(){
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
 
+  // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
+  armmotor.set_arm_constants(12, .4, .03, 3, 15);
+
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
