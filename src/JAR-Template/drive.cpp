@@ -596,6 +596,66 @@ void Drive::drive_to_pose(float X_position, float Y_position, float angle, float
     task::sleep(10);
   }
 }
+/**
+ * Drives to a specified point on the field.
+ * Uses a pure pursuit algorithm.
+ * 
+ * @param X_position Desired x position in inches.
+ * @param Y_position Desired y position in inches.
+ * @param angle Desired orientation in degrees.
+ * @param lead Constant scale factor that determines how far away the carrot point is. 
+ * @param setback Distance in inches from target by which the carrot is always pushed back.
+ * @param drive_min_voltage Minimum voltage on the drive, used for chaining movements.
+ */
+void Drive::drive_to_pose_pursuit(float X_position, float Y_position) {
+    drive_to_pose_pursuit(X_position, Y_position, pure_pursuit_look_ahead, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_to_pose_pursuit(float X_position, float Y_position, float look_ahead_distance, float drive_min_voltage) {
+    drive_to_pose_pursuit(X_position, Y_position, look_ahead_distance, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_to_pose_pursuit(float X_position, float Y_position, float look_ahead_distance, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage) {
+    drive_to_pose_pursuit(X_position, Y_position, look_ahead_distance, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_to_pose_pursuit(float X_position, float Y_position, float look_ahead_distance, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout) {
+    drive_to_pose_pursuit(X_position, Y_position, look_ahead_distance, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_to_pose_pursuit(
+    float goal_X, float goal_Y, float look_ahead_distance,
+    float drive_min_voltage, float drive_max_voltage, float heading_max_voltage,
+    float drive_settle_error, float drive_settle_time, float drive_timeout,
+    float drive_kp, float drive_ki, float drive_kd, float drive_starti,
+    float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
+
+    constexpr float wheelbase = 13.25 /* specify your wheelbase constant here */;
+    float goal_distance = hypot(goal_X - get_X_position(), goal_Y - get_Y_position());
+    PID drivePID(goal_distance, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
+    PID headingPID(0.0, heading_kp, heading_ki, heading_kd, heading_starti);
+
+    while (!drivePID.is_settled()) {
+        float look_ahead_X = goal_X;
+        float look_ahead_Y = goal_Y;
+
+        float heading_error = atan2(look_ahead_Y - get_Y_position(), look_ahead_X - get_X_position()) - get_absolute_heading();
+        heading_error = reduce_negative_180_to_180(to_deg(heading_error)); 
+
+        float steering_angle = atan((2 * wheelbase * sin(to_rad(heading_error))) / look_ahead_distance);
+        float distance_error = 2 * asin(look_ahead_distance / (2 * (look_ahead_distance / (2 * sin(to_rad(heading_error))))));
+
+        float drive_output = drivePID.compute(distance_error);
+        float heading_output = headingPID.compute(steering_angle);
+
+        drive_output = clamp(drive_output, -drive_max_voltage, drive_max_voltage);
+        heading_output = clamp(heading_output, -heading_max_voltage, heading_max_voltage);
+        drive_output = clamp_min_voltage(drive_output, drive_min_voltage);
+
+        drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
+        task::sleep(10);
+    }
+}
 
 /**
  * Turns to a specified point on the field.
