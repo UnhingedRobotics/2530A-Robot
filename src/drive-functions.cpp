@@ -92,7 +92,7 @@ void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_set
 void Arm::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti){
   PID armPID(reduce_negative_180_to_180(angle - get_absolute_heading()), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
   while( !armPID.is_settled() ){
-    float error = angle - fourBar.position(percent);
+    float error = angle - fourBar.position(degrees);
     float output = armPID.compute(error);
     output = arm_max_voltage;
     fourBar.setVelocity(output, percent);
