@@ -7,14 +7,18 @@ extern brain Brain;
 
 //Add your devices below, and don't forget to do the same in robot-config.cpp:
 extern controller Controller1;
-extern motor_group intake;
 extern motor leftdrivefront;
 extern motor leftdriveback;
 extern motor rightdrivefront;
 extern motor rightdriveback;
-extern inertial inertialsensor;
+extern motor_group intake;
+extern motor_group fourBar;
+extern inertial leftinertialsensor;
+extern inertial rightinertialsensor;
 extern distance distancesensor;
 extern optical opticalsensor;
 extern digital_out goalclamp;
+extern rotation verticalwheelrotation;
+extern rotation horizaontalwheelrotation;
 
 void  vexcodeInit( void );

@@ -6,6 +6,7 @@ enum gameElements {
 	blueRing,
 };
 
+IntakeControl intakeControl;
 bool RemoteControlCodeEnabled = true;
 int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVisionBack_objectIndex = 0;
 
@@ -16,6 +17,18 @@ int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVis
  * drive, heading, turning, and swinging, as well as the PID and
  * exit conditions, check the docs.
  */
+
+int intakeTaskFunction() {
+    intake.spin(forward);
+    intake.setVelocity(0, percent);
+
+    while (true) {
+        intakeControl.colorSorting();
+        wait(10, msec); // Small delay to avoid resource overuse
+    }
+
+    return 0; // End of the task
+}
 
 void default_constants(){
   // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
@@ -50,10 +63,13 @@ void odom_constants(){
  */
 
 void skills(){
-  chassis.drive_distance(6);
-  chassis.drive_distance(12);
-  chassis.drive_distance(18);
-  chassis.drive_distance(-36);
+  task intakeTask(intakeTaskFunction);
+  intakeControl.team = false;
+  chassis.drive_distance(-26);
+  intakeControl.intakeon = true;
+  goalclamp.set(true);
+  chassis.turn_to_angle(90);
+
 }
 
 /**
@@ -61,10 +77,15 @@ void skills(){
  */
 
 void winpoint(){
-  chassis.drive_distance(24);
-  chassis.turn_to_angle(-45);
-  chassis.drive_distance(-36);
-  chassis.right_swing_to_angle(-90);
-  chassis.drive_distance(24);
-  chassis.turn_to_angle(0);
+  task intakeTask(intakeTaskFunction);
+  intakeControl.team = false;
+  intakeControl.intakeon = true;
+  chassis.drive_distance(-6);
+  goalclamp.set(false);
+  chassis.turn_to_angle(90);
+  chassis.drive_distance(20);
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(-6);
+  chassis.turn_to_angle(270);
+  chassis.drive_distance(60);
 }

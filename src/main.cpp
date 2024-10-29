@@ -3,6 +3,7 @@
 using namespace vex;
 competition Competition;
 
+
 /*---------------------------------------------------------------------------*/
 /*                             VEXcode Config                                */
 /*                                                                           */
@@ -51,7 +52,7 @@ motor_group(leftdrivefront,leftdriveback),
 motor_group(rightdrivefront,rightdriveback),
 
 //Specify the PORT NUMBER of your inertial sensor, in PORT format (i.e. "PORT1", not simply "1"):
-PORT17,
+PORT12,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
 3.25,
@@ -121,9 +122,16 @@ void pre_auton() {
   vexcodeInit();
   default_constants();
   intake.spin(forward);
+  fourBar.setVelocity(0, percent);
+  fourBar.setMaxTorque(100, percent);
+  fourBar.spin(forward);
   opticalsensor.integrationTime(5);
   opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
+  intake.spin(forward);
+  opticalsensor.setLight(ledState::on);
+  opticalsensor.setLightPower(100.0, percent);
+  IntakeControl intakeControl;
 
   while(!auto_started){
     Brain.Screen.clearScreen();
@@ -180,13 +188,18 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
-  intake.spin(forward);
-  intake.setVelocity(0, percent);
   IntakeControl intakeControl;
-  opticalsensor.setLight(ledState::on);
-  opticalsensor.setLightPower(100.0, percent);
   // User control code here, inside the loop
   while (1) {
+    if (Controller1.ButtonB.pressing()) {
+      fourBar.setVelocity(100, percent);
+    }
+    if (Controller1.ButtonX.pressing()) {
+      fourBar.setVelocity(0, percent);
+    }
+    if (Controller1.ButtonY.pressing()) {
+      fourBar.setVelocity(-100, percent);
+    }
     // Intake velocity control
     if (Controller1.ButtonR1.pressing()) {
       intakeControl.intakeon = true;
@@ -198,7 +211,8 @@ void usercontrol(void) {
     // Goal clamp control
     if (Controller1.ButtonL1.pressing()) {
       goalclamp.set(false);
-    } else if (Controller1.ButtonL2.pressing()) {
+    } 
+    if (Controller1.ButtonL2.pressing()) {
       goalclamp.set(true);
     }
 
