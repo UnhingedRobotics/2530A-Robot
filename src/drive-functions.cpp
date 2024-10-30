@@ -4,66 +4,46 @@
 using namespace vex;
 
 // Constructor with initializer list to initialize member variables
-IntakeControl::IntakeControl() : 
-  hue(0.0), 
-  ring(false), 
-  team(true), 
-  ringdetected(false), 
-  intakeon(false), 
-  intakevelocity(0) 
+IntakeControl::IntakeControl() :
+  hue(0.0),
+  ring(false),
+  team(true),
+  ringdetected(false),
+  intakeon(false),
+  intakevelocity(0),
+  mode(INTAKE_COLOR_SORT)
 {}
 
+void IntakeControl::setMode(Mode newMode) {
+  mode = newMode;
+  if (mode == WALLSTAKE_HOLDING || mode == HIGH_WALLSTAKE_SCORING || mode == ALLIANCE_WALLSTAKE_SCORING) {
+    intakeon = false; // Stop intake when switching to wallstake modes
+  }
+}
+
 void IntakeControl::colorSorting() {
-  hue = opticalsensor.hue();
-  if (intakeon) {
-    // Color detection logic
+  if (mode == INTAKE_COLOR_SORT && intakeon) {
+    hue = opticalsensor.hue();
     if (hue < 30) {
-      Controller1.Screen.setCursor(1, 1);
       Controller1.Screen.clearScreen();
       Controller1.Screen.print("red");
       ring = true;
-    }
-    if (hue > 170) {
-      Controller1.Screen.setCursor(1, 1);
+    } else if (hue > 170) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.print("blue");
       ring = false;
     }
+
     if (opticalsensor.isNearObject()) {
       ringdetected = true;
       intakevelocity = 80;
     }
-    if (!team) {
-      if (distancesensor.objectDistance(inches) < 4) {
-        Controller1.Screen.setCursor(1, 1);
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.print("object found");
-        wait(40, msec);
-        intakevelocity = 0;
-        intake.stop(brake);
-        wait(20, msec);
-        intake.spin(forward);
-        ring = false;
-        ringdetected = false;
-      }
-      else {
-        if (distancesensor.objectDistance(inches) < 4) {
-          Controller1.Screen.setCursor(1, 1);
-          Controller1.Screen.clearScreen();
-          Controller1.Screen.print("object found");
-          wait(40, msec);
-          intakevelocity = 0;
-          intake.stop(brake);
-    	  wait(20, msec);
-          intake.spin(forward);
-          ring = true;
-          ringdetected = false;
-        }
-      }
-    } 
     if (!ringdetected) {
       intakevelocity = 60;
     }
+  } else if (mode == WALLSTAKE_HOLDING && distancesensor.objectDistance(inches) < 4) {
+    intakevelocity = 0;
+    intake.stop(brake);
   } else {
     intakevelocity = 0;
   }
@@ -106,3 +86,21 @@ void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_set
     task::sleep(10);
   }
 }
+
+void IntakeControl::update() {
+  switch (mode) {
+    case INTAKE_COLOR_SORT:
+      colorSorting();
+      break;
+    case WALLSTAKE_HOLDING:
+      if (distancesensor.objectDistance(inches) < 4) {
+        intake.stop(brake);
+      }
+      break;
+    case HIGH_WALLSTAKE_SCORING:
+    case ALLIANCE_WALLSTAKE_SCORING:
+      intake.stop(brake);
+      break;
+  }
+}
+

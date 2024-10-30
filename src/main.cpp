@@ -16,6 +16,8 @@ competition Competition;
 /*  motors spin forward.                                                     */
 /*---------------------------------------------------------------------------*/
 
+ArmControl armControl; // Define armmotor here
+
 /*---------------------------------------------------------------------------*/
 /*                             JAR-Template Config                           */
 /*                                                                           */
@@ -24,7 +26,6 @@ competition Competition;
 /*  already have configured your motors.                                     */
 /*---------------------------------------------------------------------------*/
 
-ArmControl armmotor; // Define armmotor here
 
 Drive chassis(
 
@@ -190,36 +191,47 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
   IntakeControl intakeControl;
-  // User control code here, inside the loop
+
   while (1) {
-    if (Controller1.ButtonB.pressing()) {
-      fourBar.setVelocity(100, percent);
-    }
-    if (Controller1.ButtonX.pressing()) {
-      fourBar.setVelocity(0, percent);
-    }
-    if (Controller1.ButtonY.pressing()) {
-      fourBar.setVelocity(-100, percent);
-    }
-    // Intake velocity control
+    // Intake mode management
     if (Controller1.ButtonR1.pressing()) {
+      intakeControl.setMode(INTAKE_COLOR_SORT);
       intakeControl.intakeon = true;
     } 
     if (Controller1.ButtonR2.pressing()) {
       intakeControl.intakeon = false;
     }
 
-    // Goal clamp control
-    if (Controller1.ButtonL1.pressing()) {
-      goalclamp.set(false);
-    } 
-    if (Controller1.ButtonL2.pressing()) {
-      goalclamp.set(true);
+    // Wallstake holding mode
+    if (Controller1.ButtonX.pressing()) {
+      intakeControl.setMode(WALLSTAKE_HOLDING);
+    }
+
+    // Tall Wallstake scoring mode
+    if (Controller1.ButtonY.pressing()) {
+      intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
+      armControl.move_to_angle(90); // Move arm to 90 degrees
+    }
+
+    // Alliance Wallstake scoring mode
+    if (Controller1.ButtonB.pressing()) {
+      intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
+      armControl.move_to_angle(90); // Move arm to 90 degrees
+    }
+
+    // Return to color sorting mode and reset arm position
+    if (!Controller1.ButtonB.pressing() && intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
+      intakeControl.setMode(INTAKE_COLOR_SORT);
+      armControl.move_to_angle(90); // Move arm to 90 degrees
+    }
+    if (!Controller1.ButtonY.pressing() && intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
+      intakeControl.setMode(INTAKE_COLOR_SORT);
+      armControl.move_to_angle(90); // Move arm to 90 degrees
     }
 
     // Tank drive control
     chassis.control_tank_squared();
-    intakeControl.colorSorting();
+    intakeControl.update();
 
     wait(5, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
