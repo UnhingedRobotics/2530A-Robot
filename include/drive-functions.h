@@ -24,8 +24,8 @@ public:
   float arm_settle_time;
   float arm_timeout;
 
-  ArmControl(); // Constructor
   void set_arm_constants(float arm_max_voltage, float arm_kp, float arm_ki, float arm_kd, float arm_starti);
+  void set_arm_exit_conditions(float arm_settle_error, float arm_settle_time, float arm_timeout);
   void move_to_angle(float angle);
   void move_to_angle(float angle, float arm_max_voltage);
   void move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout);

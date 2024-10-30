@@ -13,16 +13,67 @@ IntakeControl::IntakeControl() :
   intakevelocity(0) 
 {}
 
-// ArmControl constructor
-ArmControl::ArmControl() : 
-  arm_max_voltage(0), arm_kp(0), arm_ki(0), arm_kd(0), arm_starti(0),
-  arm_settle_error(0), arm_settle_time(0), arm_timeout(0)
-{}
-
 void IntakeControl::colorSorting() {
   hue = opticalsensor.hue();
-  // Add color detection logic here
-  // (code remains the same as provided in the original post)
+  if (intakeon) {
+    // Color detection logic
+    if (hue < 30) {
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.print("red");
+      ring = true;
+    }
+    if (hue > 170) {
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.print("blue");
+      ring = false;
+    }
+    if (opticalsensor.isNearObject()) {
+      ringdetected = true;
+      intakevelocity = 80;
+    }
+    if (!team) {
+      if (distancesensor.objectDistance(inches) < 4) {
+        Controller1.Screen.setCursor(1, 1);
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("object found");
+        wait(40, msec);
+        intakevelocity = 0;
+        intake.stop(brake);
+        wait(20, msec);
+        intake.spin(forward);
+        ring = false;
+        ringdetected = false;
+      }
+      else {
+        if (distancesensor.objectDistance(inches) < 4) {
+          Controller1.Screen.setCursor(1, 1);
+          Controller1.Screen.clearScreen();
+          Controller1.Screen.print("object found");
+          wait(40, msec);
+          intakevelocity = 0;
+          intake.stop(brake);
+    	  wait(20, msec);
+          intake.spin(forward);
+          ring = true;
+          ringdetected = false;
+        }
+      }
+    } 
+    if (!ringdetected) {
+      intakevelocity = 60;
+    }
+  } else {
+    intakevelocity = 0;
+  }
+  intake.setVelocity(intakevelocity, percent);
+}
+
+void ArmControl::set_arm_exit_conditions(float arm_settle_error, float arm_settle_time, float arm_timeout){
+  this->arm_settle_error = arm_settle_error;
+  this->arm_settle_time = arm_settle_time;
+  this->arm_timeout = arm_timeout;
 }
 
 void ArmControl::set_arm_constants(float arm_max_voltage, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
