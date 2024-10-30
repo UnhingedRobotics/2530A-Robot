@@ -2,10 +2,10 @@
 #include "JAR-Template/drive.h"
 #include "drive-functions.h"
 
-class ArmControl;
+class ArmCOntrol;
 class Drive;
 
-extern ArmControl armmotor;
+extern ArmControl armControl;
 extern Drive chassis;
 
 void default_constants();
