@@ -210,7 +210,7 @@ void usercontrol(void) {
     // Tall Wallstake scoring mode
     if (Controller1.ButtonY.pressing()) {
       intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-      armControl.move_to_angle(90); // Move arm to 90 degrees
+      armControl.move_to_angle(180); // Move arm to 90 degrees
     }
 
     // Alliance Wallstake scoring mode
@@ -222,11 +222,11 @@ void usercontrol(void) {
     // Return to color sorting mode and reset arm position
     if (!Controller1.ButtonB.pressing() && intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
       intakeControl.setMode(INTAKE_COLOR_SORT);
-      armControl.move_to_angle(90); // Move arm to 90 degrees
+      armControl.move_to_angle(0); // Move arm to 90 degrees
     }
     if (!Controller1.ButtonY.pressing() && intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
       intakeControl.setMode(INTAKE_COLOR_SORT);
-      armControl.move_to_angle(90); // Move arm to 90 degrees
+      armControl.move_to_angle(0); // Move arm to 90 degrees
     }
 
     // Tank drive control
