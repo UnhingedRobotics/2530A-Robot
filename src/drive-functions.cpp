@@ -24,16 +24,17 @@ void IntakeControl::setMode(Mode newMode) {
 void IntakeControl::colorSorting() {
   if (mode == INTAKE_COLOR_SORT && intakeon) {
     hue = opticalsensor.hue();
-    if (hue < 30) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.print("red");
-      ring = true;
-    } else if (hue > 170) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.print("blue");
-      ring = false;
-    }
-
+    if (!ringdetected) {
+	  if (hue < 30) {
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("red");
+        ring = true;
+      } else if (hue > 170) {
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.print("blue");
+        ring = false;
+      }
+	}
     if (opticalsensor.isNearObject()) {
       ringdetected = true;
       intakevelocity = 80;
@@ -41,18 +42,29 @@ void IntakeControl::colorSorting() {
     if (!ringdetected) {
       intakevelocity = 60;
     }
-    if (ringdetected) {
-      if (team) {
-        if (!ring) {
-          if (distancesensor.objectDistance(inches) < 4) {
-          intake.stop(brake);
-          intakevelocity = 0;
-          intakeon = false;
-          ringdetected = false;
+    if (distancesensor.objectDistance(inches) < 4) {
+	  if (ringdetected) {
+        if (team) {
+          if (!ring) {
+            if (distancesensor.objectDistance(inches) < 4) {
+              intake.stop(brake);
+              intakevelocity = 0;
+              intakeon = false;
+            }
           }
         }
-      }  
-    }
+	    else {
+	      if (ring) {
+            if (distancesensor.objectDistance(inches) < 4) {
+              intake.stop(brake);
+              intakevelocity = 0;
+              intakeon = false;
+            }
+		  }
+	    }    
+        ringdetected = false;
+	  }
+	}
 
   } else if (mode == WALLSTAKE_HOLDING && distancesensor.objectDistance(inches) < 4) {
     intakevelocity = 0;
