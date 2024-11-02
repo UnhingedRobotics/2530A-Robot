@@ -231,6 +231,16 @@ void usercontrol(void) {
       armControl.move_to_angle(0); // Move arm to 90 degrees
     }
 
+    //Elijah's version of mogo clamp mech code :D
+    if (Controller1.ButtonL1.pressing()) {
+      goalclamp.set(true);
+    }
+
+    //Elijah's version of mogo clamp mech code :D
+    if (!Controller1.ButtonL2.pressing()) {
+      goalclamp.set(false);
+    }
+
     // Tank drive control
     chassis.control_tank_squared();
     intakeControl.update();

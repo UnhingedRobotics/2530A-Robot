@@ -43,7 +43,7 @@ void IntakeControl::colorSorting() {
       intakevelocity = 60;
     }
     if (distancesensor.objectDistance(inches) < 4) {
-	  if (ringdetected) {
+      if (ringdetected) {
         if (team) {
           if (!ring) {
             if (distancesensor.objectDistance(inches) < 4) {
@@ -53,19 +53,18 @@ void IntakeControl::colorSorting() {
             }
           }
         }
-	    else {
-	      if (ring) {
+        else {
+          if (ring) {
             if (distancesensor.objectDistance(inches) < 4) {
               intake.stop(brake);
               intakevelocity = 0;
               intakeon = false;
             }
-		  }
-	    }    
+          }
+        }    
         ringdetected = false;
+      }
 	  }
-	}
-
   } else if (mode == WALLSTAKE_HOLDING && distancesensor.objectDistance(inches) < 4) {
     intakevelocity = 0;
     intake.stop(brake);
