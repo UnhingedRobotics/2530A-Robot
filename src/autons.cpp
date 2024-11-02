@@ -6,7 +6,6 @@ enum gameElements {
 	blueRing,
 };
 
-IntakeControl intakeControl;
 bool RemoteControlCodeEnabled = true;
 int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVisionBack_objectIndex = 0;
 
@@ -23,12 +22,9 @@ int intakeTaskFunction() {
     intake.setVelocity(0, percent);
 
     while (true) {
-        intakeControl.colorSorting();
-        if (!intakeControl.intakeon) {
-          wait(1, seconds);
-          intakeControl.intakeon = true;
-        }
-        wait(5, msec); // Small delay to avoid resource overuse
+      // Intake mode management
+      intakeControl.colorSorting();
+      wait(5, msec); // Small delay to avoid resource overuse
     }
 
     return 0; // End of the task
@@ -40,13 +36,13 @@ void default_constants(){
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
-  armControl.set_arm_constants(12, .4, .03, 3, 15);
+  armControl.set_arm_constants(12, .2, 0, 0, 0);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
-  armControl.set_arm_exit_conditions(1, 300, 3000);
+  armControl.set_arm_exit_conditions(8, 300, 3000);
 }
 
 /**
@@ -71,23 +67,26 @@ void odom_constants(){
 void skills(){
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
-  chassis.drive_distance(-45);
+  chassis.drive_distance(-42);
   wait(0.5, seconds);
-  chassis.drive_distance(-3);
+  chassis.drive_distance(-6);
   goalclamp.set(true);
   wait(0.5, seconds);
   intakeControl.intakeon = true;
   chassis.turn_to_angle(90);
-  chassis.drive_distance(42);
+  chassis.drive_distance(46);
   wait(2, seconds);
   chassis.turn_to_angle(180);
-  chassis.drive_distance(20);
+  chassis.drive_distance(24);
   chassis.turn_to_angle(270);  
-  chassis.drive_distance(30);
+  chassis.drive_distance(23);
   wait(2, seconds);
-  chassis.turn_to_angle(360);
-  chassis.drive_distance(50); 
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(-42);
   goalclamp.set(false);
+  chassis.drive_distance(25);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(35);
 }
 
 /**

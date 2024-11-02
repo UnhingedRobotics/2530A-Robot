@@ -15,8 +15,8 @@ competition Competition;
 /*  properly reversed, meaning the drive should drive forward when all       */
 /*  motors spin forward.                                                     */
 /*---------------------------------------------------------------------------*/
-
-ArmControl armControl; // Define armmotor here
+IntakeControl intakeControl; // Define Intake Control here
+ArmControl armControl; // Define Arm Control here
 
 /*---------------------------------------------------------------------------*/
 /*                             JAR-Template Config                           */
@@ -119,6 +119,66 @@ bool auto_started = false;
  * be more descriptive, if you like.
  */
 
+
+
+int armTaskFunctionUser() {
+    intake.spin(forward);
+    intake.setVelocity(0, percent);
+
+    while (true) {
+        // Wallstake holding mode
+        if (Controller1.ButtonX.pressing()) {
+          intakeControl.setMode(WALLSTAKE_HOLDING);
+        }
+
+        // Tall Wallstake scoring mode
+        if (Controller1.ButtonY.pressing()) {
+          intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
+          armControl.move_to_angle(68); // Move arm to 90 degrees
+        }
+
+        // Alliance Wallstake scoring mode
+        if (Controller1.ButtonB.pressing()) {
+          intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
+          // fourBar.setVelocity(100, percent);
+          armControl.move_to_angle(40); // Move arm to 90 degrees
+        }
+
+        // Return to color sorting mode and reset arm position
+        if (!Controller1.ButtonB.pressing() && intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
+          intakeControl.setMode(INTAKE_COLOR_SORT);
+          armControl.move_to_angle(0); // Move arm to 90 degrees
+        }
+        if (!Controller1.ButtonY.pressing() && intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
+          intakeControl.setMode(INTAKE_COLOR_SORT);
+          armControl.move_to_angle(0); // Move arm to 90 degrees
+        }
+        wait(10, msec); // Small delay to avoid resource overuse
+    }
+
+    return 0; // End of the task
+}
+
+int intakeTaskFunctionUser() {
+    intake.spin(forward);
+    intake.setVelocity(0, percent);
+
+    while (true) {
+      // Intake mode management
+      intakeControl.colorSorting();
+      if (Controller1.ButtonR1.pressing()) {
+        intakeControl.setMode(INTAKE_COLOR_SORT);
+        intakeControl.intakeon = true;
+      } 
+      if (Controller1.ButtonR2.pressing()) {
+        intakeControl.intakeon = false;
+      }
+      wait(5, msec); // Small delay to avoid resource overuse
+    }
+
+    return 0; // End of the task
+}
+
 void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE
   vexcodeInit();
@@ -191,45 +251,9 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
-  IntakeControl intakeControl;
-
+  task armTask(armTaskFunctionUser);
+  task intakeTask(intakeTaskFunctionUser);
   while (1) {
-    // Intake mode management
-    if (Controller1.ButtonR1.pressing()) {
-      intakeControl.setMode(INTAKE_COLOR_SORT);
-      intakeControl.intakeon = true;
-    } 
-    if (Controller1.ButtonR2.pressing()) {
-      intakeControl.intakeon = false;
-    }
-
-    // Wallstake holding mode
-    if (Controller1.ButtonX.pressing()) {
-      intakeControl.setMode(WALLSTAKE_HOLDING);
-    }
-
-    // Tall Wallstake scoring mode
-    if (Controller1.ButtonY.pressing()) {
-      intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-      armControl.move_to_angle(20); // Move arm to 90 degrees
-    }
-
-    // Alliance Wallstake scoring mode
-    if (Controller1.ButtonB.pressing()) {
-      intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-      // fourBar.setVelocity(100, percent);
-      armControl.move_to_angle(0); // Move arm to 90 degrees
-    }
-
-    // Return to color sorting mode and reset arm position
-    if (!Controller1.ButtonB.pressing() && intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
-      intakeControl.setMode(INTAKE_COLOR_SORT);
-      armControl.move_to_angle(0); // Move arm to 90 degrees
-    }
-    if (!Controller1.ButtonY.pressing() && intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
-      intakeControl.setMode(INTAKE_COLOR_SORT);
-      armControl.move_to_angle(0); // Move arm to 90 degrees
-    }
 
     //Elijah's version of mogo clamp mech code :D
     if (Controller1.ButtonL1.pressing()) {
@@ -245,7 +269,7 @@ void usercontrol(void) {
     chassis.control_tank_squared();
     intakeControl.update();
 
-    wait(5, msec); // Sleep the task for a short amount of time to prevent wasted resources
+    wait(7, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
 }
 
