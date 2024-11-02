@@ -24,7 +24,11 @@ int intakeTaskFunction() {
 
     while (true) {
         intakeControl.colorSorting();
-        wait(10, msec); // Small delay to avoid resource overuse
+        if (!intakeControl.intakeon) {
+          wait(1, seconds);
+          intakeControl.intakeon = true;
+        }
+        wait(5, msec); // Small delay to avoid resource overuse
     }
 
     return 0; // End of the task
@@ -66,12 +70,24 @@ void odom_constants(){
 
 void skills(){
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
-  chassis.drive_distance(-26);
-  intakeControl.intakeon = true;
+  intakeControl.team = true;
+  chassis.drive_distance(-45);
+  wait(0.5, seconds);
+  chassis.drive_distance(-3);
   goalclamp.set(true);
+  wait(0.5, seconds);
+  intakeControl.intakeon = true;
   chassis.turn_to_angle(90);
-
+  chassis.drive_distance(42);
+  wait(2, seconds);
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(20);
+  chassis.turn_to_angle(270);  
+  chassis.drive_distance(30);
+  wait(2, seconds);
+  chassis.turn_to_angle(360);
+  chassis.drive_distance(50); 
+  goalclamp.set(false);
 }
 
 /**

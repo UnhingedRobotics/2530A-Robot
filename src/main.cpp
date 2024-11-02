@@ -120,12 +120,13 @@ bool auto_started = false;
  */
 
 void pre_auton() {
-  // Initializing Robot Configuration. DO NOT REMOVE!
+  // Initializing Robot Configuration. DO NOT REMOVE
   vexcodeInit();
   default_constants();
   intake.spin(forward);
   fourBar.setVelocity(0, percent);
   fourBar.setMaxTorque(100, percent);
+  fourBar.resetPosition();
   fourBar.spin(forward);
   opticalsensor.integrationTime(5);
   opticalsensor.gestureDisable();
@@ -210,13 +211,14 @@ void usercontrol(void) {
     // Tall Wallstake scoring mode
     if (Controller1.ButtonY.pressing()) {
       intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-      armControl.move_to_angle(180); // Move arm to 90 degrees
+      armControl.move_to_angle(20); // Move arm to 90 degrees
     }
 
     // Alliance Wallstake scoring mode
     if (Controller1.ButtonB.pressing()) {
       intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-      armControl.move_to_angle(90); // Move arm to 90 degrees
+      // fourBar.setVelocity(100, percent);
+      armControl.move_to_angle(0); // Move arm to 90 degrees
     }
 
     // Return to color sorting mode and reset arm position
