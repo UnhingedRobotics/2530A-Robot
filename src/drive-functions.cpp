@@ -73,13 +73,27 @@ void IntakeControl::colorSorting() {
         ringdetected = false;
       }
 	  }
-  } else if (mode == WALLSTAKE_HOLDING && distancesensor.objectDistance(inches) < 4) {
-    intakevelocity = 0;
-  } else {
+  } 
+  else {
     intakevelocity = 0;
   }
   intake.spin(forward);
   intake.setVelocity(intakevelocity, percent);
+}
+
+void IntakeControl::update() {
+  switch (mode) {
+    case INTAKE_COLOR_SORT:
+      colorSorting();
+      break;
+    case WALLSTAKE_HOLDING:
+      if (distancesensor.objectDistance(inches) < 2) {
+        intake.stop(brake);
+		intake.spin(forward);
+		intake.setVelocity(0, percent);
+      }
+      break;
+  }
 }
 
 void ArmControl::set_arm_exit_conditions(float arm_settle_error, float arm_settle_time, float arm_timeout){
@@ -123,22 +137,4 @@ void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_set
   fourBar.stop(brake);
   fourBar.spin(forward);
   fourBar.setVelocity(0, percent);
-}
-
-
-void IntakeControl::update() {
-  switch (mode) {
-    case INTAKE_COLOR_SORT:
-      colorSorting();
-      break;
-    case WALLSTAKE_HOLDING:
-      if (distancesensor.objectDistance(inches) < 4) {
-        intake.stop(brake);
-      }
-      break;
-    case HIGH_WALLSTAKE_SCORING:
-    case ALLIANCE_WALLSTAKE_SCORING:
-      intake.stop(brake);
-      break;
-  }
 }
