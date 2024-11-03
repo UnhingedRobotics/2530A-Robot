@@ -233,7 +233,7 @@ void autonomous(void) {
   auto_started = true;
   switch(current_auton_selection){ 
     case 0:
-      skills();
+      red_left_elims();
       break;
     case 1:         
       winpoint();

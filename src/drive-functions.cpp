@@ -125,6 +125,7 @@ void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_set
   fourBar.setVelocity(0, percent);
 }
 
+
 void IntakeControl::update() {
   switch (mode) {
     case INTAKE_COLOR_SORT:

@@ -12,5 +12,5 @@ extern Drive chassis;
 
 void default_constants();
 
-void skills();
+void red_left_elims();
 void winpoint();

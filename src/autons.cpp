@@ -64,29 +64,27 @@ void odom_constants(){
  * The expected behavior is to return to the start position.
  */
 
-void skills(){
+void red_left_elims(){
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
+  intakeControl.intakeon = true;
   chassis.drive_distance(-42);
-  wait(0.5, seconds);
   chassis.drive_distance(-6);
   goalclamp.set(true);
   wait(0.5, seconds);
-  intakeControl.intakeon = true;
   chassis.turn_to_angle(90);
   chassis.drive_distance(46);
-  wait(2, seconds);
+  wait(.5, seconds);
   chassis.turn_to_angle(180);
   chassis.drive_distance(24);
   chassis.turn_to_angle(270);  
   chassis.drive_distance(23);
-  wait(2, seconds);
+  wait(.5, seconds);
   chassis.turn_to_angle(180);
-  chassis.drive_distance(-42);
+  chassis.drive_distance(-22);
   goalclamp.set(false);
-  chassis.drive_distance(25);
   chassis.turn_to_angle(-90);
-  chassis.drive_distance(35);
+  chassis.drive_distance(43);
 }
 
 /**
