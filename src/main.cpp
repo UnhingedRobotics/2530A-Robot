@@ -134,21 +134,18 @@ void buttonXEventHandler() {
   armControl.pid_stop = true;
   wait(20, msec);
   intakeControl.setMode(WALLSTAKE_HOLDING);
-  armControl.pid_stop = false;
   armControl.move_to_angle(0);
 }
 void buttonYEventHandler() {
   armControl.pid_stop = true;
   wait(20, msec);
   intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-  armControl.pid_stop = false;
   armControl.move_to_angle(68);
 }
 void buttonBEventHandler() {
   armControl.pid_stop = true;
   wait(20, msec);
   intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-  armControl.pid_stop = false;
   armControl.move_to_angle(40);
 }
 
@@ -156,7 +153,6 @@ void buttonUpEventHandler() {
   armControl.pid_stop = true;
   wait(20, msec);
   intakeControl.setMode(INTAKE_COLOR_SORT);
-  armControl.pid_stop = false;
   Controller1.Screen.clearScreen();
   Controller1.Screen.setCursor(1,1);
   Controller1.Screen.print("PID down");  
