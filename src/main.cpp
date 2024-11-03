@@ -119,8 +119,6 @@ bool auto_started = false;
  * be more descriptive, if you like.
  */
 
-
-
 int armTaskFunctionUser() {
     intake.spin(forward);
     intake.setVelocity(0, percent);
@@ -141,7 +139,7 @@ int armTaskFunctionUser() {
         if (Controller1.ButtonB.pressing()) {
           intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
           // fourBar.setVelocity(100, percent);
-          armControl.move_to_angle(40); // Move arm to 90 degrees
+          armControl.move_to_angle(40); // Move arm to 40 degrees
         }
 
         // Return to color sorting mode and reset arm position
@@ -160,12 +158,8 @@ int armTaskFunctionUser() {
 }
 
 int intakeTaskFunctionUser() {
-    intake.spin(forward);
-    intake.setVelocity(0, percent);
-
     while (true) {
       // Intake mode management
-      intakeControl.colorSorting();
       if (Controller1.ButtonR1.pressing()) {
         intakeControl.setMode(INTAKE_COLOR_SORT);
         intakeControl.intakeon = true;
@@ -173,11 +167,12 @@ int intakeTaskFunctionUser() {
       if (Controller1.ButtonR2.pressing()) {
         intakeControl.intakeon = false;
       }
+      intakeControl.update();
       wait(5, msec); // Small delay to avoid resource overuse
     }
 
     return 0; // End of the task
-}
+}r
 
 void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE
@@ -251,23 +246,22 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
-  task armTask(armTaskFunctionUser);
-  task intakeTask(intakeTaskFunctionUser);
+  thread armTask(armTaskFunctionUser);
+  thread intakeTask(intakeTaskFunctionUser);
   while (1) {
 
-    //Elijah's version of mogo clamp mech code :D
+    //Elijah's version of mogo clamp mech code :D fixed
     if (Controller1.ButtonL1.pressing()) {
       goalclamp.set(true);
     }
 
-    //Elijah's version of mogo clamp mech code :D
+    //Elijah's version of mogo clamp mech code :D fixed
     if (!Controller1.ButtonL2.pressing()) {
       goalclamp.set(false);
     }
 
     // Tank drive control
     chassis.control_tank_squared();
-    intakeControl.update();
 
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
