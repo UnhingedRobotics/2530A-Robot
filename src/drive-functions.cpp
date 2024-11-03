@@ -16,13 +16,10 @@ IntakeControl::IntakeControl() :
 
 void IntakeControl::setMode(Mode newMode) {
   mode = newMode;
-  if (mode == WALLSTAKE_HOLDING || mode == HIGH_WALLSTAKE_SCORING || mode == ALLIANCE_WALLSTAKE_SCORING) {
-    intakeon = false; // Stop intake when switching to wallstake modes
-  }
 }
 
 void IntakeControl::colorSorting() {
-  if (mode == INTAKE_COLOR_SORT && intakeon) {
+  if (intakeon) {
     hue = opticalsensor.hue();
     if (!ringdetected) {
       if (hue < 30) {
@@ -89,9 +86,15 @@ void IntakeControl::update() {
     case WALLSTAKE_HOLDING:
       if (distancesensor.objectDistance(inches) < 2) {
         intake.stop(brake);
-		intake.spin(forward);
-		intake.setVelocity(0, percent);
+		    intake.spin(forward);
+		    intake.setVelocity(0, percent);
       }
+      break;
+    case ALLIANCE_WALLSTAKE_SCORING:
+      colorSorting();
+      break;
+    case HIGH_WALLSTAKE_SCORING:
+      colorSorting();
       break;
   }
 }

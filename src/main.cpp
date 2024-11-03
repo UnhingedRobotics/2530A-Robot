@@ -132,37 +132,35 @@ void buttonR2EventHandler() {
 }
 void buttonXEventHandler() {
   armControl.pid_stop = true;
+  wait(20, msec);
   intakeControl.setMode(WALLSTAKE_HOLDING);
   armControl.pid_stop = false;
   armControl.move_to_angle(0);
 }
 void buttonYEventHandler() {
   armControl.pid_stop = true;
-  if (intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
-    intakeControl.setMode(INTAKE_COLOR_SORT);
-    armControl.pid_stop = false;
-    armControl.move_to_angle(0);
-  }
-  else {
-    intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-    armControl.pid_stop = false;
-    armControl.move_to_angle(68);
-  }
-  
+  wait(20, msec);
+  intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
+  armControl.pid_stop = false;
+  armControl.move_to_angle(68);
 }
 void buttonBEventHandler() {
   armControl.pid_stop = true;
-  if (intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
-    intakeControl.setMode(INTAKE_COLOR_SORT);
-    armControl.pid_stop = false;
-    armControl.move_to_angle(0);
-  }
-  else {
-    intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-    armControl.pid_stop = false;
-    armControl.move_to_angle(40);
-  }
-  
+  wait(20, msec);
+  intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
+  armControl.pid_stop = false;
+  armControl.move_to_angle(40);
+}
+
+void buttonUpEventHandler() {
+  armControl.pid_stop = true;
+  wait(20, msec);
+  intakeControl.setMode(INTAKE_COLOR_SORT);
+  armControl.pid_stop = false;
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1,1);
+  Controller1.Screen.print("PID down");  
+  armControl.move_to_angle(0);
 }
 
 int intakeTaskFunctionUser() {
@@ -172,7 +170,7 @@ int intakeTaskFunctionUser() {
     }
 
     return 0; // End of the task
-}r
+}
 
 void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE
@@ -254,6 +252,7 @@ void usercontrol(void) {
   Controller1.ButtonX.pressed(buttonXEventHandler);
   Controller1.ButtonY.pressed(buttonYEventHandler);
   Controller1.ButtonB.pressed(buttonBEventHandler);
+  Controller1.ButtonUp.pressed(buttonUpEventHandler);
   while (1) {
     // Tank drive control
     chassis.control_tank_squared();
