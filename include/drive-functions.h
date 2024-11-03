@@ -28,6 +28,7 @@ public:
 
 class ArmControl {
 public:
+  bool pid_stop;
   float arm_max_voltage;
   float arm_kp;
   float arm_ki;

@@ -131,27 +131,35 @@ void buttonR2EventHandler() {
   intakeControl.intakeon = false;
 }
 void buttonXEventHandler() {
+  armControl.pid_stop = true;
   intakeControl.setMode(WALLSTAKE_HOLDING);
+  armControl.pid_stop = false;
   armControl.move_to_angle(0);
 }
 void buttonYEventHandler() {
+  armControl.pid_stop = true;
   if (intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
     intakeControl.setMode(INTAKE_COLOR_SORT);
+    armControl.pid_stop = false;
     armControl.move_to_angle(0);
   }
   else {
     intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
+    armControl.pid_stop = false;
     armControl.move_to_angle(68);
   }
   
 }
 void buttonBEventHandler() {
+  armControl.pid_stop = true;
   if (intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
     intakeControl.setMode(INTAKE_COLOR_SORT);
+    armControl.pid_stop = false;
     armControl.move_to_angle(0);
   }
   else {
     intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
+    armControl.pid_stop = false;
     armControl.move_to_angle(40);
   }
   
@@ -181,7 +189,7 @@ void pre_auton() {
   intake.spin(forward);
   opticalsensor.setLight(ledState::on);
   opticalsensor.setLightPower(100.0, percent);
-  IntakeControl intakeControl;
+  armControl.pid_stop = false;
 
   while(!auto_started){
     Brain.Screen.clearScreen();
