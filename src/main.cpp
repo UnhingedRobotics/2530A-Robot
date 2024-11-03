@@ -118,55 +118,47 @@ bool auto_started = false;
  * may need, like resetting pneumatic components. You can rename these autons to
  * be more descriptive, if you like.
  */
-
-int armTaskFunctionUser() {
-    intake.spin(forward);
-    intake.setVelocity(0, percent);
-
-    while (true) {
-        // Wallstake holding mode
-        if (Controller1.ButtonX.pressing()) {
-          intakeControl.setMode(WALLSTAKE_HOLDING);
-        }
-
-        // Tall Wallstake scoring mode
-        if (Controller1.ButtonY.pressing()) {
-          intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-          armControl.move_to_angle(68); // Move arm to 90 degrees
-        }
-
-        // Alliance Wallstake scoring mode
-        if (Controller1.ButtonB.pressing()) {
-          intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-          // fourBar.setVelocity(100, percent);
-          armControl.move_to_angle(40); // Move arm to 40 degrees
-        }
-
-        // Return to color sorting mode and reset arm position
-        if (!Controller1.ButtonB.pressing() && intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
-          intakeControl.setMode(INTAKE_COLOR_SORT);
-          armControl.move_to_angle(0); // Move arm to 90 degrees
-        }
-        if (!Controller1.ButtonY.pressing() && intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
-          intakeControl.setMode(INTAKE_COLOR_SORT);
-          armControl.move_to_angle(0); // Move arm to 90 degrees
-        }
-        wait(10, msec); // Small delay to avoid resource overuse
-    }
-
-    return 0; // End of the task
+void buttonL1EventHandler() {
+  goalclamp.set(true);
+}
+void buttonL2EventHandler() {
+  goalclamp.set(false);
+}
+void buttonR1EventHandler() {
+  intakeControl.intakeon = true;
+}
+void buttonR2EventHandler() {
+  intakeControl.intakeon = false;
+}
+void buttonXEventHandler() {
+  intakeControl.setMode(WALLSTAKE_HOLDING);
+  armControl.move_to_angle(0);
+}
+void buttonYEventHandler() {
+  if (intakeControl.mode == HIGH_WALLSTAKE_SCORING) {
+    intakeControl.setMode(INTAKE_COLOR_SORT);
+    armControl.move_to_angle(0);
+  }
+  else {
+    intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
+    armControl.move_to_angle(68);
+  }
+  
+}
+void buttonBEventHandler() {
+  if (intakeControl.mode == ALLIANCE_WALLSTAKE_SCORING) {
+    intakeControl.setMode(INTAKE_COLOR_SORT);
+    armControl.move_to_angle(0);
+  }
+  else {
+    intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
+    armControl.move_to_angle(40);
+  }
+  
 }
 
 int intakeTaskFunctionUser() {
     while (true) {
-      // Intake mode management
-      if (Controller1.ButtonR1.pressing()) {
-        intakeControl.setMode(INTAKE_COLOR_SORT);
-        intakeControl.intakeon = true;
-      } 
-      if (Controller1.ButtonR2.pressing()) {
-        intakeControl.intakeon = false;
-      }
       intakeControl.update();
       wait(5, msec); // Small delay to avoid resource overuse
     }
@@ -246,20 +238,15 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
-  thread armTask(armTaskFunctionUser);
   thread intakeTask(intakeTaskFunctionUser);
+  Controller1.ButtonL1.pressed(buttonL1EventHandler);
+  Controller1.ButtonL2.pressed(buttonL2EventHandler);
+  Controller1.ButtonR1.pressed(buttonR1EventHandler);
+  Controller1.ButtonR2.pressed(buttonR2EventHandler);
+  Controller1.ButtonX.pressed(buttonXEventHandler);
+  Controller1.ButtonY.pressed(buttonYEventHandler);
+  Controller1.ButtonB.pressed(buttonBEventHandler);
   while (1) {
-
-    //Elijah's version of mogo clamp mech code :D fixed
-    if (Controller1.ButtonL1.pressing()) {
-      goalclamp.set(true);
-    }
-
-    //Elijah's version of mogo clamp mech code :D fixed
-    if (!Controller1.ButtonL2.pressing()) {
-      goalclamp.set(false);
-    }
-
     // Tank drive control
     chassis.control_tank_squared();
 
