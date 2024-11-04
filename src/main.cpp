@@ -137,26 +137,32 @@ void buttonXEventHandler() {
   armControl.move_to_angle(0);
 }
 void buttonYEventHandler() {
-  armControl.pid_stop = true;
-  wait(20, msec);
-  intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-  armControl.move_to_angle(68);
+  // armControl.pid_stop = true;
+  // wait(20, msec);
+  // intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
+  // armControl.move_to_angle(68);
+  fourBar.setVelocity(80, percent);
+  fourBar.spinFor(forward, 0.5, seconds);
 }
 void buttonBEventHandler() {
-  armControl.pid_stop = true;
-  wait(20, msec);
-  intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-  armControl.move_to_angle(40);
+  // armControl.pid_stop = true;
+  // wait(20, msec);
+  // intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
+  // armControl.move_to_angle(40);
+  fourBar.setVelocity(80, percent);
+  fourBar.spinFor(forward, 0.3, seconds);
 }
 
 void buttonUpEventHandler() {
-  armControl.pid_stop = true;
-  wait(20, msec);
-  intakeControl.setMode(INTAKE_COLOR_SORT);
-  Controller1.Screen.clearScreen();
-  Controller1.Screen.setCursor(1,1);
-  Controller1.Screen.print("PID down");  
-  armControl.move_to_angle(0);
+  // armControl.pid_stop = true;
+  // wait(20, msec);
+  // intakeControl.setMode(INTAKE_COLOR_SORT);
+  // Controller1.Screen.clearScreen();
+  // Controller1.Screen.setCursor(1,1);
+  // Controller1.Screen.print("PID down");  
+  // armControl.move_to_angle(0);
+  fourBar.setVelocity(80, percent);
+  fourBar.spinFor(reverse, 0.3, seconds);
 }
 
 int intakeTaskFunctionUser() {

@@ -36,7 +36,7 @@ void default_constants(){
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
-  armControl.set_arm_constants(12, .2, 0, 0, 0);
+  armControl.set_arm_constants(12, 5, 0, 0, 0);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
@@ -67,24 +67,38 @@ void odom_constants(){
 void red_left_elims(){
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
+  intakeControl.intakeon = false;
+  chassis.drive_distance(-10);
+  chassis.turn_to_angle(270);
+  chassis.drive_distance(28);
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(-12.5);
+  fourBar.setVelocity(80, percent);
+  fourBar.spinFor(forward, 0.45, seconds);
   intakeControl.intakeon = true;
-  chassis.drive_distance(-42);
-  chassis.drive_distance(-6);
-  goalclamp.set(true);
-  wait(0.5, seconds);
+  wait(0.3, seconds);
+  fourBar.setVelocity(80, percent);
+  fourBar.spinFor(reverse, 0.8, seconds);
+  intakeControl.intakeon = true;
+  chassis.drive_distance(15);
   chassis.turn_to_angle(90);
-  chassis.drive_distance(46);
-  wait(.5, seconds);
-  chassis.turn_to_angle(180);
-  chassis.drive_distance(24);
-  chassis.turn_to_angle(270);  
-  chassis.drive_distance(23);
-  wait(.5, seconds);
-  chassis.turn_to_angle(180);
-  chassis.drive_distance(-22);
-  goalclamp.set(false);
-  chassis.turn_to_angle(-90);
+  chassis.drive_distance(29);
+  chassis.turn_to_angle(0);
+  chassis.drive_distance(-34);
+  chassis.drive_distance(-4);
+  goalclamp.set(true);
+  wait(0.2, seconds);
+  chassis.drive_distance(8);
+  chassis.turn_to_angle(90);
+  intakeControl.intakeon = true;
   chassis.drive_distance(43);
+  wait(.5, seconds);
+  chassis.drive_distance(-21);
+  chassis.turn_to_angle(180);
+  chassis.drive_distance(21);
+  wait(.5, seconds);
+  chassis.turn_to_angle(270);
+  chassis.drive_distance(18);
 }
 
 /**
