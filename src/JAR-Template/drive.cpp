@@ -374,8 +374,10 @@ float Drive::get_ForwardTracker_position(){
     return(get_right_position_in());
   }
   if (drive_setup==TANK_ONE_FORWARD_ENCODER || drive_setup == TANK_TWO_ENCODER || drive_setup == HOLONOMIC_TWO_ENCODER){
+    //return(get_right_position_in());
     return(E_ForwardTracker.position(deg)*ForwardTracker_in_to_deg_ratio);
   }else{
+    // return(get_right_position_in());
     return(R_ForwardTracker.position(deg)*ForwardTracker_in_to_deg_ratio);
   }
 }
