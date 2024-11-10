@@ -4,7 +4,7 @@
  * Drive constructor for the chassis.
  * Even though there's only one constructor, there can be
  * huge differences in implementation depending on the drive style
- * selected.
+ * selected.Example Conversion
  * 
  * @param drive_setup The style of drive, such as TANK_TWO_ROTATION.
  * @param DriveL Left motor group.
@@ -38,7 +38,7 @@ int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_
   ForwardTracker_diameter(ForwardTracker_diameter),
   ForwardTracker_in_to_deg_ratio(M_PI*ForwardTracker_diameter/360.0),
   SidewaysTracker_center_distance(SidewaysTracker_center_distance),
-  SidewaysTracker_diameter(SidewaysTracker_diameter),
+  SidewaysTracker_diameter(SidewaysTracker_diameter),Example Conversion
   SidewaysTracker_in_to_deg_ratio(M_PI*SidewaysTracker_diameter/360.0),
   drive_setup(drive_setup),
   DriveL(DriveL),
@@ -323,6 +323,96 @@ void Drive::drive_distance(float distance, float heading, float drive_max_voltag
   }
 }
 
+/**
+ * Drives the robot a given distance with a given heading.
+ * Drive distance does not optimize for direction, so it won't try
+ * to drive at the opposite heading from the one given to get there faster.
+ * You can control the heading, but if you choose not to, it will drive with the
+ * heading it's currently facing. It uses the average of the left and right
+ * motor groups to calculate distance driven.
+ * Also uses motion profiling.
+ * 
+ * @param distance Desired distance in inches.
+ * @param heading Desired heading in degrees.
+ */
+void Drive::drive_distance_mp(float distance) {
+  drive_distance_mp(distance, get_absolute_heading(), drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_distance_mp(float distance, float heading) {
+  drive_distance_mp(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage) {
+  drive_distance_mp(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout) {
+  drive_distance_mp(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
+  // Initialize PID controllers
+  PID drivePID(distance, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
+  PID headingPID(reduce_negative_180_to_180(heading - get_absolute_heading()), heading_kp, heading_ki, heading_kd, heading_starti);
+
+  float start_average_position = (get_left_position_in() + get_right_position_in()) / 2.0;
+  float average_position = start_average_position;
+
+  // Motion profile variables
+  float position, velocity, acceleration;
+  double time = 0;
+  
+  // Current drive output and previous drive output for rate limiting
+  float drive_output = 0.0;
+  float prev_drive_output = 0.0;
+
+  while (!drivePID.is_settled()) {
+    // Update the current position
+    average_position = (get_left_position_in() + get_right_position_in()) / 2.0;
+    float drive_error = distance + start_average_position - average_position;
+    float heading_error = reduce_negative_180_to_180(heading - get_absolute_heading());
+
+    // Compute PID outputs
+    float drive_pid_output = drivePID.compute(drive_error);
+    float heading_output = headingPID.compute(heading_error);
+
+    // Update time for the motion profile
+    time += 0.01; // Assuming this loop runs at ~100 Hz
+    trapezoid_velocity(distance);  // Call to motion profile
+
+    // Use profile velocity and acceleration for feedforward
+    float feedforward = (velocity * adjust_velocity) + (acceleration * 0.01); // scale as needed
+
+    // Adjust drive PID output by adding feedforward
+    float desired_drive_output = drive_pid_output + feedforward;
+
+    // Apply acceleration limiting
+    float max_output_change = max_acceleration * 0.01; // max change per loop iteration (assuming 100 Hz loop rate)
+    float output_change = desired_drive_output - prev_drive_output;
+
+    if (output_change > max_output_change) {
+      drive_output = prev_drive_output + max_output_change;
+    } else if (output_change < -max_output_change) {
+      drive_output = prev_drive_output - max_output_change;
+    } else {
+      drive_output = desired_drive_output;
+    }
+
+    // Clamp outputs to the max voltages
+    drive_output = clamp(drive_output, -drive_max_voltage, drive_max_voltage);
+    heading_output = clamp(heading_output, -heading_max_voltage, heading_max_voltage);
+
+    // Send calculated voltages to motors
+    drive_with_voltage(drive_output + heading_output, drive_output - heading_output);
+
+    // Update previous drive output
+    prev_drive_output = drive_output;
+
+    // Wait to prevent fast looping
+    task::sleep(10);
+  }
+}
 /**
  * Turns to a given angle with only one side of the drivetrain.
  * Like turn_to_angle(), is optimized for turning the shorter
