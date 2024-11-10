@@ -42,7 +42,7 @@ Drive chassis(
 //HOLONOMIC_TWO_ROTATION
 //
 //Write it here:
-TANK_TWO_ROTATION,
+TANK_ONE_SIDEWAYS_ROTATION,
 
 //Add the names of your Drive motors into the motor groups below, separated by commas, i.e. motor_group(Motor1,Motor2,Motor3).
 //You will input whatever motor names you chose when you configured your robot using the sidebar configurer, they don't have to be "Motor1" and "Motor2".
@@ -258,7 +258,6 @@ void usercontrol(void) {
   while (1) {
     // Tank drive control
     chassis.control_tank_squared();
-
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
 }
