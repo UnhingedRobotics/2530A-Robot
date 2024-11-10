@@ -1,6 +1,7 @@
 // Define the constants
 double max_velocity = 1.73; // m/s
 double max_acceleration = 5.61; // m/s^2
+double max_jerk = 18.1; // m/s^3
 
 // Minimum distance required to reach max velocity
 double minimum_distance = (max_velocity * max_velocity) / max_acceleration; 
