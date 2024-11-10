@@ -138,7 +138,7 @@ void buttonXEventHandler() {
 }
 void buttonYEventHandler() {
   // armControl.pid_stop = true;
-  // wait(20, msec);
+  // waitUntil(!armControl.pid_stop);
   // intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
   // armControl.move_to_angle(68);
   fourBar.setVelocity(80, percent);
@@ -146,7 +146,7 @@ void buttonYEventHandler() {
 }
 void buttonBEventHandler() {
   // armControl.pid_stop = true;
-  // wait(20, msec);
+  // waitUntil(!armControl.pid_stop);
   // intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
   // armControl.move_to_angle(40);
   fourBar.setVelocity(80, percent);
@@ -155,7 +155,7 @@ void buttonBEventHandler() {
 
 void buttonUpEventHandler() {
   // armControl.pid_stop = true;
-  // wait(20, msec);
+  // waitUntil(!armControl.pid_stop);
   // intakeControl.setMode(INTAKE_COLOR_SORT);
   // Controller1.Screen.clearScreen();
   // Controller1.Screen.setCursor(1,1);
