@@ -42,7 +42,7 @@ void IntakeControl::colorSorting() {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,1);
       Controller1.Screen.print("ring not detected");
-      intakevelocity = 60;
+      intakevelocity = 100;
     }
     if (distancesensor.objectDistance(inches) < 2) {
       if (ringdetected) {

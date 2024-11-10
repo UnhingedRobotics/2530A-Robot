@@ -88,7 +88,7 @@ PORT3,     -PORT4,
 //If you are using position tracking, this is the Forward Tracker port (the tracker which runs parallel to the direction of the chassis).
 //If this is a rotation sensor, enter it in "PORT1" format, inputting the port below.
 //If this is an encoder, enter the port as an integer. Triport A will be a "1", Triport B will be a "2", etc.
-6,
+15,
 
 //Input the Forward Tracker diameter (reverse it to make the direction switch):
 2.75,
@@ -99,7 +99,7 @@ PORT3,     -PORT4,
 -1,
 
 //Input the Sideways Tracker Port, following the same steps as the Forward Tracker Port:
-5,
+7,
 
 //Sideways tracker diameter (reverse to make the direction switch):
 -2.75,
