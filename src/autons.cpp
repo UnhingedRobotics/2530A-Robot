@@ -73,12 +73,8 @@ void red_left_elims(){
   chassis.drive_distance(28);
   chassis.turn_to_angle(180);
   chassis.drive_distance(-12.5);
-  fourBar.setVelocity(80, percent);
-  fourBar.spinFor(forward, 0.45, seconds);
   intakeControl.intakeon = true;
   wait(0.3, seconds);
-  fourBar.setVelocity(80, percent);
-  fourBar.spinFor(reverse, 0.8, seconds);
   intakeControl.intakeon = true;
   chassis.drive_distance(15);
   chassis.turn_to_angle(90);

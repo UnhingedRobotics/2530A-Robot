@@ -12,25 +12,25 @@ brain  Brain;
 
 //Add your devices below, and don't forget to do the same in robot-config.h:
 controller Controller1 = controller(primary);
-motor intakeMotorA = motor(PORT11, ratio6_1, false);
-motor intakeMotorB = motor(PORT20, ratio6_1, true);
+motor intakeMotorA = motor(PORT1, ratio6_1, false);
+motor intakeMotorB = motor(PORT6, ratio6_1, true);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
-motor fourBarMotorA = motor(PORT14, ratio36_1, false);
-motor fourBarMotorB = motor(PORT17, ratio36_1, true);
+motor fourBarMotorA = motor(PORT2, ratio36_1, false);
+motor fourBarMotorB = motor(PORT3, ratio36_1, true);
 motor_group fourBar = motor_group(fourBarMotorA, fourBarMotorB);
-motor leftdrivefront = motor(PORT3, ratio18_1, true);
-motor leftdriveback = motor(PORT4, ratio18_1, true);
-motor rightdrivefront = motor(PORT19, ratio18_1, false);
-motor rightdriveback = motor(PORT18, ratio18_1, false);
+motor leftdrivefront = motor(PORT16, ratio18_1, true);
+motor leftdriveback = motor(PORT14, ratio18_1, true);
+motor rightdrivefront = motor(PORT20, ratio18_1, false);
+motor rightdriveback = motor(PORT19, ratio18_1, false);
 inertial leftinertialsensor = inertial(PORT12);
-inertial rightinertialsensor = inertial(PORT8);
-distance distancesensor = distance(PORT2);
-optical opticalsensor = optical(PORT9);
+inertial rightinertialsensor = inertial(PORT9);
+distance distancesensor = distance(PORT4);
+optical opticalsensor = optical(PORT5);
 digital_out goalclamp = digital_out(Brain.ThreeWirePort.A);
 // vex::aivision AIVisionFront(PORT8, aivision::ALL_AIOBJS);
 // vex::aivision AIVisionBack(PORT9, aivision::ALL_AIOBJS);
-rotation verticalwheelrotation = rotation(PORT7, true);
-rotation horizaontalwheelrotation = rotation(PORT6, true);
+rotation verticalwheelrotation = rotation(PORT15, true);
+rotation horizaontalwheelrotation = rotation(PORT7, true);
 
 void vexcodeInit( void ) {
   // nothing to initialize
