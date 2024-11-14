@@ -12,10 +12,17 @@ double minimum_distance;
 double acceleration_time;
 double acceleration_distance;
 
-void trapezoid_initialize() {
+void trapezoid_initialize(double distance) {
   // Minimum distance required to reach max velocity
   minimum_distance = (max_velocity * max_velocity) / max_acceleration;
-
+  if (distance >= minimum_distance) {
+    double constant_distance = distance - 2 * acceleration_distance;
+    double constant_time = constant_distance / max_velocity;
+    double total_time = 2 * acceleration_time + constant_time;
+  } else {
+    double triangular_time = sqrt(distance / max_acceleration);
+  }
+  
   // Time to reach max velocity
   acceleration_time = max_velocity / max_acceleration;
 
@@ -23,17 +30,13 @@ void trapezoid_initialize() {
   acceleration_distance = 0.5 * max_acceleration * (acceleration_time * acceleration_time);
 }
 
-void trapezoid_velocity(double distance) {
+void trapezoid_velocity() {
   distance = distance * 0.0254; // Convert inches to meters
   double time = Brain.Timer.time(seconds);
   double velocity = 0.0; // Initialize velocity variable
   
   // Check if distance allows reaching max velocity
   if (distance >= minimum_distance) {
-    double constant_distance = distance - 2 * acceleration_distance;
-    double constant_time = constant_distance / max_velocity;
-    double total_time = 2 * acceleration_time + constant_time;
-
     // Calculate values based on time
     if (time < acceleration_time) {
       // double position = 0.5 * max_acceleration * time * time;
@@ -53,7 +56,6 @@ void trapezoid_velocity(double distance) {
       // Use position, velocity, and acceleration for motor control here if needed
     }
   } else {
-    double triangular_time = sqrt(distance / max_acceleration);
     if (time < triangular_time) {
       // double position = 0.5 * max_acceleration * time * time;
       velocity = max_acceleration * time;

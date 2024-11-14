@@ -355,14 +355,13 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
   // Initialize PID controllers
   PID drivePID(distance, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
   PID headingPID(reduce_negative_180_to_180(heading - get_absolute_heading()), heading_kp, heading_ki, heading_kd, heading_starti);
+  trapezoid_initialize(distance);
 
   float start_average_position = (get_left_position_in() + get_right_position_in()) / 2.0;
   float average_position = start_average_position;
 
   // Motion profile variables
-  float position, velocity, acceleration;
-  double time = 0;
-  
+  float position, velocity, acceleration; 
   // Current drive output and previous drive output for rate limiting
   float drive_output = 0.0;
   float prev_drive_output = 0.0;
@@ -377,16 +376,16 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
     float drive_pid_output = drivePID.compute(drive_error);
     float heading_output = headingPID.compute(heading_error);
 
-    trapezoid_velocity(distance);  // Call to motion profile
+    trapezoid_velocity();  // Call to motion profile
 
     // Use profile velocity and acceleration for feedforward
-    float feedforward = (velocity * adjust_velocity); // scale as needed
+    float feedforward = velocity; // scale as needed
 
     // Adjust drive PID output by adding feedforward
     float desired_drive_output = drive_pid_output + feedforward;
 
     // Apply acceleration limiting
-    float max_output_change = max_acceleration * 0.0254 * 6.93641618497; // max change per loop iteration (assuming 100 Hz loop rate)
+    float max_output_change = 0.38913294797; // max change per loop iteration (assuming 100 Hz loop rate)
     float output_change = desired_drive_output - prev_drive_output;
 
     if (output_change > max_output_change) {
