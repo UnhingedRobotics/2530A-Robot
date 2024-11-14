@@ -9,6 +9,7 @@ IntakeControl::IntakeControl() :
   ring(false),
   team(true),
   ringdetected(false),
+  holding(false),
   intakeon(false),
   intakevelocity(0),
   mode(INTAKE_COLOR_SORT)
@@ -23,26 +24,26 @@ void IntakeControl::colorSorting() {
     hue = opticalsensor.hue();
     if (!ringdetected) {
       if (hue < 30) {
-          Controller1.Screen.clearScreen();
-          Controller1.Screen.setCursor(1,1);
-          Controller1.Screen.print("red");
+          // Controller1.Screen.clearScreen();
+          // Controller1.Screen.setCursor(1,1);
+          // Controller1.Screen.print("red");
           ring = true;
         } else if (hue > 170) {
-          Controller1.Screen.clearScreen();
-          Controller1.Screen.setCursor(1,1);
-          Controller1.Screen.print("blue");
+          // Controller1.Screen.clearScreen();
+          // Controller1.Screen.setCursor(1,1);
+          // Controller1.Screen.print("blue");
           ring = false;
         }
 	  }
     if (opticalsensor.isNearObject()) {
       ringdetected = true;
-      intakevelocity = 80;
+      intakevelocity = 75;
     }
     if (!ringdetected) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print("ring not detected");
-      intakevelocity = 100;
+      // Controller1.Screen.clearScreen();
+      // Controller1.Screen.setCursor(1,1);
+      // Controller1.Screen.print("ring not detected");
+      intakevelocity = 75;
     }
     if (distancesensor.objectDistance(inches) < 2) {
       if (ringdetected) {
@@ -64,10 +65,18 @@ void IntakeControl::colorSorting() {
             }
           }
         }
+        // Controller1.Screen.clearScreen();
+        // Controller1.Screen.setCursor(1,1);
+        // Controller1.Screen.print("ring detected");    
+        ringdetected = false;
+      }
+      if (holding) {
+        intake.stop(brake);
+        intakevelocity = 0;
+        intakeon = false;
         Controller1.Screen.clearScreen();
         Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("ring detected");    
-        ringdetected = false;
+        Controller1.Screen.print("held");  
       }
 	  }
   } 
@@ -82,6 +91,19 @@ void IntakeControl::update() {
   switch (mode) {
     case INTAKE_COLOR_SORT:
       colorSorting();
+      if (auto_on) {
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("auto on");  
+        time_waited = time_waited + 1;
+        if (time_waited >= 10) {
+          intakeon = true;
+          time_waited = 0;
+          Controller1.Screen.clearScreen();
+          Controller1.Screen.setCursor(1,1);
+          Controller1.Screen.print("time");  
+        } 
+      }
       break;
     case WALLSTAKE_HOLDING:
       if (distancesensor.objectDistance(inches) < 2) {
@@ -90,12 +112,12 @@ void IntakeControl::update() {
 		    intake.setVelocity(0, percent);
       }
       break;
-    case ALLIANCE_WALLSTAKE_SCORING:
-      colorSorting();
-      break;
-    case HIGH_WALLSTAKE_SCORING:
-      colorSorting();
-      break;
+    // case ALLIANCE_WALLSTAKE_SCORING:
+      // colorSorting();
+      // break;
+    // case HIGH_WALLSTAKE_SCORING:
+      // colorSorting();
+      // break;
   }
 }
 

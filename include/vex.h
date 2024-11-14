@@ -20,6 +20,7 @@
 
 #include "robot-config.h"
 #include "drive-functions.h"
+#include "motion-profiling.h"
 #include "JAR-Template/odom.h"
 #include "JAR-Template/drive.h"
 #include "JAR-Template/util.h"

@@ -111,6 +111,8 @@ public:
   void drive_distance(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
   void drive_distance_mp(float distance);
   void drive_distance_mp(float distance, float heading);
+  void drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage);
+  void drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout);
   void drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
   
   void left_swing_to_angle(float angle);

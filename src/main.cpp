@@ -110,7 +110,6 @@ PORT3,     -PORT4,
 );
 
 int current_auton_selection = 0;
-bool auto_started = false;
 
 /**
  * Function before autonomous. It prints the current auton number on the screen
@@ -134,26 +133,26 @@ void buttonXEventHandler() {
   armControl.pid_stop = true;
   wait(20, msec);
   intakeControl.setMode(WALLSTAKE_HOLDING);
-  armControl.move_to_angle(0);
+  // armControl.move_to_angle(0);
 }
-void buttonYEventHandler() {
+// void buttonYEventHandler() {
   // armControl.pid_stop = true;
   // waitUntil(!armControl.pid_stop);
   // intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
   // armControl.move_to_angle(68);
-  fourBar.setVelocity(80, percent);
-  fourBar.spinFor(forward, 0.5, seconds);
-}
-void buttonBEventHandler() {
+  // fourBar.setVelocity(80, percent);
+  // fourBar.spinFor(forward, 0.5, seconds);
+// }
+// void buttonBEventHandler() {
   // armControl.pid_stop = true;
   // waitUntil(!armControl.pid_stop);
   // intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
   // armControl.move_to_angle(40);
-  fourBar.setVelocity(80, percent);
-  fourBar.spinFor(forward, 0.3, seconds);
-}
+  // fourBar.setVelocity(80, percent);
+  // fourBar.spinFor(forward, 0.3, seconds);
+// }
 
-void buttonUpEventHandler() {
+// void buttonUpEventHandler() {
   // armControl.pid_stop = true;
   // waitUntil(!armControl.pid_stop);
   // intakeControl.setMode(INTAKE_COLOR_SORT);
@@ -161,9 +160,9 @@ void buttonUpEventHandler() {
   // Controller1.Screen.setCursor(1,1);
   // Controller1.Screen.print("PID down");  
   // armControl.move_to_angle(0);
-  fourBar.setVelocity(80, percent);
-  fourBar.spinFor(reverse, 0.3, seconds);
-}
+  // fourBar.setVelocity(80, percent);
+  // fourBar.spinFor(reverse, 0.3, seconds);
+// }
 
 int intakeTaskFunctionUser() {
     while (true) {
@@ -191,7 +190,7 @@ void pre_auton() {
   opticalsensor.setLightPower(100.0, percent);
   armControl.pid_stop = false;
 
-  while(!auto_started){
+  while(!intakeControl.auto_on){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(5, 20, "JAR Template v1.2.0");
     Brain.Screen.printAt(5, 40, "Battery Percentage:");
@@ -225,7 +224,7 @@ void pre_auton() {
  */
 
 void autonomous(void) {
-  auto_started = true;
+  intakeControl.auto_on = true;
   switch(current_auton_selection){ 
     case 0:
       red_left_elims();
@@ -246,15 +245,16 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 void usercontrol(void) {
+  intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
   Controller1.ButtonX.pressed(buttonXEventHandler);
-  Controller1.ButtonY.pressed(buttonYEventHandler);
-  Controller1.ButtonB.pressed(buttonBEventHandler);
-  Controller1.ButtonUp.pressed(buttonUpEventHandler);
+  // Controller1.ButtonY.pressed(buttonYEventHandler);
+  // Controller1.ButtonB.pressed(buttonBEventHandler);
+  // Controller1.ButtonUp.pressed(buttonUpEventHandler);
   while (1) {
     // Tank drive control
     chassis.control_tank_squared();

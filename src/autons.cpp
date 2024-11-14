@@ -66,35 +66,35 @@ void odom_constants(){
 
 void red_left_elims(){
   task intakeTask(intakeTaskFunction);
+  intakeControl.auto_on = true;
   intakeControl.team = true;
   intakeControl.intakeon = false;
-  chassis.drive_distance(-10);
-  chassis.turn_to_angle(270);
-  chassis.drive_distance(28);
-  chassis.turn_to_angle(180);
-  chassis.drive_distance(-12.5);
-  intakeControl.intakeon = true;
+  chassis.drive_distance(-53);
+  goalclamp.set(true);
   wait(0.3, seconds);
   intakeControl.intakeon = true;
-  chassis.drive_distance(15);
-  chassis.turn_to_angle(90);
-  chassis.drive_distance(29);
-  chassis.turn_to_angle(0);
-  chassis.drive_distance(-34);
-  chassis.drive_distance(-4);
-  goalclamp.set(true);
-  wait(0.2, seconds);
   chassis.drive_distance(8);
   chassis.turn_to_angle(90);
+  chassis.drive_distance(30);
+  chassis.drive_distance(4);
+  wait(.5, seconds);
+  chassis.drive_distance(-33);
+  chassis.turn_to_angle(-45);
+  goalclamp.set(false);
+  intakeControl.holding = true;
+  chassis.drive_distance(50);
+  wait(.5, seconds);
+  chassis.turn_to_angle(-90);
+  chassis.drive_distance(25);
+  chassis.turn_to_angle(0);
+  chassis.drive_distance(-40);
+  goalclamp.set(true);
   intakeControl.intakeon = true;
-  chassis.drive_distance(43);
-  wait(.5, seconds);
-  chassis.drive_distance(-21);
-  chassis.turn_to_angle(180);
-  chassis.drive_distance(21);
-  wait(.5, seconds);
-  chassis.turn_to_angle(270);
-  chassis.drive_distance(18);
+  intakeControl.holding = false;
+  chassis.turn_to_angle(90);
+  chassis.drive_distance(17);
+  intakeControl.intakeon = false;
+  intakeControl.auto_on = false;
 }
 
 /**
@@ -103,14 +103,22 @@ void red_left_elims(){
 
 void winpoint(){
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
+  intakeControl.team = true;
+  intakeControl.intakeon = false;
+  chassis.drive_distance(-53);
+  goalclamp.set(true);
+  wait(0.3, seconds);
   intakeControl.intakeon = true;
-  chassis.drive_distance(-6);
-  goalclamp.set(false);
+  chassis.drive_distance(8);
   chassis.turn_to_angle(90);
-  chassis.drive_distance(20);
+  chassis.drive_distance(30);
+  chassis.drive_distance(4);
+  wait(.5, seconds);
+  chassis.drive_distance(-11);
   chassis.turn_to_angle(180);
-  chassis.drive_distance(-6);
-  chassis.turn_to_angle(270);
-  chassis.drive_distance(60);
+  chassis.drive_distance(14);
+  wait(.5, seconds);
+  chassis.turn_to_angle(255);
+  chassis.drive_distance(15);
+  intakeControl.intakeon = false;
 }

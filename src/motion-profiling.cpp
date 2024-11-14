@@ -1,3 +1,5 @@
+#include "vex.h"
+
 // motion_profiling.cpp
 
 // Define the constants
@@ -12,7 +14,7 @@ double acceleration_distance;
 
 void trapezoid_initialize() {
   // Minimum distance required to reach max velocity
-  minimum_distance = (max_velocity * max_velocity) / max_acceleration; 
+  minimum_distance = (max_velocity * max_velocity) / max_acceleration;
 
   // Time to reach max velocity
   acceleration_time = max_velocity / max_acceleration;
@@ -21,9 +23,11 @@ void trapezoid_initialize() {
   acceleration_distance = 0.5 * max_acceleration * (acceleration_time * acceleration_time);
 }
 
-void trapezoid_velocity(double distance, double time, double &position, double &velocity, double &acceleration) {
+void trapezoid_velocity(double distance) {
   distance = distance * 0.0254; // Convert inches to meters
-
+  double time = Brain.Timer.time(seconds);
+  double velocity = 0.0; // Initialize velocity variable
+  
   // Check if distance allows reaching max velocity
   if (distance >= minimum_distance) {
     double constant_distance = distance - 2 * acceleration_distance;
@@ -32,32 +36,37 @@ void trapezoid_velocity(double distance, double time, double &position, double &
 
     // Calculate values based on time
     if (time < acceleration_time) {
-      position = 0.5 * max_acceleration * time * time;
+      // double position = 0.5 * max_acceleration * time * time;
       velocity = max_acceleration * time;
-      acceleration = max_acceleration;
+      // double acceleration = max_acceleration;
+      // Use position, velocity, and acceleration for motor control here if needed
     } else if (time < acceleration_time + constant_time) {
-      position = acceleration_distance + max_velocity * (time - acceleration_time);
+      // double position = acceleration_distance + max_velocity * (time - acceleration_time);
       velocity = max_velocity;
-      acceleration = 0;
+      // double acceleration = 0;
+      // Use position, velocity, and acceleration for motor control here if needed
     } else if (time <= total_time) {
       double decel_time = total_time - time;
-      position = distance - 0.5 * max_acceleration * decel_time * decel_time;
+      // double position = distance - 0.5 * max_acceleration * decel_time * decel_time;
       velocity = max_acceleration * decel_time;
-      acceleration = -max_acceleration;
+      // double acceleration = -max_acceleration;
+      // Use position, velocity, and acceleration for motor control here if needed
     }
   } else {
     double triangular_time = sqrt(distance / max_acceleration);
     if (time < triangular_time) {
-      position = 0.5 * max_acceleration * time * time;
+      // double position = 0.5 * max_acceleration * time * time;
       velocity = max_acceleration * time;
-      acceleration = max_acceleration;
+      // double acceleration = max_acceleration;
+      // Use position, velocity, and acceleration for motor control here if needed
     } else if (time <= 2 * triangular_time) {
       double decel_time = 2 * triangular_time - time;
-      position = distance - 0.5 * max_acceleration * decel_time * decel_time;
+      // double position = distance - 0.5 * max_acceleration * decel_time * decel_time;
       velocity = max_acceleration * decel_time;
-      acceleration = -max_acceleration;
+      // double acceleration = -max_acceleration;
+      // Use position, velocity, and acceleration for motor control here if needed
     }
   }
 
-  velocity *= adjust_velocity;
+  velocity *= adjust_velocity; // Apply velocity adjustment factor
 }

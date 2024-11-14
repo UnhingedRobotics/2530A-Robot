@@ -38,7 +38,7 @@ int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_
   ForwardTracker_diameter(ForwardTracker_diameter),
   ForwardTracker_in_to_deg_ratio(M_PI*ForwardTracker_diameter/360.0),
   SidewaysTracker_center_distance(SidewaysTracker_center_distance),
-  SidewaysTracker_diameter(SidewaysTracker_diameter),Example Conversion
+  SidewaysTracker_diameter(SidewaysTracker_diameter),
   SidewaysTracker_in_to_deg_ratio(M_PI*SidewaysTracker_diameter/360.0),
   drive_setup(drive_setup),
   DriveL(DriveL),
@@ -377,18 +377,16 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
     float drive_pid_output = drivePID.compute(drive_error);
     float heading_output = headingPID.compute(heading_error);
 
-    // Update time for the motion profile
-    time += 0.01; // Assuming this loop runs at ~100 Hz
     trapezoid_velocity(distance);  // Call to motion profile
 
     // Use profile velocity and acceleration for feedforward
-    float feedforward = (velocity * adjust_velocity) + (acceleration * 0.01); // scale as needed
+    float feedforward = (velocity * adjust_velocity); // scale as needed
 
     // Adjust drive PID output by adding feedforward
     float desired_drive_output = drive_pid_output + feedforward;
 
     // Apply acceleration limiting
-    float max_output_change = max_acceleration * 0.01; // max change per loop iteration (assuming 100 Hz loop rate)
+    float max_output_change = max_acceleration * 0.0254 * 6.93641618497; // max change per loop iteration (assuming 100 Hz loop rate)
     float output_change = desired_drive_output - prev_drive_output;
 
     if (output_change > max_output_change) {
