@@ -21,24 +21,39 @@ void IntakeControl::setMode(Mode newMode) {
 
 void IntakeControl::colorSorting() {
   if (intakeon) {
-    hue = opticalsensor.hue();
+    // hue = opticalsensor.hue();
+
+    
     if (!ringdetected) {
-      if (hue < 30) {
-          // Controller1.Screen.clearScreen();
-          // Controller1.Screen.setCursor(1,1);
-          // Controller1.Screen.print("red");
-          ring = true;
-        } else if (hue > 170) {
-          // Controller1.Screen.clearScreen();
-          // Controller1.Screen.setCursor(1,1);
-          // Controller1.Screen.print("blue");
-          ring = false;
-        }
+      aivisionsensor.takeSnapshot(aivisionsensor__bluering);
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,1);
+      Controller1.Screen.print("red");
+      if (aivisionsensor.objects[0].exists) {
+        ring = true;
+        ringdetected = true;
+        intakevelocity = 75;
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("red");
+      }
+      else {
+        ring = false;
+      }
+      aivisionsensor.takeSnapshot(aivisionsensor__bluering);
+      if (aivisionsensor.objects[0].exists) {
+        ring = false;
+        ringdetected = true;
+        intakevelocity = 75;
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("blue");
+      }
+      else {
+        ring = true;
+      }
+      // if (hue < 30) { // for optical
 	  }
-    if (opticalsensor.isNearObject()) {
-      ringdetected = true;
-      intakevelocity = 75;
-    }
     if (!ringdetected) {
       // Controller1.Screen.clearScreen();
       // Controller1.Screen.setCursor(1,1);
@@ -50,6 +65,7 @@ void IntakeControl::colorSorting() {
         if (team) {
           if (!ring) {
             if (distancesensor.objectDistance(inches) < 2) {
+              wait(30, msec);
               intake.stop(brake);
               intakevelocity = 0;
               intakeon = false;
@@ -59,6 +75,8 @@ void IntakeControl::colorSorting() {
         else {
           if (ring) {
             if (distancesensor.objectDistance(inches) < 2) {
+
+              wait(30, msec);
               intake.stop(brake);
               intakevelocity = 0;
               intakeon = false;
@@ -72,7 +90,9 @@ void IntakeControl::colorSorting() {
       }
       if (holding) {
         intake.stop(brake);
-        intakevelocity = 0;
+        intake.spin(forward);
+        intakevelocity = -50;
+        intake.setVelocity(intakevelocity, percent);
         intakeon = false;
         Controller1.Screen.clearScreen();
         Controller1.Screen.setCursor(1,1);
@@ -90,7 +110,6 @@ void IntakeControl::colorSorting() {
 void IntakeControl::update() {
   switch (mode) {
     case INTAKE_COLOR_SORT:
-      colorSorting();
       if (auto_on) {
         Controller1.Screen.clearScreen();
         Controller1.Screen.setCursor(1,1);
@@ -102,8 +121,9 @@ void IntakeControl::update() {
           Controller1.Screen.clearScreen();
           Controller1.Screen.setCursor(1,1);
           Controller1.Screen.print("time");  
-        } 
+        }   
       }
+      colorSorting();
       break;
     case WALLSTAKE_HOLDING:
       if (distancesensor.objectDistance(inches) < 2) {

@@ -16,9 +16,12 @@ extern motor_group fourBar;
 extern inertial leftinertialsensor;
 extern inertial rightinertialsensor;
 extern distance distancesensor;
-extern optical opticalsensor;
+// extern optical opticalsensor;
 extern digital_out goalclamp;
 extern rotation verticalwheelrotation;
 extern rotation horizaontalwheelrotation;
+extern aivision aivisionsensor;
+extern aivision::colordesc aivisionsensor__bluering;
+extern aivision::colordesc aivisionsensor__redring;
 
 void  vexcodeInit( void );

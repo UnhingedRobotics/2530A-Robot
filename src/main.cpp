@@ -130,9 +130,9 @@ void buttonR2EventHandler() {
   intakeControl.intakeon = false;
 }
 void buttonXEventHandler() {
-  armControl.pid_stop = true;
-  wait(20, msec);
-  intakeControl.setMode(WALLSTAKE_HOLDING);
+  // armControl.pid_stop = true;
+  // wait(20, msec);
+  intakeControl.holding = true;
   // armControl.move_to_angle(0);
 }
 // void buttonYEventHandler() {
@@ -182,12 +182,12 @@ void pre_auton() {
   fourBar.setMaxTorque(100, percent);
   fourBar.resetPosition();
   fourBar.spin(forward);
-  opticalsensor.integrationTime(5);
-  opticalsensor.gestureDisable();
+  // opticalsensor.integrationTime(5);
+  // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
   intake.spin(forward);
-  opticalsensor.setLight(ledState::on);
-  opticalsensor.setLightPower(100.0, percent);
+  // opticalsensor.setLight(ledState::on);
+  // opticalsensor.setLightPower(100.0, percent);
   armControl.pid_stop = false;
 
   while(!intakeControl.auto_on){
@@ -200,16 +200,30 @@ void pre_auton() {
     Brain.Screen.printAt(5, 120, "Selected Auton:");
     switch(current_auton_selection){
       case 0:
-        Brain.Screen.printAt(5, 140, "Auton 1");
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("Red Left Elims");
         break;
       case 1:
-        Brain.Screen.printAt(5, 140, "Auton 2");
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("Red Left Winpoint");
+        break;
+      case 2:
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("Blue Left Elims");
+        break;
+      case 3:
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("Blue Left Winpoint");
         break;
     }
-    if(Brain.Screen.pressing()){
-      while(Controller1.ButtonA.pressing()) {}
+    if (Controller1.ButtonA.pressing()) {
       current_auton_selection ++;
-    } else if (current_auton_selection == 3){
+    }  
+    if (current_auton_selection == 4){
       current_auton_selection = 0;
     }
     task::sleep(10);
@@ -230,7 +244,13 @@ void autonomous(void) {
       red_left_elims();
       break;
     case 1:         
-      winpoint();
+      red_left_winpoint();
+      break;
+    case 2:
+      blue_left_elims();
+      break;
+    case 3:
+      blue_left_winpoint();
       break;
  }
 }

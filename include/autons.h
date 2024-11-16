@@ -13,4 +13,6 @@ extern Drive chassis;
 void default_constants();
 
 void red_left_elims();
-void winpoint();
+void red_left_winpoint();
+void blue_left_elims();
+void blue_left_winpoint();
