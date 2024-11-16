@@ -177,3 +177,13 @@ void blue_left_winpoint(){
   chassis.drive_distance(17);
   intakeControl.intakeon = false;
 }
+
+void skills(){
+  task intakeTask(intakeTaskFunction);
+  intakeControl.team = true;
+  intakeControl.intakeon = false;
+  chassis.drive_distance(-25);
+  goalclamp.set(true);
+  wait(0.3, seconds);
+  intakeControl.intakeon = true;
+}

@@ -129,12 +129,12 @@ void buttonR1EventHandler() {
 void buttonR2EventHandler() {
   intakeControl.intakeon = false;
 }
-void buttonXEventHandler() {
+// void buttonXEventHandler() {
   // armControl.pid_stop = true;
   // wait(20, msec);
-  intakeControl.holding = true;
+  // intakeControl.holding = true;
   // armControl.move_to_angle(0);
-}
+// }
 // void buttonYEventHandler() {
   // armControl.pid_stop = true;
   // waitUntil(!armControl.pid_stop);
@@ -219,11 +219,16 @@ void pre_auton() {
         Controller1.Screen.setCursor(1,1);
         Controller1.Screen.print("Blue Left Winpoint");
         break;
+      case 4:
+        Controller1.Screen.clearScreen();
+        Controller1.Screen.setCursor(1,1);
+        Controller1.Screen.print("Skills");
+        break;
     }
     if (Controller1.ButtonA.pressing()) {
       current_auton_selection ++;
     }  
-    if (current_auton_selection == 4){
+    if (current_auton_selection == 5){
       current_auton_selection = 0;
     }
     task::sleep(10);
@@ -252,6 +257,9 @@ void autonomous(void) {
     case 3:
       blue_left_winpoint();
       break;
+    case 4:
+      skills();
+      break;
  }
 }
 
@@ -271,7 +279,7 @@ void usercontrol(void) {
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
-  Controller1.ButtonX.pressed(buttonXEventHandler);
+  // Controller1.ButtonX.pressed(buttonXEventHandler);
   // Controller1.ButtonY.pressed(buttonYEventHandler);
   // Controller1.ButtonB.pressed(buttonBEventHandler);
   // Controller1.ButtonUp.pressed(buttonUpEventHandler);
