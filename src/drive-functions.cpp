@@ -65,21 +65,22 @@ void IntakeControl::colorSorting() {
         if (team) {
           if (!ring) {
             if (distancesensor.objectDistance(inches) < 2) {
-              wait(30, msec);
-              intake.stop(brake);
-              intakevelocity = 0;
-              intakeon = false;
+              // Elijah - Color sorting turn off / on
+              //wait(30, msec);
+              //intake.stop(brake);
+              //intakevelocity = 0;
+              //intakeon = false;
             }
           }
         }
         else {
           if (ring) {
             if (distancesensor.objectDistance(inches) < 2) {
-
-              wait(30, msec);
-              intake.stop(brake);
-              intakevelocity = 0;
-              intakeon = false;
+              // Elijah - Color sorting turn off / on
+              //wait(30, msec);
+              //intake.stop(brake);
+              //intakevelocity = 0;
+              //intakeon = false;
             }
           }
         }
