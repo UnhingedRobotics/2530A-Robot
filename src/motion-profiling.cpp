@@ -1,74 +1,81 @@
-#include "vex.h"
+#include "motion-profiling.h" // Use the correct header file name
+#include <cmath>              // For mathematical operations like sqrt
 
-// motion_profiling.cpp
+MP::MP() :
+  adjust_velocity(6.93641618497), // m/s to volts
+  max_velocity(1.73),            // m/s
+  max_acceleration(5.61),        // m/s^2
+  max_jerk(18.1),                // m/s^3
+  minimum_distance(0),           // Minimum distance for acceleration phase
+  acceleration_time(0),          // Time to reach max velocity
+  acceleration_distance(0),      // Distance covered during acceleration phase
+  constant_distance(0),
+  constant_time(0),
+  total_time(0),
+  triangular_time(0),
+  time(0),
+  velocity(0),
+  decel_time(0)
+{}
 
-// Define the constants
-const double adjust_velocity = 6.93641618497; // m/s to volts
-const double max_velocity = 1.73; // m/s
-const double max_acceleration = 5.61; // m/s^2
-const double max_jerk = 18.1; // m/s^3
-
-double minimum_distance;
-double acceleration_time;
-double acceleration_distance;
-
-void trapezoid_initialize(double distance) {
-  // Minimum distance required to reach max velocity
-  minimum_distance = (max_velocity * max_velocity) / max_acceleration;
-  if (distance >= minimum_distance) {
-    double constant_distance = distance - 2 * acceleration_distance;
-    double constant_time = constant_distance / max_velocity;
-    double total_time = 2 * acceleration_time + constant_time;
-  } else {
-    double triangular_time = sqrt(distance / max_acceleration);
-  }
-  
+void MP::trapezoid_initialize(double distance) {
   // Time to reach max velocity
   acceleration_time = max_velocity / max_acceleration;
 
   // Distance covered during acceleration phase
   acceleration_distance = 0.5 * max_acceleration * (acceleration_time * acceleration_time);
+
+  // Minimum distance required to reach max velocity
+  minimum_distance = 2 * acceleration_distance;
+
+  if (distance >= minimum_distance) {
+    // Compute constant motion phase distance and time
+    constant_distance = distance - 2 * acceleration_distance;
+    constant_time = constant_distance / max_velocity;
+
+    // Total time for motion profiling
+    total_time = 2 * acceleration_time + constant_time;
+  } else {
+    // Triangular profile when distance < minimum_distance
+    triangular_time = sqrt(distance / max_acceleration);
+    total_time = 2 * triangular_time;
+  }
 }
 
-void trapezoid_velocity() {
-  distance = distance * 0.0254; // Convert inches to meters
-  double time = Brain.Timer.time(seconds);
-  double velocity = 0.0; // Initialize velocity variable
-  
-  // Check if distance allows reaching max velocity
+void MP::trapezoid_velocity(double distance) {
+  // Convert distance from inches to meters
+  distance *= 0.0254;
+
+  // Get the current time in seconds
+  time = Brain.Timer.time(seconds);
+
+  // Reset velocity
+  velocity = 0.0;
+
+  // Check if the distance allows reaching max velocity
   if (distance >= minimum_distance) {
-    // Calculate values based on time
     if (time < acceleration_time) {
-      // double position = 0.5 * max_acceleration * time * time;
+      // Acceleration phase
       velocity = max_acceleration * time;
-      // double acceleration = max_acceleration;
-      // Use position, velocity, and acceleration for motor control here if needed
     } else if (time < acceleration_time + constant_time) {
-      // double position = acceleration_distance + max_velocity * (time - acceleration_time);
+      // Constant velocity phase
       velocity = max_velocity;
-      // double acceleration = 0;
-      // Use position, velocity, and acceleration for motor control here if needed
     } else if (time <= total_time) {
-      double decel_time = total_time - time;
-      // double position = distance - 0.5 * max_acceleration * decel_time * decel_time;
+      // Deceleration phase
+      decel_time = total_time - time;
       velocity = max_acceleration * decel_time;
-      // double acceleration = -max_acceleration;
-      // Use position, velocity, and acceleration for motor control here if needed
     }
   } else {
     if (time < triangular_time) {
-      // double position = 0.5 * max_acceleration * time * time;
+      // Acceleration phase for triangular profile
       velocity = max_acceleration * time;
-      // double acceleration = max_acceleration;
-      // Use position, velocity, and acceleration for motor control here if needed
-    } else if (time <= 2 * triangular_time) {
-      double decel_time = 2 * triangular_time - time;
-      // double position = distance - 0.5 * max_acceleration * decel_time * decel_time;
+    } else if (time <= total_time) {
+      // Deceleration phase for triangular profile
+      decel_time = total_time - time;
       velocity = max_acceleration * decel_time;
-      // double acceleration = -max_acceleration;
-      // Use position, velocity, and acceleration for motor control here if needed
     }
   }
 
-  velocity *= adjust_velocity; // Apply velocity adjustment factor
+  // Adjust velocity using the conversion factor
+  velocity *= adjust_velocity;
 }
