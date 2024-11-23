@@ -65,25 +65,7 @@ void odom_constants(){
  */
 
 void red_left_elims(){
-  task intakeTask(intakeTaskFunction);
-  intakeControl.team = true;
-  intakeControl.intakeon = false;
-  chassis.drive_distance(-53);
-  goalclamp.set(true);
-  wait(0.3, seconds);
-  intakeControl.intakeon = true;
-  chassis.drive_distance(8);
-  chassis.turn_to_angle(90);
-  chassis.drive_distance(30);
-  chassis.drive_distance(4);
-  wait(.5, seconds);
-  chassis.drive_distance(-11);
-  chassis.turn_to_angle(180);
-  chassis.drive_distance(14);
-  wait(.5, seconds);
-  chassis.turn_to_angle(255);
-  chassis.drive_distance(15);
-  intakeControl.intakeon = false;
+  chassis.drive_distance_mp(40);
 }
 
 void red_left_winpoint(){
@@ -119,6 +101,25 @@ void red_left_winpoint(){
   chassis.turn_to_angle(90);
   chassis.drive_distance(17);
   intakeControl.intakeon = false;
+  // task intakeTask(intakeTaskFunction);
+  // intakeControl.team = true;
+  // intakeControl.intakeon = false;
+  // chassis.drive_distance(-53);
+  // goalclamp.set(true);
+  // wait(0.3, seconds);
+  // intakeControl.intakeon = true;
+  // chassis.drive_distance(8);
+  // chassis.turn_to_angle(90);
+  // chassis.drive_distance(30);
+  // chassis.drive_distance(4);
+  // wait(.5, seconds);
+  // chassis.drive_distance(-11);
+  // chassis.turn_to_angle(180);
+  // chassis.drive_distance(14);
+  // wait(.5, seconds);
+  // chassis.turn_to_angle(255);
+  // chassis.drive_distance(15);
+  // intakeControl.intakeon = false;
 }
 
 void blue_left_elims(){

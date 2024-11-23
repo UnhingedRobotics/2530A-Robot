@@ -74,6 +74,8 @@ int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_
 void Drive::drive_with_voltage(float leftVoltage, float rightVoltage){
   DriveL.spin(fwd, leftVoltage, volt);
   DriveR.spin(fwd, rightVoltage,volt);
+  // DriveL.spin(fwd, leftVoltage * 8.33, percent);
+  // DriveR.spin(fwd, rightVoltage * 8.33, percent);
 }
 
 /**
@@ -383,7 +385,7 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
     float feedforward = velocity; // Use feedforward as needed
 
     // Adjust drive PID output by adding feedforward
-    float desired_drive_output = drive_pid_output + feedforward;
+    float desired_drive_output = feedforward ; // drive_pid_output + 
 
     // Apply acceleration limiting
     float max_output_change = 0.38913294797; // max change per loop iteration (assuming 100 Hz loop rate)
