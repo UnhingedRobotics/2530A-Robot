@@ -2,5 +2,5 @@
 /build
 compile_commands.json
 /.vscode/*
-/venv
-/__pycache__
+venv/
+__pycache__/
