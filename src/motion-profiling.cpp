@@ -59,51 +59,22 @@ void MP::trapezoid_velocity(double distance) {
     if (time < acceleration_time) {
       // Acceleration phase
       velocity = max_acceleration * time;
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print(velocity);
-
-      Controller1.Screen.setCursor(2,1);
-      Controller1.Screen.print(time);
     } else if (time < acceleration_time + constant_time) {
       // Constant velocity phase
       velocity = max_velocity;
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print(velocity);
-
-      Controller1.Screen.setCursor(2,1);
-      Controller1.Screen.print(time);
     } else if (time <= total_time) {
       // Deceleration phase
       decel_time = total_time - time;
       velocity = max_acceleration * decel_time;
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print(velocity);
-
-      Controller1.Screen.setCursor(2,1);
-      Controller1.Screen.print(time);
     }
   } else {
     if (time < triangular_time) {
       // Acceleration phase for triangular profile
       velocity = max_acceleration * time;
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print(velocity);
-      Controller1.Screen.setCursor(2,1);
-      Controller1.Screen.print(time);
     } else if (time <= total_time) {
       // Deceleration phase for triangular profile
       decel_time = total_time - time;
       velocity = max_acceleration * decel_time;
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print(velocity);
-
-      Controller1.Screen.setCursor(2,1);
-      Controller1.Screen.print(time);
     }
   }
 

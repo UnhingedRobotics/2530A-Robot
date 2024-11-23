@@ -402,7 +402,6 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
     // Clamp outputs to the max voltages
     drive_output = clamp(drive_output, -drive_max_voltage, drive_max_voltage);
     heading_output = clamp(heading_output, -heading_max_voltage, heading_max_voltage);
-
     // Send calculated voltages to motors
     drive_with_voltage(drive_output + heading_output, drive_output - heading_output);
 
