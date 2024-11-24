@@ -25,7 +25,9 @@ def simulate_motion_profile(distance):
         velocities.append(velocity)
 
         # Update position
-        position += (velocity / mp.adjust_velocity) * time_step  # Convert back to m/s
+        if current_time >= mp.deadband_time:  # Use 'current_time' instead of 'time'
+            position += (velocity / mp.adjust_velocity) * time_step  # Convert back to m/s
+
         positions.append(position)
 
         # Update time
@@ -59,3 +61,4 @@ def simulate_motion_profile(distance):
 if __name__ == "__main__":
     # Simulate motion profile for a distance of 100 inches
     simulate_motion_profile(distance=30)
+

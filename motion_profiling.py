@@ -4,14 +4,17 @@ class MotionProfiling:
     def __init__(self):
         # Motion profile parameters
         self.adjust_velocity = 6.93641618497  # Conversion from m/s to volts
+        self.adjust_voltage = 0.144166666667  # Conversion from m/s to volts
         self.max_velocity = 1.73               # Max velocity (m/s)
         self.max_acceleration = 5.61           # Max acceleration (m/s^2)
         self.max_jerk = 18.1                   # Max jerk (m/s^3)
+        self.deadband = 2                   # Deadband (voltage)
 
         # Motion profile state
         self.minimum_distance = 0              # Minimum distance for acceleration phase
         self.acceleration_time = 0             # Time to reach max velocity
-        self.acceleration_distance = 0         # Distance covered during acceleration phase
+        self.deadband_time = 0             # Time to reach max velocity
+        self.deadband_distance = 0         # Distance covered during acceleration phase
         self.constant_distance = 0             # Distance for constant velocity
         self.constant_time = 0                 # Time for constant velocity phase
         self.total_time = 0                    # Total time for the motion profile
@@ -26,23 +29,25 @@ class MotionProfiling:
 
         # Calculate time to reach max velocity
         self.acceleration_time = self.max_velocity / self.max_acceleration
+        self.deadband_time = self.deadband * self.adjust_voltage / self.max_acceleration
 
         # Calculate distance covered during acceleration phase
+        self.deadband_distance = 0.5 * self.max_acceleration * (self.deadband_time ** 2)
         self.acceleration_distance = 0.5 * self.max_acceleration * (self.acceleration_time ** 2)
 
         # Minimum distance required to reach max velocity
-        self.minimum_distance = 2 * self.acceleration_distance
+        self.minimum_distance =  2 * self.acceleration_distance + self.deadband_distance
 
         if distance >= self.minimum_distance:
             # Compute constant motion phase distance and time
-            self.constant_distance = distance - 2 * self.acceleration_distance
+            self.constant_distance = distance - (2 * self.acceleration_distance) + self.deadband_distance
             self.constant_time = self.constant_distance / self.max_velocity
 
             # Total time for motion profiling
             self.total_time = 2 * self.acceleration_time + self.constant_time
         else:
             # Triangular profile when distance < minimum_distance
-            self.triangular_time = math.sqrt(distance / self.max_acceleration)
+            self.triangular_time = math.sqrt((distance + self.deadband_distance) / self.max_acceleration)
             self.total_time = 2 * self.triangular_time
 
     def get_velocity(self, current_time):
