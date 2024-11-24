@@ -8,7 +8,7 @@ class MotionProfiling:
         self.max_velocity = 1.73               # Max velocity (m/s)
         self.max_acceleration = 5.61           # Max acceleration (m/s^2)
         self.max_jerk = 18.1                   # Max jerk (m/s^3)
-        self.deadband = 2                   # Deadband (voltage)
+        self.deadband = 8                   # Deadband (voltage)
 
         # Motion profile state
         self.minimum_distance = 0              # Minimum distance for acceleration phase
