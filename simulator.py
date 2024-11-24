@@ -38,9 +38,9 @@ def simulate_motion_profile(distance):
     # Plot results
     plt.figure(figsize=(10, 6))
     plt.subplot(2, 1, 1)
-    plt.plot(times, velocities, label="Velocity (m/s)")
+    plt.plot(times, velocities, label="Velocity (volts)")
     plt.xlabel("Time (s)")
-    plt.ylabel("Velocity (m/s)")
+    plt.ylabel("Velocity (volts)")
     plt.title("Velocity vs Time")
     plt.grid()
     plt.legend()
@@ -58,4 +58,4 @@ def simulate_motion_profile(distance):
 
 if __name__ == "__main__":
     # Simulate motion profile for a distance of 100 inches
-    simulate_motion_profile(distance=10)
+    simulate_motion_profile(distance=30)

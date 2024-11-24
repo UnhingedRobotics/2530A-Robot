@@ -77,5 +77,5 @@ class MotionProfiling:
                 self.velocity = self.max_acceleration * self.decel_time
 
         # Adjust velocity for conversion to voltage
-        self.velocity *= self.adjust_velocity * 0.144166666667
+        self.velocity *= self.adjust_velocity
         return self.velocity
