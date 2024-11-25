@@ -8,7 +8,7 @@ MP::MP() :
   max_velocity(1.73),              // Max velocity (m/s)
   max_acceleration(5.61),          // Max acceleration (m/s^2)
   max_jerk(18.1),                  // Max jerk (m/s^3)
-  deadband(2),                     // Deadband in volts
+  deadband(0),                     // Deadband in volts
   minimum_distance(0),             // Initialize motion profile parameters
   acceleration_time(0),
   deadband_time(0),
