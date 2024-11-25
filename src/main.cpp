@@ -177,6 +177,7 @@ void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE
   vexcodeInit();
   default_constants();
+  thread healthTask(healthCheck);
   intake.spin(forward);
   fourBar.setVelocity(0, percent);
   fourBar.setMaxTorque(100, percent);
@@ -265,7 +266,6 @@ void autonomous(void) {
 void usercontrol(void) {
   intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
-  thread healthTask(healthCheck);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);

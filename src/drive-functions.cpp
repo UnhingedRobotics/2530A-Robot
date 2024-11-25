@@ -9,8 +9,8 @@ IntakeControl::IntakeControl() :
   ring(false),
   team(true),
   ringdetected(false),
-  holding(false),
   intakeon(false),
+  holding(false),
   intakevelocity(0),
   mode(INTAKE_COLOR_SORT)
 {}
@@ -136,12 +136,6 @@ void IntakeControl::update() {
 		    intake.setVelocity(0, percent);
       }
       break;
-    // case ALLIANCE_WALLSTAKE_SCORING:
-      // colorSorting();
-      // break;
-    // case HIGH_WALLSTAKE_SCORING:
-      // colorSorting();
-      // break;
   }
 }
 

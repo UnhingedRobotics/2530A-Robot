@@ -13,7 +13,7 @@ MP::MP() :
   acceleration_time(0),
   deadband_time(0),
   acceleration_distance(0),
-  deadband_distance(0),
+  deadband_distance(1),
   constant_distance(0),
   constant_time(0),
   total_time(0),
@@ -42,17 +42,33 @@ void MP::trapezoid_initialize(double distance) {
   // Minimum distance required to reach max velocity, including deadband
   minimum_distance = 2 * acceleration_distance + deadband_distance;
 
-  if (distance >= minimum_distance) {
-    // Compute constant motion phase distance and time
-    constant_distance = distance - (2 * acceleration_distance) - deadband_distance;
-    constant_time = constant_distance / max_velocity;
+  if (distance > 0) {
+    if (distance >= minimum_distance) {
+      // Compute constant motion phase distance and time
+      constant_distance = distance - (2 * acceleration_distance) - deadband_distance;
+      constant_time = constant_distance / max_velocity;
 
-    // Total time for motion profiling
-    total_time = 2 * acceleration_time + constant_time + deadband_time;
-  } else {
-    // Triangular profile when distance < minimum_distance
-    triangular_time = sqrt((distance + deadband_distance) / max_acceleration);
-    total_time = 2 * triangular_time;
+      // Total time for motion profiling
+      total_time = 2 * acceleration_time + constant_time + deadband_time;
+    } else {
+      // Triangular profile when distance < minimum_distance
+      triangular_time = sqrt((distance + deadband_distance) / max_acceleration);
+      total_time = 2 * triangular_time;
+    }
+  }
+  else {
+    if (distance >= minimum_distance) {
+      // Compute constant motion phase distance and time
+      constant_distance = (distance * -1) - (2 * acceleration_distance) - deadband_distance;
+      constant_time = constant_distance / max_velocity;
+
+      // Total time for motion profiling
+      total_time = 2 * acceleration_time + constant_time + deadband_time;
+    } else {
+      // Triangular profile when distance < minimum_distance
+      triangular_time = sqrt(((distance * -1) + deadband_distance) / max_acceleration);
+      total_time = 2 * triangular_time;
+    }
   }
 }
 
@@ -65,32 +81,61 @@ void MP::trapezoid_velocity(double distance) {
 
   // Reset velocity
   velocity = 0.0;
-
-  if (distance >= minimum_distance) {
-    if (time < deadband_time) {
-      // Deadband phase: Adjust velocity based on deadband
-      velocity = max_acceleration * time;
-    } else if (time < deadband_time + acceleration_time) {
-      // Acceleration phase
-      velocity = max_acceleration * (time - deadband_time);
-    } else if (time < deadband_time + acceleration_time + constant_time) {
-      // Constant velocity phase
-      velocity = max_velocity;
-    } else if (time <= total_time) {
-      // Deceleration phase
-      decel_time = total_time - time;
-      velocity = max_acceleration * decel_time;
-    }
-  } else {
-    if (time < triangular_time) {
-      // Acceleration phase for triangular profile
-      velocity = max_acceleration * time;
-    } else if (time <= total_time) {
-      // Deceleration phase for triangular profile
-      decel_time = total_time - time;
-      velocity = max_acceleration * decel_time;
+  if (distance > 0) {
+    if (distance >= minimum_distance) {
+      if (time < deadband_time) {
+        // Deadband phase: Adjust velocity based on deadband
+        velocity = max_acceleration * time;
+      } else if (time < deadband_time + acceleration_time) {
+        // Acceleration phase
+        velocity = max_acceleration * (time - deadband_time);
+      } else if (time < deadband_time + acceleration_time + constant_time) {
+        // Constant velocity phase
+        velocity = max_velocity;
+      } else if (time <= total_time) {
+        // Deceleration phase
+        decel_time = total_time - time;
+        velocity = max_acceleration * decel_time;
+      }
+    } else {
+      if (time < triangular_time) {
+        // Acceleration phase for triangular profile
+        velocity = max_acceleration * time;
+      } else if (time <= total_time) {
+        // Deceleration phase for triangular profile
+        decel_time = total_time - time;
+        velocity = max_acceleration * decel_time;
+      }
     }
   }
+  else {
+    if (distance <= minimum_distance) {
+      if (time < deadband_time) {
+        // Deadband phase: Adjust velocity based on deadband
+        velocity = max_acceleration * time * -1;
+      } else if (time < deadband_time + acceleration_time) {
+        // Acceleration phase
+        velocity = max_acceleration * (time - deadband_time);
+      } else if (time < deadband_time + acceleration_time + constant_time) {
+        // Constant velocity phase
+        velocity = max_velocity * -1;
+      } else if (time <= total_time) {
+        // Deceleration phase
+        decel_time = total_time - time;
+        velocity = max_acceleration * decel_time * -1;
+      }
+    } else {
+      if (time < triangular_time) {
+        // Acceleration phase for triangular profile
+        velocity = max_acceleration * time * -1;
+      } else if (time <= total_time) {
+        // Deceleration phase for triangular profile
+        decel_time = total_time - time;
+        velocity = max_acceleration * decel_time * -1;
+      }
+    }
+  }
+
 
   // Adjust velocity using the conversion factor
   velocity *= adjust_velocity;
