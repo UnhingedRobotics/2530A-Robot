@@ -52,3 +52,4 @@ public:
   void move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti);
 };
 
+void healthCheck();

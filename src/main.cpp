@@ -200,35 +200,25 @@ void pre_auton() {
     Brain.Screen.printAt(5, 120, "Selected Auton:");
     switch(current_auton_selection){
       case 0:
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("Red Left Elims");
+        Brain.Screen.printAt(5, 140, "Red Left Elims");
         break;
       case 1:
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("Red Left Winpoint");
+        Brain.Screen.printAt(5, 140, "Red Left Winpoint");
         break;
       case 2:
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("Blue Left Elims");
+        Brain.Screen.printAt(5, 140, "Blue Left Elims");
         break;
       case 3:
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("Blue Left Winpoint");
+        Brain.Screen.printAt(5, 140, "Blue Left Winpoint");
         break;
       case 4:
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("Skills");
+        Brain.Screen.printAt(5, 140, "Skills Left Winpoint");
         break;
     }
-    if (Controller1.ButtonA.pressing()) {
+    if(Brain.Screen.pressing()){
+      while(Brain.Screen.pressing()) {}
       current_auton_selection ++;
-    }  
-    if (current_auton_selection == 5){
+    } else if (current_auton_selection == 5){
       current_auton_selection = 0;
     }
     task::sleep(10);
@@ -275,6 +265,7 @@ void autonomous(void) {
 void usercontrol(void) {
   intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
+  thread healthTask(healthCheck);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);

@@ -19,7 +19,7 @@ void IntakeControl::setMode(Mode newMode) {
   mode = newMode;
 }
 
-void IntakeControl::colorSorting() {
+void IntakeControl::colorSorting() { 
   if (intakeon) {
     // hue = opticalsensor.hue();
 
@@ -54,6 +54,7 @@ void IntakeControl::colorSorting() {
       }
       // if (hue < 30) { // for optical
 	  }
+    
     if (!ringdetected) {
       // Controller1.Screen.clearScreen();
       // Controller1.Screen.setCursor(1,1);
@@ -100,13 +101,15 @@ void IntakeControl::colorSorting() {
         Controller1.Screen.print("held");  
       }
 	  }
-  } 
+  }
+
   else {
     intakevelocity = 0;
   }
   intake.spin(forward);
   intake.setVelocity(intakevelocity, percent);
 }
+
 
 void IntakeControl::update() {
   switch (mode) {
@@ -184,4 +187,44 @@ void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_set
   fourBar.stop(brake);
   fourBar.spin(forward);
   fourBar.setVelocity(0, percent);
+}
+
+void healthCheck() {
+  while (true) {
+    if (intake.temperature(fahrenheit) >= 105) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,1);
+      Controller1.Screen.print("Intake too hot!");
+      Controller1.rumble("..--");
+    }
+
+    if (leftdrivefront.temperature(fahrenheit) >= 105) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,2);
+      Controller1.Screen.print("LeftDriveFront too hot!");
+      Controller1.rumble("..--");
+    }
+    
+    if (leftdriveback.temperature(fahrenheit) >= 105) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,3);
+      Controller1.Screen.print("LeftDriveBack too hot!");
+      Controller1.rumble("..--");
+    }
+
+    if (rightdrivefront.temperature(fahrenheit) >= 105) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,4);
+      Controller1.Screen.print("RightDriveFront too hot!");
+      Controller1.rumble("..--");
+    }
+
+    if (rightdriveback.temperature(fahrenheit) >= 105) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,1);
+      Controller1.Screen.print("RightDriveBack too hot!");
+      Controller1.rumble("..--");
+    }
+    wait(1, seconds);
+  }
 }
