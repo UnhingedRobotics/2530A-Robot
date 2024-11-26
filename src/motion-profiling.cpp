@@ -1,5 +1,5 @@
 #include "motion-profiling.h"
-#include <cmath> // For sqrt()
+#include <cmath> // For sqrt() and pow()
 
 // Constructor with initializer list
 MP::MP() :
@@ -29,7 +29,7 @@ void MP::trapezoid_initialize(double distance) {
 
   // Time to reach max velocity
   acceleration_time = max_velocity / max_acceleration;
-  
+
   // Time for deadband phase
   deadband_time = (deadband * adjust_voltage) / max_acceleration;
 
@@ -55,17 +55,12 @@ void MP::trapezoid_initialize(double distance) {
       triangular_time = sqrt((distance + deadband_distance) / max_acceleration);
       total_time = 2 * triangular_time;
     }
-  }
-  else {
+  } else {
     if (distance >= minimum_distance) {
-      // Compute constant motion phase distance and time
       constant_distance = (distance * -1) - (2 * acceleration_distance) - deadband_distance;
       constant_time = constant_distance / max_velocity;
-
-      // Total time for motion profiling
       total_time = 2 * acceleration_time + constant_time + deadband_time;
     } else {
-      // Triangular profile when distance < minimum_distance
       triangular_time = sqrt(((distance * -1) + deadband_distance) / max_acceleration);
       total_time = 2 * triangular_time;
     }
@@ -73,71 +68,106 @@ void MP::trapezoid_initialize(double distance) {
 }
 
 void MP::trapezoid_velocity(double distance) {
-  // Convert distance from inches to meters
-  distance *= 0.0254;
-
-  // Get the current time in seconds
-  time = Brain.Timer.time(seconds);
-
-  // Reset velocity
+  distance *= 0.0254; // Convert distance from inches to meters
+  time = Brain.Timer.time(seconds); // Get current time
   velocity = 0.0;
+
   if (distance > 0) {
     if (distance >= minimum_distance) {
       if (time < deadband_time) {
-        // Deadband phase: Adjust velocity based on deadband
-        velocity = max_acceleration * time;
+        velocity = max_acceleration * time; // Deadband phase
       } else if (time < deadband_time + acceleration_time) {
-        // Acceleration phase
-        velocity = max_acceleration * (time - deadband_time);
+        velocity = max_acceleration * (time - deadband_time); // Acceleration phase
       } else if (time < deadband_time + acceleration_time + constant_time) {
-        // Constant velocity phase
-        velocity = max_velocity;
+        velocity = max_velocity; // Constant velocity phase
       } else if (time <= total_time) {
-        // Deceleration phase
         decel_time = total_time - time;
-        velocity = max_acceleration * decel_time;
+        velocity = max_acceleration * decel_time; // Deceleration phase
       }
     } else {
       if (time < triangular_time) {
-        // Acceleration phase for triangular profile
-        velocity = max_acceleration * time;
+        velocity = max_acceleration * time; // Acceleration phase
       } else if (time <= total_time) {
-        // Deceleration phase for triangular profile
         decel_time = total_time - time;
-        velocity = max_acceleration * decel_time;
+        velocity = max_acceleration * decel_time; // Deceleration phase
       }
     }
-  }
-  else {
+  } else {
     if (distance <= minimum_distance) {
       if (time < deadband_time) {
-        // Deadband phase: Adjust velocity based on deadband
-        velocity = max_acceleration * time * -1;
+        velocity = max_acceleration * time * -1; // Deadband phase
       } else if (time < deadband_time + acceleration_time) {
-        // Acceleration phase
-        velocity = max_acceleration * (time - deadband_time);
+        velocity = max_acceleration * (time - deadband_time); // Acceleration phase
       } else if (time < deadband_time + acceleration_time + constant_time) {
-        // Constant velocity phase
-        velocity = max_velocity * -1;
+        velocity = max_velocity * -1; // Constant velocity phase
       } else if (time <= total_time) {
-        // Deceleration phase
         decel_time = total_time - time;
-        velocity = max_acceleration * decel_time * -1;
+        velocity = max_acceleration * decel_time * -1; // Deceleration phase
       }
     } else {
       if (time < triangular_time) {
-        // Acceleration phase for triangular profile
-        velocity = max_acceleration * time * -1;
+        velocity = max_acceleration * time * -1; // Acceleration phase
       } else if (time <= total_time) {
-        // Deceleration phase for triangular profile
         decel_time = total_time - time;
-        velocity = max_acceleration * decel_time * -1;
+        velocity = max_acceleration * decel_time * -1; // Deceleration phase
       }
     }
   }
-
-
-  // Adjust velocity using the conversion factor
-  velocity *= adjust_velocity;
+  velocity *= adjust_velocity; // Adjust velocity using the conversion factor
 }
 
+void MP::sigmoid_initialize(double distance) {
+  Brain.Timer.reset();
+  distance *= 0.0254; // Convert distance from inches to meters
+
+  double jerk_phase_time = max_acceleration / max_jerk; // Time to reach max acceleration using max jerk
+  acceleration_time = max_velocity / max_acceleration;
+
+  double jerk_distance = 0.5 * max_jerk * pow(jerk_phase_time, 3); // Distance covered during jerk phase
+  acceleration_distance = 0.5 * max_acceleration * pow(acceleration_time, 2) - 2 * jerk_distance;
+
+  double full_acceleration_distance = 2 * jerk_distance + acceleration_distance;
+  minimum_distance = 2 * full_acceleration_distance;
+
+  if (distance >= minimum_distance) {
+    constant_distance = distance - 2 * full_acceleration_distance;
+    constant_time = constant_distance / max_velocity;
+    total_time = 2 * acceleration_time + constant_time;
+  } else {
+    triangular_time = sqrt(distance / max_acceleration);
+    total_time = 2 * triangular_time;
+  }
+}
+
+void MP::sigmoid_velocity(double distance) {
+  distance *= 0.0254; // Convert distance from inches to meters
+  time = Brain.Timer.time(seconds);
+  velocity = 0.0;
+
+  double jerk_phase_time = max_acceleration / max_jerk;
+
+  if (distance >= minimum_distance) {
+    if (time < jerk_phase_time) {
+      velocity = 0.5 * max_jerk * pow(time, 2); // Initial jerk phase
+    } else if (time < jerk_phase_time + acceleration_time) {
+      double t = time - jerk_phase_time;
+      velocity = max_acceleration * t + 0.5 * max_jerk * pow(jerk_phase_time, 2); // Acceleration
+    } else if (time < total_time - acceleration_time - jerk_phase_time) {
+      velocity = max_velocity; // Constant velocity
+    } else if (time < total_time - jerk_phase_time) {
+      double t = time - (total_time - acceleration_time - jerk_phase_time);
+      velocity = max_velocity - max_acceleration * t; // Deceleration
+    } else if (time <= total_time) {
+      double t = total_time - time;
+      velocity = 0.5 * max_jerk * pow(t, 2); // Final jerk phase
+    }
+  } else {
+    if (time < triangular_time) {
+      velocity = 0.5 * max_jerk * pow(time, 2); // Triangular acceleration phase
+    } else if (time <= total_time) {
+      double t = total_time - time;
+      velocity = 0.5 * max_jerk * pow(t, 2); // Triangular deceleration phase
+    }
+  }
+  velocity *= adjust_velocity; // Adjust velocity using the conversion factor
+}
