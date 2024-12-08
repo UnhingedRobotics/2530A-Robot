@@ -65,29 +65,22 @@ void IntakeControl::colorSorting() {
       if (ringdetected) {
         if (team) {
           if (!ring) {
-            if (distancesensor.objectDistance(inches) < 2) {
-              // Elijah - Color sorting turn off / on
-              //wait(30, msec);
-              //intake.stop(brake);
-              //intakevelocity = 0;
-              //intakeon = false;
+            if ((intake.position(degrees) >= 99 && intake.position(degrees) <= 101) || (intake.position(degrees) % 100 == 99 || intake.position(degrees) % 100 == 0 || intake.position(degrees) % 100 == 1)) {
+			  intake.resetPosition();
+			  intake.spin(reverse);
+			  intake.setVelocity(100, percent);
             }
           }
         }
         else {
           if (ring) {
-            if (distancesensor.objectDistance(inches) < 2) {
-              // Elijah - Color sorting turn off / on
-              //wait(30, msec);
-              //intake.stop(brake);
-              //intakevelocity = 0;
-              //intakeon = false;
+            if ((intake.position(degrees) >= 99 && intake.position(degrees) <= 101) || (intake.position(degrees) % 100 == 99 || intake.position(degrees) % 100 == 0 || intake.position(degrees) % 100 == 1)) {
+			  intake.resetPosition();
+			  intake.spin(reverse);
+			  intake.setVelocity(100, percent);
             }
           }
         }
-        // Controller1.Screen.clearScreen();
-        // Controller1.Screen.setCursor(1,1);
-        // Controller1.Screen.print("ring detected");    
         ringdetected = false;
       }
       if (holding) {
@@ -108,6 +101,9 @@ void IntakeControl::colorSorting() {
   }
   intake.spin(forward);
   intake.setVelocity(intakevelocity, percent);
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1,1);
+  Controller1.Screen.print(intake.position(degrees));  
 }
 
 
