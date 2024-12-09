@@ -16,7 +16,6 @@ competition Competition;
 /*  motors spin forward.                                                     */
 /*---------------------------------------------------------------------------*/
 IntakeControl intakeControl; // Define Intake Control here
-ArmControl armControl; // Define Arm Control here
 
 /*---------------------------------------------------------------------------*/
 /*                             JAR-Template Config                           */
@@ -129,40 +128,6 @@ void buttonR1EventHandler() {
 void buttonR2EventHandler() {
   intakeControl.intakeon = false;
 }
-// void buttonXEventHandler() {
-  // armControl.pid_stop = true;
-  // wait(20, msec);
-  // intakeControl.holding = true;
-  // armControl.move_to_angle(0);
-// }
-// void buttonYEventHandler() {
-  // armControl.pid_stop = true;
-  // waitUntil(!armControl.pid_stop);
-  // intakeControl.setMode(HIGH_WALLSTAKE_SCORING);
-  // armControl.move_to_angle(68);
-  // fourBar.setVelocity(80, percent);
-  // fourBar.spinFor(forward, 0.5, seconds);
-// }
-// void buttonBEventHandler() {
-  // armControl.pid_stop = true;
-  // waitUntil(!armControl.pid_stop);
-  // intakeControl.setMode(ALLIANCE_WALLSTAKE_SCORING);
-  // armControl.move_to_angle(40);
-  // fourBar.setVelocity(80, percent);
-  // fourBar.spinFor(forward, 0.3, seconds);
-// }
-
-// void buttonUpEventHandler() {
-  // armControl.pid_stop = true;
-  // waitUntil(!armControl.pid_stop);
-  // intakeControl.setMode(INTAKE_COLOR_SORT);
-  // Controller1.Screen.clearScreen();
-  // Controller1.Screen.setCursor(1,1);
-  // Controller1.Screen.print("PID down");  
-  // armControl.move_to_angle(0);
-  // fourBar.setVelocity(80, percent);
-  // fourBar.spinFor(reverse, 0.3, seconds);
-// }
 
 int intakeTaskFunctionUser() {
     while (true) {
@@ -179,17 +144,13 @@ void pre_auton() {
   default_constants();
   thread healthTask(healthCheck);
   intake.spin(forward);
-  fourBar.setVelocity(0, percent);
-  fourBar.setMaxTorque(100, percent);
-  fourBar.resetPosition();
-  fourBar.spin(forward);
+  fishMech.spin(forward);
   // opticalsensor.integrationTime(5);
   // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
   intake.spin(forward);
   // opticalsensor.setLight(ledState::on);
   // opticalsensor.setLightPower(100.0, percent);
-  armControl.pid_stop = false;
 
   while(!intakeControl.auto_on){
     Brain.Screen.clearScreen();
@@ -270,11 +231,18 @@ void usercontrol(void) {
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
-  // Controller1.ButtonX.pressed(buttonXEventHandler);
-  // Controller1.ButtonY.pressed(buttonYEventHandler);
-  // Controller1.ButtonB.pressed(buttonBEventHandler);
-  // Controller1.ButtonUp.pressed(buttonUpEventHandler);
   while (1) {
+    if (Controller1.ButtonX.pressing()) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.print("press");
+      fishMech.setVelocity(100, percent);
+    }
+    else if (Controller1.ButtonY.pressing()) {
+      fishMech.setVelocity(-100, percent);
+    } else {
+      fishMech.setVelocity(0, percent);
+    }
     // Tank drive control
     chassis.control_tank_squared();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources

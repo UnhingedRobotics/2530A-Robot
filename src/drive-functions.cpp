@@ -1,5 +1,6 @@
 #include "drive-functions.h"
 #include "vex.h"
+#include <sstream> // For std::ostringstream
 
 using namespace vex;
 
@@ -15,97 +16,83 @@ IntakeControl::IntakeControl() :
   mode(INTAKE_COLOR_SORT)
 {}
 
-void IntakeControl::setMode(Mode newMode) {
-  mode = newMode;
+
+// Converts a numeric value to a string
+std::string toString(double value) {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
 }
 
-void IntakeControl::colorSorting() { 
-  if (intakeon) {
-    // hue = opticalsensor.hue();
+// Member function of IntakeControl
+void IntakeControl::updateControllerScreen(const char* message) {
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print(message);
+}
 
-    
-    if (!ringdetected) {
-      aivisionsensor.takeSnapshot(aivisionsensor__bluering);
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print("red");
-      if (aivisionsensor.objects[0].exists) {
-        ring = true;
-        ringdetected = true;
-        intakevelocity = 75;
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("red");
-      }
-      else {
-        ring = false;
-      }
-      aivisionsensor.takeSnapshot(aivisionsensor__bluering);
-      if (aivisionsensor.objects[0].exists) {
-        ring = false;
-        ringdetected = true;
-        intakevelocity = 75;
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("blue");
-      }
-      else {
-        ring = true;
-      }
-      // if (hue < 30) { // for optical
-	  }
-    
-    if (!ringdetected) {
-      // Controller1.Screen.clearScreen();
-      // Controller1.Screen.setCursor(1,1);
-      // Controller1.Screen.print("ring not detected");
-      intakevelocity = 75;
+void IntakeControl::resetIntake() {
+    intake.setVelocity(-80, percent);
+
+}
+
+void IntakeControl::colorSorting() {
+    if (!intakeon) {
+      intakevelocity = 0;
     }
-    if (distancesensor.objectDistance(inches) < 2) {
-      if (ringdetected) {
-        if (team) {
-          if (!ring) {
-            if ((intake.position(degrees) >= 99 && intake.position(degrees) <= 101) || (intake.position(degrees) % 100 == 99 || intake.position(degrees) % 100 == 0 || intake.position(degrees) % 100 == 1)) {
-			  intake.resetPosition();
-			  intake.spin(reverse);
-			  intake.setVelocity(100, percent);
-            }
-          }
-        }
-        else {
-          if (ring) {
-            if ((intake.position(degrees) >= 99 && intake.position(degrees) <= 101) || (intake.position(degrees) % 100 == 99 || intake.position(degrees) % 100 == 0 || intake.position(degrees) % 100 == 1)) {
-			  intake.resetPosition();
-			  intake.spin(reverse);
-			  intake.setVelocity(100, percent);
-            }
-          }
-        }
+    else {
+      intakevelocity = 80;
+      if (intake.position(degrees) >= 2000) {
         ringdetected = false;
+        
       }
-      if (holding) {
-        intake.stop(brake);
-        intake.spin(forward);
-        intakevelocity = -50;
-        intake.setVelocity(intakevelocity, percent);
-        intakeon = false;
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("held");  
+      if (!ringdetected) {
+          aivisionsensor.takeSnapshot(aivisionsensor__bluering);
+          if (aivisionsensor.objects[0].exists) {
+              ring = false;
+              ringdetected = true;
+              if (team) {
+                intake.resetPosition();
+              }
+              // updateControllerScreen("blue");
+          } else {
+              aivisionsensor.takeSnapshot(aivisionsensor__redring);
+              if (aivisionsensor.objects[0].exists) {
+                ring = true;
+                ringdetected = true;
+                if (!team) {
+                  intake.resetPosition();
+                }
+                // updateControllerScreen("red");
+              }
+          }
       }
-	  }
-  }
+      // Check if position is a multiple of 1300
+      if (intake.position(degrees) >= 350) {
+          if (ringdetected) {
+            if ((team && !ring) || (!team && ring)) {
+              resetIntake();
+              updateControllerScreen("ring removed");
+              ringdetected = false;
+            }
 
-  else {
-    intakevelocity = 0;
-  }
-  intake.spin(forward);
-  intake.setVelocity(intakevelocity, percent);
-  Controller1.Screen.clearScreen();
-  Controller1.Screen.setCursor(1,1);
-  Controller1.Screen.print(intake.position(degrees));  
+            if (holding) {
+                intake.stop(brake);
+                intake.spin(forward);
+                intakevelocity = -50;
+                intake.setVelocity(intakevelocity, percent);
+                intakeon = false;
+            }
+          }
+          
+
+      }
+
+    }
+    intake.spin(forward);
+    intake.setVelocity(intakevelocity, percent);
+    // updateControllerScreen(toString(intake.position(degrees)).c_str());
 }
-
 
 void IntakeControl::update() {
   switch (mode) {
@@ -133,50 +120,6 @@ void IntakeControl::update() {
       }
       break;
   }
-}
-
-void ArmControl::set_arm_exit_conditions(float arm_settle_error, float arm_settle_time, float arm_timeout){
-  this->arm_settle_error = arm_settle_error;
-  this->arm_settle_time = arm_settle_time;
-  this->arm_timeout = arm_timeout;
-}
-
-void ArmControl::set_arm_constants(float arm_max_voltage, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
-  this->arm_max_voltage = arm_max_voltage;
-  this->arm_kp = arm_kp;
-  this->arm_ki = arm_ki;
-  this->arm_kd = arm_kd;
-  this->arm_starti = arm_starti;
-}
-
-void ArmControl::move_to_angle(float angle) {
-  move_to_angle(angle, arm_max_voltage, arm_settle_error, arm_settle_time, arm_timeout, arm_kp, arm_ki, arm_kd, arm_starti);
-}
-
-void ArmControl::move_to_angle(float angle, float arm_max_voltage) {
-  move_to_angle(angle, arm_max_voltage, arm_settle_error, arm_settle_time, arm_timeout, arm_kp, arm_ki, arm_kd, arm_starti);
-}
-
-void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout) {
-  move_to_angle(angle, arm_max_voltage, arm_settle_error, arm_settle_time, arm_timeout, arm_kp, arm_ki, arm_kd, arm_starti);
-}
-
-void ArmControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
-  PID armPID((angle - fourBar.position(degrees)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
-  while (!pid_stop) {   
-    float error = angle - fourBar.position(degrees);
-    float output = armPID.compute(error);
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(1,1);
-    Controller1.Screen.print(angle - fourBar.position(degrees));
-    output = clamp(output, -arm_max_voltage, arm_max_voltage);
-    fourBar.setVelocity(output, percent);
-    task::sleep(10);
-  }
-  pid_stop = false;
-  fourBar.stop(brake);
-  fourBar.spin(forward);
-  fourBar.setVelocity(0, percent);
 }
 
 void healthCheck() {

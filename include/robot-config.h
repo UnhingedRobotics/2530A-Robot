@@ -12,7 +12,7 @@ extern motor leftdriveback;
 extern motor rightdrivefront;
 extern motor rightdriveback;
 extern motor_group intake;
-extern motor_group fourBar;
+extern motor_group fishMech;
 extern inertial leftinertialsensor;
 extern inertial rightinertialsensor;
 extern distance distancesensor;
