@@ -3,6 +3,7 @@
 #include <sstream> // For std::ostringstream
 
 using namespace vex;
+double intakeInitPos;
 
 // Constructor with initializer list to initialize member variables
 IntakeControl::IntakeControl() :
@@ -15,7 +16,10 @@ IntakeControl::IntakeControl() :
   intakevelocity(0),
   mode(INTAKE_COLOR_SORT)
 {}
-
+const double accuracyIntake = 125;
+const double intakeFullRotation = 2486.4;
+const double intakeFirstHook = 1054.8;
+const double intakeSecondHook = 2349.6;
 
 // Converts a numeric value to a string
 std::string toString(double value) {
@@ -44,54 +48,69 @@ void IntakeControl::colorSorting() {
       intakevelocity = 80;
       if (intake.position(degrees) >= 2000) {
         ringdetected = false;
-        
       }
       if (!ringdetected) {
           aivisionsensor.takeSnapshot(aivisionsensor__bluering);
           if (aivisionsensor.objects[0].exists) {
               ring = false;
               ringdetected = true;
-              if (team) {
-                intake.resetPosition();
-              }
-              // updateControllerScreen("blue");
+              intakeInitPos = fmod(intake.position(degrees), intakeFullRotation);
+              updateControllerScreen("blue");
           } else {
               aivisionsensor.takeSnapshot(aivisionsensor__redring);
               if (aivisionsensor.objects[0].exists) {
                 ring = true;
                 ringdetected = true;
-                if (!team) {
-                  intake.resetPosition();
-                }
-                // updateControllerScreen("red");
+                intakeInitPos = fmod(intake.position(degrees), intakeFullRotation);
+                updateControllerScreen("red");
               }
           }
       }
       // Check if position is a multiple of 1300
-      if (intake.position(degrees) >= 350) {
-          if (ringdetected) {
-            if ((team && !ring) || (!team && ring)) {
-              resetIntake();
-              updateControllerScreen("ring removed");
-              ringdetected = false;
-            }
+      if (intakeInitPos >= intakeFirstHook) {
+        if (fmod(intake.position(degrees), intakeFullRotation) >= intakeSecondHook - accuracyIntake || fmod(intake.position(degrees), intakeFullRotation) <= intakeFirstHook - accuracyIntake) {
+            if (ringdetected) {
+              if ((team && !ring) || (!team && ring)) {
+                resetIntake();
+                updateControllerScreen("ring removed");
+                ringdetected = false;
+              }
 
-            if (holding) {
-                intake.stop(brake);
-                intake.spin(forward);
-                intakevelocity = -50;
-                intake.setVelocity(intakevelocity, percent);
-                intakeon = false;
+              if (holding) {
+                  intake.stop(brake);
+                  intake.spin(forward);
+                  intakevelocity = -50;
+                  intake.setVelocity(intakevelocity, percent);
+                  intakeon = false;
+              }
             }
-          }
-          
-
+        }     
       }
+      else {
+        if (fmod(intake.position(degrees), intakeFullRotation) >= intakeFirstHook - accuracyIntake) {
+            if (ringdetected) {
+              if ((team && !ring) || (!team && ring)) {
+                resetIntake();
+                updateControllerScreen("ring removed");
+                ringdetected = false;
+              }
+
+              if (holding) {
+                  intake.stop(brake);
+                  intake.spin(forward);
+                  intakevelocity = -50;
+                  intake.setVelocity(intakevelocity, percent);
+                  intakeon = false;
+              }
+            }
+        }     
+      }
+
 
     }
     intake.spin(forward);
     intake.setVelocity(intakevelocity, percent);
-    // updateControllerScreen(toString(intake.position(degrees)).c_str());
+    // updateControllerScreen(toString(fmod(intake.position(degrees), 2486.4)).c_str());
 }
 
 void IntakeControl::update() {
