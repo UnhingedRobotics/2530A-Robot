@@ -70,18 +70,17 @@ void IntakeControl::colorSorting() {
       if (intakeInitPos >= intakeFirstHook) {
         if (fmod(intake.position(degrees), intakeFullRotation) >= intakeSecondHook - accuracyIntake || fmod(intake.position(degrees), intakeFullRotation) <= intakeFirstHook - accuracyIntake) {
             if (ringdetected) {
-              if ((team && !ring) || (!team && ring)) {
-                resetIntake();
-                updateControllerScreen("ring removed");
-                ringdetected = false;
+              if (!holding) {
+                if ((team && !ring) || (!team && ring)) {
+                  resetIntake();
+                  updateControllerScreen("ring removed");
+                  ringdetected = false;
+                }
               }
-
-              if (holding) {
-                  intake.stop(brake);
-                  intake.spin(forward);
-                  intakevelocity = -50;
-                  intake.setVelocity(intakevelocity, percent);
-                  intakeon = false;
+              else {
+                updateControllerScreen("holding");
+                ringdetected = false;
+                intakeon = false;
               }
             }
         }     
@@ -89,18 +88,17 @@ void IntakeControl::colorSorting() {
       else {
         if (fmod(intake.position(degrees), intakeFullRotation) >= intakeFirstHook - accuracyIntake) {
             if (ringdetected) {
-              if ((team && !ring) || (!team && ring)) {
-                resetIntake();
-                updateControllerScreen("ring removed");
-                ringdetected = false;
+              if (!holding) {
+                if ((team && !ring) || (!team && ring)) {
+                  resetIntake();
+                  updateControllerScreen("ring removed");
+                  ringdetected = false;
+                }
               }
-
-              if (holding) {
-                  intake.stop(brake);
-                  intake.spin(forward);
-                  intakevelocity = -50;
-                  intake.setVelocity(intakevelocity, percent);
-                  intakeon = false;
+              else {
+                updateControllerScreen("holding");
+                ringdetected = false;
+                intakeon = false;
               }
             }
         }     

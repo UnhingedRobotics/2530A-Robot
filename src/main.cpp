@@ -116,6 +116,19 @@ int current_auton_selection = 0;
  * may need, like resetting pneumatic components. You can rename these autons to
  * be more descriptive, if you like.
  */
+void buttonAEventHandler() {
+  intakeControl.holding = true;
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1, 1);
+  Controller1.Screen.print("holding");
+}
+void buttonBEventHandler() {
+  intakeControl.holding = false;
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1, 1);
+  Controller1.Screen.print("released");
+}
+
 void buttonL1EventHandler() {
   goalclamp.set(true);
 }
@@ -227,6 +240,8 @@ void autonomous(void) {
 void usercontrol(void) {
   intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
+  Controller1.ButtonA.pressed(buttonAEventHandler);
+  Controller1.ButtonA.pressed(buttonBEventHandler);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
