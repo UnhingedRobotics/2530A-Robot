@@ -144,7 +144,7 @@ void buttonR2EventHandler() {
 
 int intakeTaskFunctionUser() {
     while (true) {
-      intakeControl.update();
+      intakeControl.colorSorting();
       wait(5, msec); // Small delay to avoid resource overuse
     }
 
@@ -248,9 +248,6 @@ void usercontrol(void) {
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
   while (1) {
     if (Controller1.ButtonX.pressing()) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.print("press");
       fishMech.setVelocity(100, percent);
     }
     else if (Controller1.ButtonY.pressing()) {

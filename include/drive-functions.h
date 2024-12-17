@@ -35,7 +35,6 @@ public:
   void setMode(Mode newMode);       // Sets the intake mode
   void colorSorting();              // Color-sorting logic
   void intakeMove();
-  void update();                    // Update intake behavior based on mode
 
 private:
   // Helper functions for modularized actions

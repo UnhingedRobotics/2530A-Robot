@@ -120,65 +120,37 @@ void IntakeControl::intakeMove() {
     intake.setVelocity(intakeVelocity, percent);
 }
 
-void IntakeControl::update() {
-  switch (mode) {
-    case INTAKE_COLOR_SORT:
-      if (auto_on) {
-        Controller1.Screen.clearScreen();
-        Controller1.Screen.setCursor(1,1);
-        Controller1.Screen.print("auto on");  
-        time_waited = time_waited + 1;
-        if (time_waited >= 10) {
-          intakeon = true;
-          time_waited = 0;
-          Controller1.Screen.clearScreen();
-          Controller1.Screen.setCursor(1,1);
-          Controller1.Screen.print("time");  
-        }   
-      }
-      colorSorting();
-      break;
-    case WALLSTAKE_HOLDING:
-      if (distancesensor.objectDistance(inches) < 2) {
-        intake.stop(brake);
-		    intake.spin(forward);
-		    intake.setVelocity(0, percent);
-      }
-      break;
-  }
-}
-
 void healthCheck() {
   while (true) {
-    if (intake.temperature(fahrenheit) >= 105) {
+    if (intake.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,1);
       Controller1.Screen.print("Intake too hot!");
       Controller1.rumble("..--");
     }
 
-    if (leftdrivefront.temperature(fahrenheit) >= 105) {
+    if (leftdrivefront.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,2);
       Controller1.Screen.print("LeftDriveFront too hot!");
       Controller1.rumble("..--");
     }
     
-    if (leftdriveback.temperature(fahrenheit) >= 105) {
+    if (leftdriveback.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,3);
       Controller1.Screen.print("LeftDriveBack too hot!");
       Controller1.rumble("..--");
     }
 
-    if (rightdrivefront.temperature(fahrenheit) >= 105) {
+    if (rightdrivefront.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,4);
       Controller1.Screen.print("RightDriveFront too hot!");
       Controller1.rumble("..--");
     }
 
-    if (rightdriveback.temperature(fahrenheit) >= 105) {
+    if (rightdriveback.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,1);
       Controller1.Screen.print("RightDriveBack too hot!");

@@ -18,9 +18,6 @@ int Brain_precision = 0, Console_precision = 0, Controller1_precision = 0, AIVis
  */
 
 int intakeTaskFunction() {
-    intake.spin(forward);
-    intake.setVelocity(0, percent);
-
     while (true) {
       // Intake mode management
       intakeControl.colorSorting();
