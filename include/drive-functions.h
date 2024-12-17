@@ -20,7 +20,12 @@ public:
   bool ringdetected;
   bool intakeon;
   bool holding;
-  int intakevelocity;
+  int intakeVelocity;
+  int intakeMaxVelocity;
+  double accuracyIntake;
+  double intakeFullRotation;
+  double intakeFirstHook;
+  double intakeSecondHook;
   Mode mode;          // Current mode of the intake system
 
   IntakeControl(); // Constructor with an initializer list
@@ -28,6 +33,7 @@ public:
   // Functions for controlling intake behavior
   void setMode(Mode newMode);       // Sets the intake mode
   void colorSorting();              // Color-sorting logic
+  void intakeMove();
   void update();                    // Update intake behavior based on mode
 
 private:
