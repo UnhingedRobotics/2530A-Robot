@@ -26,6 +26,7 @@ public:
   double intakeFullRotation;
   double intakeFirstHook;
   double intakeSecondHook;
+  double intakeHoldingPos;
   Mode mode;          // Current mode of the intake system
 
   IntakeControl(); // Constructor with an initializer list
@@ -39,7 +40,6 @@ public:
 private:
   // Helper functions for modularized actions
   void updateControllerScreen(const char* message); // Updates the controller screen
-  void resetIntake();                               // Resets the intake mechanism
 };
 
 

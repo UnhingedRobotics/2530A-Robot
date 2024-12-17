@@ -19,7 +19,8 @@ IntakeControl::IntakeControl() :
   accuracyIntake(125),
   intakeFullRotation(2486.4),
   intakeFirstHook(1054.8),
-  intakeSecondHook(2349.6)
+  intakeSecondHook(2349.6),
+  intakeHoldingPos(700)
 {}
 
 // Converts a numeric value to a string
@@ -36,10 +37,6 @@ void IntakeControl::updateControllerScreen(const char* message) {
     Controller1.Screen.print(message);
 }
 
-void IntakeControl::resetIntake() {
-    intake.setVelocity(-intakeMaxVelocity, percent);
-
-}
 
 void IntakeControl::colorSorting() {
     if (!intakeon) {
@@ -64,29 +61,47 @@ void IntakeControl::colorSorting() {
               }
           }
       }
-      // Check if position is a multiple of 1300
-      if (intakeInitPos >= intakeFirstHook) {
-        if (fmod(intake.position(degrees), intakeFullRotation) >= intakeSecondHook - accuracyIntake || fmod(intake.position(degrees), intakeFullRotation) <= intakeFirstHook - accuracyIntake) {
+	  if (holding) {
+        if (fmod(intake.position(degrees), intakeFullRotation) >= intakeHoldingPos - accuracyIntake) {
           if (ringdetected) {
             if ((team && !ring) || (!team && ring)) {
-              resetIntake();
+    		  intake.setvelocity(-intakemaxvelocity, percent);
               updateControllerScreen("ring removed");
               ringdetected = false;
             }
-          }
-        }     
-      }
-      else {
-        if (fmod(intake.position(degrees), intakeFullRotation) >= intakeFirstHook - accuracyIntake) {
-          if (ringdetected) {
-            if ((team && !ring) || (!team && ring)) {
-              resetIntake();
-              updateControllerScreen("ring removed");
+			else {
+    		  intake.setVelocity(0, percent);
+			  intakeon = false;
+              updateControllerScreen("ring held");
               ringdetected = false;
-            }
+			}
           }
         }     
-      }
+	  }
+	  else {
+        if (intakeInitPos >= intakeFirstHook) {
+          if (fmod(intake.position(degrees), intakeFullRotation) >= intakeSecondHook - accuracyIntake || fmod(intake.position(degrees), intakeFullRotation) <= intakeFirstHook - accuracyIntake) {
+            if (ringdetected) {
+              if ((team && !ring) || (!team && ring)) {
+    			intake.setvelocity(-intakemaxvelocity, percent);
+                updateControllerScreen("ring removed");
+                ringdetected = false;
+              }
+            }
+          }     
+        }
+        else {
+          if (fmod(intake.position(degrees), intakeFullRotation) >= intakeFirstHook - accuracyIntake) {
+            if (ringdetected) {
+              if ((team && !ring) || (!team && ring)) {
+    			intake.setvelocity(-intakemaxvelocity, percent);
+                updateControllerScreen("ring removed");
+                ringdetected = false;
+              }
+            }
+          }     
+        }
+	  }
 
 
     }
