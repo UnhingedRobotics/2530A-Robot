@@ -1,7 +1,7 @@
 # VEXcode makefile 2019_03_26_01
 
 # show compiler output
-VERBOSE = 1
+VERBOSE = 0
 
 # include toolchain options
 include vex/mkenv.mk
