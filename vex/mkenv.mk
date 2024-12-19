@@ -57,12 +57,12 @@ Q =
 endif
 
 # compile and link tools
-CC      = $(CURDIR)/toolchain/clang/bin/clang 
-CXX     = $(CURDIR)/toolchain/clang/bin/clang
-OBJCOPY = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-objcopy
-SIZE    = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-size
-LINK    = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-ld
-ARCH    = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-ar
+CC      = clang 
+CXX     = clang
+OBJCOPY = arm-none-eabi-objcopy
+SIZE    = arm-none-eabi-size
+LINK    = arm-none-eabi-ld
+ARCH    = arm-none-eabi-ar
 ECHO    = @echo
 DEFINES = -DVexV5
 
