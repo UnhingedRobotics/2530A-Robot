@@ -2,25 +2,24 @@
 
 # compile C files
 $(BUILD)/%.o: %.c $(SRC_H)
-	$(Q)$(MKDIR)
+	$(Q)mkdir -p $(BUILD)
 	$(ECHO) "CC  $<"
 	$(Q)$(CC) $(CFLAGS) $(INC) -c -o $@ $<
-	
+
 # compile C++ files
 $(BUILD)/%.o: %.cpp $(SRC_H) $(SRC_A)
 	$(Q)$(MKDIR)
 	$(ECHO) "CXX $<"
 	$(Q)$(CXX) $(CXX_FLAGS) $(INC) -c -o $@ $<
-	
-# create executable 
+
+# create executable
 $(BUILD)/$(PROJECT).elf: $(OBJ)
 	$(ECHO) "LINK $@"
 	$(Q)$(LINK) $(LNK_FLAGS) -o $@ $^ $(LIBS)
-	$(Q)$(SIZE) $@
 
-# create binary 
+# create binary
 $(BUILD)/$(PROJECT).bin: $(BUILD)/$(PROJECT).elf
-	$(Q)$(OBJCOPY) -O binary $(BUILD)/$(PROJECT).elf $(BUILD)/$(PROJECT).bin
+	$(Q)$(OBJCOPY) -O binary $< $@
 
 # create archive
 $(BUILD)/$(PROJECTLIB).a: $(OBJ)
@@ -29,4 +28,14 @@ $(BUILD)/$(PROJECTLIB).a: $(OBJ)
 # clean project
 clean:
 	$(info clean project)
-	$(Q)$(CLEAN)
+	$(Q)$(RMDIR) $(BUILD) 2> /dev/null || :
+
+
+# upload the binary to VEX V5
+upload: $(BUILD)/$(PROJECT).bin
+	./vexcom --write $(BUILD)/$(PROJECT).bin --slot --name $(PROJECT)
+
+test:
+	./vexcom
+# Default target for build
+build: clean $(BUILD)/$(PROJECT).bin

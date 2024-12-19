@@ -27,12 +27,10 @@ $(error Project name cannot contain whitespace: $(PROJECT))
 endif
 
 # SDK path passed from app
-# if not set then environmental variabled used
-ifeq ("$(origin T)", "command line")
-VEX_SDK_PATH = $(T)
-endif
-# backup if still not set
-VEX_SDK_PATH ?= ${HOME}/sdk
+VEX_SDK_PATH = $(CURDIR)/sdk
+# TOOLCHAIN path passed from app
+VEX_TOOLCHAIN_PATH = $(CURDIR)/toolchain
+
 
 # printf_float flag name passed from app (not used in this version)
 ifeq ("$(origin PRINTF_FLOAT)", "command line")
@@ -59,12 +57,12 @@ Q =
 endif
 
 # compile and link tools
-CC      = clang
-CXX     = clang
-OBJCOPY = arm-none-eabi-objcopy
-SIZE    = arm-none-eabi-size
-LINK    = arm-none-eabi-ld
-ARCH    = arm-none-eabi-ar
+CC      = $(CURDIR)/toolchain/clang/bin/clang 
+CXX     = $(CURDIR)/toolchain/clang/bin/clang
+OBJCOPY = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-objcopy
+SIZE    = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-size
+LINK    = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-ld
+ARCH    = $(CURDIR)/toolchain/gcc/bin/arm-none-eabi-ar
 ECHO    = @echo
 DEFINES = -DVexV5
 
