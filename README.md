@@ -41,7 +41,7 @@ This repository has evolved over the course of the season, starting with a custo
 2. **Exploration of Tools**:  
    Originally, we considered using [PROS](https://pros.cs.purdue.edu/), but it was challenging to set up with our environment, especially when working with the VEX AI Vision Sensor.  
    - Although there are ways to make the sensor work with PROS, we opted for VEXcode initially.  
-   - On my personal account, [SerrialError](https://github.com/SerrialError), I also created a PROS project for an X-Drive as part of earlier experiments.  
+   - On my personal account, [SerrialError](https://github.com/SerrialError), I also created a [PROS project](https://github.com/SerrialError/x-drive-v5-pros) for an X-Drive as part of earlier experiments.  
 
 3. **Switch to JAR Template**:  
    The current project is built on top of [JAR Template](https://github.com/JAR-Template), which uses the Apache License.  
