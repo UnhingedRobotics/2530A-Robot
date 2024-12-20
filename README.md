@@ -3,7 +3,8 @@
 ## About This Repository  
 
 Welcome to the code repository for **Team 2530A**, where we document the development of our robot's software for the 2024–2025 VEX Robotics Competition (VRC) season. This repository contains all the code our robot will run during competitions, including templates, control systems, and experimental features.
-**Note**: This uses a Linux vexcom file, to switch over to windows please check the (**vexcodetext repo**)[https://github.com/UnhingedRobotics/vexcodetext]
+
+**Note**: This uses a Linux vexcom file, to switch over to windows please check the [**vexcodetext repo**](https://github.com/UnhingedRobotics/vexcodetext)
 
 ## Features  
 
