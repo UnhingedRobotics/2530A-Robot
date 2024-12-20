@@ -52,19 +52,23 @@ This repository has evolved over the course of the season, starting with a custo
 
 ## Usage Instructions  
 
-### Setting Up the Repository  
-1. **Install VEXcode Pro V5**:  
-   - Download and install the [VEXcode Pro V5](https://www.vexrobotics.com/vexcode-download) plugin for Visual Studio Code (VSCode).  
+### Setting Up the Repository 
+I made a custom repository that allows you to interact with VEX directly through the command line and through makefiles. The name is [VEX Robotics Command Line Programming Environment](https://github.com/UnhingedRobotics/vexcodetext), it is available for both Windows and Linux and more information can be found by clicking the link. Here is a list of steps on how to run it: 
+1. **Download the Dependencies Listed on the [Github Page](https://github.com/UnhingedRobotics/vexcodetext)**:  
+   - Download and install gcc and clang.
 
 2. **Clone the Repository**:  
    - Clone or download this repository to your computer.  
 
-3. **Prepare the Project**:  
-   - Copy the `vex` folder into this repository.  
-   - Open the repository in VSCode.  
+3. **Change Any Software Modifications to Your Specific Hardware Design**:  
+   - Change or get rid of the intake and fishmech.
 
 4. **Deploy the Code**:  
-   - Use the VEXcode plugin in VSCode to upload the code to your robot's V5 Brain.  
+   - Run
+   ```bash
+   make clean upload
+   ```
+   in your terminal
 
 ### Notes on Customization  
 - **Hardware Adjustments**:  
