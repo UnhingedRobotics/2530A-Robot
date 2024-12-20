@@ -16,10 +16,11 @@ $(BUILD)/%.o: %.cpp $(SRC_H) $(SRC_A)
 $(BUILD)/$(PROJECT).elf: $(OBJ)
 	$(ECHO) "LINK $@"
 	$(Q)$(LINK) $(LNK_FLAGS) -o $@ $^ $(LIBS)
+	$(Q)$(SIZE) $@
 
 # create binary
 $(BUILD)/$(PROJECT).bin: $(BUILD)/$(PROJECT).elf
-	$(Q)$(OBJCOPY) -O binary $< $@
+	$(Q)$(OBJCOPY) -O binary $(BUILD)/$(PROJECT).elf $(BUILD)/$(PROJECT).bin
 
 # create archive
 $(BUILD)/$(PROJECTLIB).a: $(OBJ)
@@ -33,8 +34,7 @@ clean:
 
 # upload the binary to VEX V5
 upload: $(BUILD)/$(PROJECT).bin
-	./vexcom --write $(BUILD)/$(PROJECT).bin --slot --name $(PROJECT)
-
+	./vexcom --write $(BUILD)/$(PROJECT).bin --slot 1 --name $(PROJECT) --directory /dev/ttyACM0 --progress
 test:
 	./vexcom
 # Default target for build
