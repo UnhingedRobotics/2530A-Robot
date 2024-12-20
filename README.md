@@ -1,22 +1,97 @@
-# 2530A Robot Code
-## What is this
+# 2530A Robot Code  
 
-We are team 2530A and this is a code repository of the code our robot will be running over the course of the 2024-2025 season for V5RC.
+## About This Repository  
 
-## What code does this include?
-There is a template for only linear motion profiling currently that is used in conjunction with PID. Also there is velocity color sorting for a hook intake that uses an AI sensor. Also there is a quadratic velocity controller for driving. Also I have a basic implimentation of pure pursuit that hasn't been tested.
+Welcome to the code repository for **Team 2530A**, where we document the development of our robot's software for the 2024–2025 VEX Robotics Competition (VRC) season. This repository contains all the code our robot will run during competitions, including templates, control systems, and experimental features.  
 
-## How did you make this
+## Features  
 
-Initially this started as a custom PID controller system for our robot. My plan was to eventually add odometry and pure pursuit.
-I wanted to use PROS to start, however it was annoying setting it up with my computer also I wanted to use the AI Vision Sensor which currently is only directly supported through vexcode (However there are janky ways to get it working through PROS which I now know). So I decided to start with vexcode (However before the start of the season on my personal account, SerrialError, I made a PROS project for an X-Drive).
-I implimented the custom PID controller for our first tournement. Then I switched over to JAR Template. All of the contributions and other necessary things having to do with JAR Template can be found in NOTICE.md.
-JAR Template uses the apache license, so in order to comply I have a CHANGELOG.md. Here you can see all of our versions where I will eventually put in the versions tab so you can download.
+### Current Implementations  
+- **Linear Motion Profiling with PID**:  
+  A template for motion control using PID loops in conjunction with linear motion profiling.  
 
-## How can I use this
+- **Velocity-Based Color Sorting**:  
+  An advanced sorting system for a hook intake using the VEX AI Vision Sensor.  
 
-You will need to open a new vscode project with the VEX vscode plugin. Then download this repository. Then copy over the vex volder into this repository. Then open it with vscode. Then you should be able to download to your brain using the VEX vscode plugin.
-Currently this is not a library, it is just a code repository for our robot. However eventually I am planning to make my own library, possibly with PROS.
-Currently also if you want to use this you will most likely have to get rid of a lot of the motors. JAR Template explains how to define, add, and remove motors on their website.
-If you do want to use color sorting or any other custom function I am using then you will need to change the constants. Most should be self explanatory, however if you have any questions feel free to ask.
-Again as I am using this for my personal robot there is my autonomous routes. In the future I also want to add a way for autons to be made through path.jerryio if I make a library.
+- **Quadratic Velocity Controller**:  
+  A custom velocity controller designed for improved drive performance.  
+
+- **Basic Pure Pursuit Algorithm**:  
+  An initial implementation of pure pursuit for path following (untested as of now).  
+
+### Planned Features  
+- **Odometry Integration**:  
+  Adding support for precise robot position tracking.  
+
+- **Path Generation Support**:  
+  Future compatibility with tools like [Path Jerry IO](https://path.jerryio/) for autonomous route creation.  
+
+- **Custom Library Development**:  
+  A reusable library for motion profiling, odometry, and advanced algorithms, potentially ported to PROS.  
+
+---
+
+## Development Process  
+
+This repository has evolved over the course of the season, starting with a custom PID controller system. Below is a brief timeline:  
+
+1. **Initial PID Controller**:  
+   Created and deployed for our first tournament to control basic motion.  
+
+2. **Exploration of Tools**:  
+   Originally, we considered using [PROS](https://pros.cs.purdue.edu/), but it was challenging to set up with our environment, especially when working with the VEX AI Vision Sensor.  
+   - Although there are ways to make the sensor work with PROS, we opted for VEXcode initially.  
+   - On my personal account, [SerrialError](https://github.com/SerrialError), I also created a PROS project for an X-Drive as part of earlier experiments.  
+
+3. **Switch to JAR Template**:  
+   The current project is built on top of [JAR Template](https://github.com/JAR-Template), which uses the Apache License.  
+   - All relevant contributions are documented in `NOTICE.md`.  
+   - A detailed version history is available in `CHANGELOG.md`.  
+
+---
+
+## Usage Instructions  
+
+### Setting Up the Repository  
+1. **Install VEXcode Pro V5**:  
+   - Download and install the [VEXcode Pro V5](https://www.vexrobotics.com/vexcode-download) plugin for Visual Studio Code (VSCode).  
+
+2. **Clone the Repository**:  
+   - Clone or download this repository to your computer.  
+
+3. **Prepare the Project**:  
+   - Copy the `vex` folder into this repository.  
+   - Open the repository in VSCode.  
+
+4. **Deploy the Code**:  
+   - Use the VEXcode plugin in VSCode to upload the code to your robot's V5 Brain.  
+
+### Notes on Customization  
+- **Hardware Adjustments**:  
+  - You may need to modify the motor configurations to match your robot. The [JAR Template Documentation](https://github.com/JAR-Template/JAR-Template) provides instructions on adding, removing, and defining motors.  
+
+- **Constants**:  
+  - If using specific features (e.g., color sorting), you must update the constants to fit your robot's setup.  
+  - Most constants are self-explanatory, but feel free to reach out with questions if needed.  
+
+- **Autonomous Routes**:  
+  - The current repository includes our autonomous routes, but these will need to be customized for your robot's field setup and objectives.  
+
+---
+
+## Future Plans  
+
+In the future, I plan to:  
+1. Develop a standalone library to simplify integration of motion profiling, odometry, and path planning.  
+2. Add support for autonomous path generation via tools like [Path Jerry IO](https://path.jerryio/).  
+3. Transition back to PROS for advanced customization, including seamless integration with the VEX AI Vision Sensor.  
+
+---
+
+## License  
+
+This repository is built on [JAR Template](https://github.com/JAR-Template/JAR-Template), which is licensed under the Apache License 2.0. All changes and contributions are documented in `NOTICE.md` and `CHANGELOG.md`.  
+
+For questions, issues, or collaboration, feel free to open an issue or contact me directly!  
+
+---
