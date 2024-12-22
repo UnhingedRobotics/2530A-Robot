@@ -137,10 +137,15 @@ void buttonL2EventHandler() {
   goalclamp.set(false);
 }
 void buttonR1EventHandler() {
-  intakeControl.intakeon = true;
+  if (!intakeControl.intakeon) {
+    intakeControl.intakeon = true;
+  }
+  else {
+    intakeControl.intakeon = false;
+  }
 }
 void buttonR2EventHandler() {
-  intakeControl.intakeon = false;
+    fishControl.move_to_angle(130); 
 }
 
 int intakeTaskFunctionUser() {
@@ -158,16 +163,17 @@ void pre_auton() {
   default_constants();
   thread healthTask(healthCheck);
   fishMech.resetPosition();
-  fishMech.setStopping(hold);
+  fishMech.setStopping(coast);
   intake.spin(forward);
   fishMech.spin(forward);
+  fishMech.setVelocity(0, percent);
   // opticalsensor.integrationTime(5);
   // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
   intake.spin(forward);
   // opticalsensor.setLight(ledState::on);
   // opticalsensor.setLightPower(100.0, percent);
-
+  fishControl.angle_wanted_pos = 0;
   while(!intakeControl.auto_on){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(5, 20, "JAR Template v1.2.0");
@@ -250,14 +256,10 @@ void usercontrol(void) {
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
   while (1) {
-    if (Controller1.ButtonX.pressing()) {
-      fishMech.setVelocity(100, percent);
-    }
-    else if (Controller1.ButtonY.pressing()) {
-      fishMech.setVelocity(-100, percent);
-    } else {
-      fishMech.setVelocity(0, percent);
-    }
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print(fishMech.position(degrees));
+
     // Tank drive control
     chassis.control_tank_squared();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources

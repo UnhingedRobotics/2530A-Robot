@@ -33,7 +33,7 @@ void default_constants(){
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
-  fishControl.set_arm_constants(12, .2, 0, 0, 0);
+  fishControl.set_arm_constants(12, .12, 0, 0, 15);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
@@ -69,10 +69,10 @@ void red_left_elims(){
   chassis.turn_to_angle(90);
   wait(0.1, seconds);
   fishMech.setTimeout(1.5, seconds);
-  fishMech.spinToPosition(110, degrees);
+  fishControl.move_to_angle(110);
   wait(0.1, seconds);
   chassis.drive_distance_mp(-5);
-  fishMech.spinToPosition(150, degrees);
+  fishControl.move_to_angle(150);
   chassis.turn_to_angle(45);
   chassis.drive_distance_mp(-47);
   goalclamp.set(true);

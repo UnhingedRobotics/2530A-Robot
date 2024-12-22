@@ -188,17 +188,16 @@ void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_se
 
 void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
   PID fishPID((angle - fishMech.position(degrees)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
-  while (!pid_stop) {   
-    float error = angle - fishMech.position(degrees);
+  while (!fishPID.is_settled()) {   
+    float error = angle - fmod(fishMech.position(degrees), 180);
     float output = fishPID.compute(error);
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(1,1);
-    Controller1.Screen.print(angle - fishMech.position(degrees));
     output = clamp(output, -arm_max_voltage, arm_max_voltage);
-    fishMech.setVelocity(output, percent);
+    fishMech.spin(fwd, output, volt);
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1, 1);
+    Controller1.Screen.print(output);
     task::sleep(10);
   }
-  pid_stop = false;
   fishMech.stop(brake);
   fishMech.spin(forward);
   fishMech.setVelocity(0, percent);

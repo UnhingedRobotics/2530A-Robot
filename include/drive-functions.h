@@ -54,6 +54,7 @@ public:
   float arm_settle_error;
   float arm_settle_time;
   float arm_timeout;
+  float angle_wanted_pos;
 
   // Functions for setting arm PID constants and exit conditions
   void set_arm_constants(float arm_max_voltage, float arm_kp, float arm_ki, float arm_kd, float arm_starti);
