@@ -16,6 +16,7 @@ competition Competition;
 /*  motors spin forward.                                                     */
 /*---------------------------------------------------------------------------*/
 IntakeControl intakeControl; // Define Intake Control here
+FishControl fishControl; // Define Intake Control here
 
 /*---------------------------------------------------------------------------*/
 /*                             JAR-Template Config                           */
@@ -156,6 +157,8 @@ void pre_auton() {
   vexcodeInit();
   default_constants();
   thread healthTask(healthCheck);
+  fishMech.resetPosition();
+  fishMech.setStopping(hold);
   intake.spin(forward);
   fishMech.spin(forward);
   // opticalsensor.integrationTime(5);
