@@ -3,6 +3,7 @@
 using namespace vex;
 competition Competition;
 
+bool doink_on = false;
 
 /*---------------------------------------------------------------------------*/
 /*                             VEXcode Config                                */
@@ -130,6 +131,17 @@ void buttonBEventHandler() {
   Controller1.Screen.print("released");
 }
 
+void buttonDoinkYEventHandler() {
+  if (doink_on == true) {
+    doink_on = false;
+    doink.set(false);
+  }
+  else{
+    doink_on = true;
+    doink.set(true);
+  }
+}
+
 void buttonL1EventHandler() {
   goalclamp.set(true);
 }
@@ -145,7 +157,20 @@ void buttonR1EventHandler() {
   }
 }
 void buttonR2EventHandler() {
-    fishControl.move_to_angle(130); 
+    if (fishControl.pos_num == 1) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.print("130");
+      fishControl.move_to_angle(130);
+      fishControl.pos_num = 2;
+    }
+    else if (fishControl.pos_num == 2) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1, 1);
+      Controller1.Screen.print("180");
+      fishControl.move_to_angle(180);
+      fishControl.pos_num = 1; 
+    }
 }
 
 int intakeTaskFunctionUser() {
@@ -173,7 +198,7 @@ void pre_auton() {
   intake.spin(forward);
   // opticalsensor.setLight(ledState::on);
   // opticalsensor.setLightPower(100.0, percent);
-  fishControl.angle_wanted_pos = 0;
+  fishControl.pos_num = 1;
   while(!intakeControl.auto_on){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(5, 20, "JAR Template v1.2.0");
@@ -255,11 +280,8 @@ void usercontrol(void) {
   Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
+  Controller1.ButtonY.pressed(buttonDoinkYEventHandler);
   while (1) {
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(1, 1);
-    Controller1.Screen.print(fishMech.position(degrees));
-
     // Tank drive control
     chassis.control_tank_squared();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources

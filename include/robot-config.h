@@ -18,6 +18,7 @@ extern inertial rightinertialsensor;
 extern distance distancesensor;
 // extern optical opticalsensor;
 extern digital_out goalclamp;
+extern digital_out doink; 
 extern rotation verticalwheelrotation;
 extern rotation horizaontalwheelrotation;
 extern aivision aivisionsensor;

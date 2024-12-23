@@ -193,9 +193,6 @@ void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_se
     float output = fishPID.compute(error);
     output = clamp(output, -arm_max_voltage, arm_max_voltage);
     fishMech.spin(fwd, output, volt);
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.setCursor(1, 1);
-    Controller1.Screen.print(output);
     task::sleep(10);
   }
   fishMech.stop(brake);

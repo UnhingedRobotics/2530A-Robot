@@ -27,6 +27,7 @@ inertial rightinertialsensor = inertial(PORT9);
 distance distancesensor = distance(PORT2);
 // optical opticalsensor = optical(PORT10);
 digital_out goalclamp = digital_out(Brain.ThreeWirePort.A);
+digital_out doink = digital_out(Brain.ThreeWirePort.B);
 aivision::colordesc aivisionsensor__bluering(1, 27, 47, 104, 10, 0.2);
 aivision::colordesc aivisionsensor__redring(2, 161, 13, 72, 31, 0.34);
 aivision aivisionsensor(PORT10, aivisionsensor__bluering, aivisionsensor__redring);

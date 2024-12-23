@@ -46,6 +46,7 @@ std::string toString(double value);
 class FishControl {
 public:
   bool pid_stop;
+  int pos_num;
   float arm_max_voltage;
   float arm_kp;
   float arm_ki;
