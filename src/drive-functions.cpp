@@ -187,9 +187,19 @@ void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_se
 }
 
 void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
-  PID fishPID((angle - fishMech.position(degrees)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
-  while (!fishPID.is_settled()) {   
-    float error = angle - fmod(fishMech.position(degrees), 180);
+  float init_angle = 180 - fmod(fishMech.position(degrees), 180) + fishMech.position(degrees);
+  if (angle - fmod(fishMech.position(degrees), 180) < 0) {
+	angle = 180 - fmod(fishMech.position(degrees), 180) + angle; 
+  }
+  PID fishPID((angle - fmod(fishMech.position(degrees), 180)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
+  while (!fishPID.is_settled()) {
+	float error = angle - fmod(fishMech.position(degrees), 180);
+	if (fishMech.position(degrees) >= init_angle) {
+	  error = angle - fishMech.position(degrees) - init_angle + 180;	
+	}
+	else if (fishMech.position(degrees) <= init_angle - 180) {
+	  error = angle - fishMech.position(degrees) - init_angle + 180;
+	}
     float output = fishPID.compute(error);
     output = clamp(output, -arm_max_voltage, arm_max_voltage);
     fishMech.spin(fwd, output, volt);
