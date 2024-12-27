@@ -18,12 +18,25 @@ Welcome to the code repository for **Team 2530A**, where we document the develop
 - **Quadratic Velocity Controller**:  
   A custom velocity controller designed for improved drive performance.  
 
-- **Basic Pure Pursuit Algorithm**:  
-  An initial implementation of pure pursuit for path following (untested as of now).  
+- **Odometry Integration**:  
+  Adding support for precise robot position tracking (From Jar Template).
+
+- **Boomerang Controller**
+  Boomerang Controller or Algorithm that comes with Jar Template. Currently from what I have tested it doesn't work.
+
 
 ### Planned Features  
-- **Odometry Integration**:  
-  Adding support for precise robot position tracking.  
+- **Pure Pursuit Algorithm**:  
+  An initial implementation of the pure pursuit algorithm to control robot movements as well as Boomerang.
+
+- **RAMSETE Controller or Algorithm**:
+  An implementation of the RAMSETE controller for non-linear feedback control.
+
+- **2D and Rotational Motion Profiling Feed Forward Loop**:
+  An implementation of 2D Motion Profiling with custom Velocity Profiles with [Path Jerry IO](https://path.jerryio/).
+
+- **Compilation of Mechanism Information to make custom Motion profiles**
+  An implementation given weight, gear ratio, and other constants to make an acceleration and velocity motion profile over time of any mechanism.
 
 - **Path Generation Support**:  
   Future compatibility with tools like [Path Jerry IO](https://path.jerryio/) for autonomous route creation.  

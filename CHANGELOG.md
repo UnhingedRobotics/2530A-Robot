@@ -34,6 +34,7 @@
 ### Added
 - Deadband to controller.
 - Quadratic controller scheme.
+- Variable Intake Driving controller
 
 ## [1.2.1] - 2024-9-23 to 2024-9-29
 ### Updated
