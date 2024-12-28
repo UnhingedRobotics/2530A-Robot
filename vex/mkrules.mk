@@ -31,7 +31,6 @@ clean:
 	$(info clean project)
 	$(Q)$(RMDIR) $(BUILD) 2> /dev/null || :
 
-
 # upload the binary to VEX V5
 upload: $(BUILD)/$(PROJECT).bin
 	./vexcom --write $(BUILD)/$(PROJECT).bin --slot 1 --name $(PROJECT) --directory /dev/ttyACM0 --progress
