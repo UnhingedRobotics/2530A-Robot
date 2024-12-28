@@ -76,9 +76,16 @@ I made a custom repository that allows you to interact with VEX directly through
    - Clone or download this repository to your computer.  
 
 3. **Change Any Software Modifications to Your Specific Hardware Design**:  
-   - Change or get rid of the intake and fishmech.
+   - Change or get rid of the intake and/or fishmech.
 
-4. **Deploy the Code**:  
+4. **Download SDK**:
+   - Run
+   ```bash
+   make
+   ```
+   in your terminal
+
+5. **Deploy the Code**:  
    - Run
    ```bash
    make clean upload
