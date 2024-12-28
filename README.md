@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 2530A Robot Code  
 
 ## About This Repository  
@@ -241,4 +240,3 @@ make clean build
 ```bash
 make clean upload
 ```
->>>>>>> vexcodetext/linux
