@@ -138,3 +138,50 @@
 - Motion profiling deadband.
 - Various changes to comply with Apache License.
 - Fixing this file.
+
+## [2.8.0] - 2024-11-25
+### Added
+- Sigmoid motion profile function.
+- Healthcheck for motor temperature.
+- Motion Profiling deadband.
+
+## Updated
+- Autonomous routes.
+- PID constants.
+
+## [2.9.0] - 2024-12-8
+### Added
+- Fishmech mechanism.
+- Controls for fishmech.
+- Auto color sorting using motor encoder.
+
+## [2.9.1] - 2024-12-13
+### Updated
+- Color sorting ring tracking.
+- Intake position monitoring.
+
+## [2.9.2] - 2024-12-17
+### Updated
+- Variable definitions inside of drive functions.
+- Intake holding function.
+- Got rid of unnecessary code.
+- README to be much more informational.
+
+## [3.0.0] - 2024-12-18 to 2024-12-19
+### Added
+- Rebased to vexcodetext repo for uploading code.
+## Updated
+- README to be much more aesthetic and easier to read.
+
+## [3.1.0] - 2024-12-21 to 2024-12-22
+## Added
+- Fishmech PID control.
+- Doinker mechanism.
+- Doinker controller controls.
+
+## [3.1.1] - 2024-12-23 to 2024-12-26
+## Updated
+- Fishmech PID angle wrapping.
+- Fishmech PID constant forward control with angle wrapping.
+- README by adding TODO section.
+
