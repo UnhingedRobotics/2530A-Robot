@@ -339,24 +339,19 @@ void Drive::drive_distance(float distance, float heading, float drive_max_voltag
  * @param heading Desired heading in degrees.
  */
 void Drive::drive_distance_mp(float distance) {
-  drive_distance_mp(distance, get_absolute_heading(), drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+  drive_distance_mp(distance, get_absolute_heading(), heading_max_voltage, heading_kp, heading_ki, heading_kd, heading_starti);
 }
 
 void Drive::drive_distance_mp(float distance, float heading) {
-  drive_distance_mp(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+  drive_distance_mp(distance, heading, heading_max_voltage, heading_kp, heading_ki, heading_kd, heading_starti);
 }
 
-void Drive::drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage) {
-  drive_distance_mp(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+void Drive::drive_distance_mp(float distance, float heading, float heading_max_voltage) {
+  drive_distance_mp(distance, heading, heading_max_voltage, heading_kp, heading_ki, heading_kd, heading_starti);
 }
 
-void Drive::drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout) {
-  drive_distance_mp(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
-}
-
-void Drive::drive_distance_mp(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
+void Drive::drive_distance_mp(float distance, float heading, float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
   // Initialize PID controllers
-  PID drivePID(distance, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
   PID headingPID(reduce_negative_180_to_180(heading - get_absolute_heading()), heading_kp, heading_ki, heading_kd, heading_starti);
 
   mp.sigmoid_initialize(distance);
@@ -368,14 +363,10 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
   float drive_output = 0.0;
   float prev_drive_output = 0.0;
 
-  while (!drivePID.is_settled()) {
-    // Update the current position
-    average_position = (get_left_position_in() + get_right_position_in()) / 2.0;
-    float drive_error = distance + start_average_position - average_position;
+  while (drive_output != 0) {
     float heading_error = reduce_negative_180_to_180(heading - get_absolute_heading());
 
     // Compute PID outputs
-    float drive_pid_output = drivePID.compute(drive_error);
     float heading_output = headingPID.compute(heading_error);
 
     mp.sigmoid_velocity(distance); // Call to motion profile
@@ -383,21 +374,7 @@ void Drive::drive_distance_mp(float distance, float heading, float drive_max_vol
     // Use profile velocity for feedforward
     velocity = mp.velocity; // Access motion profile velocity
     float feedforward = velocity; // Use feedforward as needed
-
-    // Adjust drive PID output by adding feedforward
-    float desired_drive_output = drive_pid_output + feedforward; // 
-
-    // Apply acceleration limiting
-    float max_output_change = 0.38913294797; // max change per loop iteration (assuming 100 Hz loop rate)
-    float output_change = desired_drive_output - prev_drive_output;
-
-    if (output_change > max_output_change) {
-      drive_output = prev_drive_output + max_output_change;
-    } else if (output_change < -max_output_change) {
-      drive_output = prev_drive_output - max_output_change;
-    } else {
-      drive_output = desired_drive_output;
-    }
+    float desired_drive_output = feedforward;
 
     // Clamp outputs to the max voltages
     drive_output = clamp(drive_output, -drive_max_voltage, drive_max_voltage);

@@ -76,11 +76,12 @@
 ## [2.3.0] - 2024-10-28
 ### Added
 - Pure Pursuit algorithm with odometry.
-- Color detection code changed again.
 - Four Bar Arm.
 - Four Bar Arm PID.
+### Updated
+- Color detection code.
 
-## [2.4.0] - 2024-10-28
+## [2.4.0] - 2024-10-29
 ### Added
 - State Loops with controller.
 - Exit conditions for PID.
@@ -184,4 +185,3 @@
 - Fishmech PID angle wrapping.
 - Fishmech PID constant forward control with angle wrapping.
 - README by adding TODO section.
-
