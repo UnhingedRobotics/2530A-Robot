@@ -181,6 +181,9 @@
 - Got rid of sdk.
 - Building to the project.
 
+### Changed
+- Use vexcom linux app.
+
 ## [1.2.0] - 2024-12-18
 
 ### Added
@@ -194,6 +197,7 @@
 ### Updated
 - Fixed mkrules to use clang for cc and cxx.
 - Folder locations for vex header file and make files.
+
 
 ---
 
@@ -209,6 +213,19 @@
 - Doinker mechanism.
 - Doinker controller controls.
 
+---
+
+# Vexcodetext Changelog
+
+## [1.3.1] - 2024-12-22
+
+### Updated
+- Fixed errors inside of mkrules to comply with the linux serial ports.
+- README to explain how to use linux serial ports.
+- README to add initial inspiration.
+
+---
+
 ## [3.1.1] - 2024-12-23 to 2024-12-26
 ## Updated
 - Fishmech PID angle wrapping.
@@ -219,18 +236,13 @@
 
 # Vexcodetext Changelog
 
-## [1.3.1] - 2024-12-22 to 2024-1-2
-
-### Updated
-- Fixed errors inside of mkrules.
-- README to add initial inspiration.
-- Licensing
-
-## [2.0.0] - 2024-1-3
+## [2.0.0] - 2024-12-27
 ### Added
 - Rebased to getvexsdk to comply and get rid off headaches with vex sdk license.
 ### Updated
 - Fixed git submodule with getvexsdk.
 - Gitignore to add files that would complicate licensing.
+- Fixed filepath inside of makefile of sdk due to getvexsdk folder location.
 - Changes to the README for using getvexsdk
+
 ---
