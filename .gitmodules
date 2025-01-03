@@ -1,3 +1,4 @@
 [submodule "external/getvexsdk"]
 	path = external/getvexsdk
 	url = https://github.com/UnhingedRobotics/getvexsdk
+	branch = linux
