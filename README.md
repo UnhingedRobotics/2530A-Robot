@@ -121,7 +121,7 @@ This repository is built on [JAR Template](https://github.com/JAR-Template/JAR-T
 For questions, issues, or collaboration, feel free to open an issue or contact me directly!  
 
 ---
-=======
+
 # VEX Robotics Command Line Programming Environment  
 
 This repository provides a lightweight, text-based environment for programming and building VEX robotics projects. It is designed as an alternative to the VEX VSCode Extension, allowing you to upload, build, and manage your VEX projects without the need for a full IDE.  

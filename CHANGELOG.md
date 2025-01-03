@@ -144,9 +144,8 @@
 ### Added
 - Sigmoid motion profile function.
 - Healthcheck for motor temperature.
-- Motion Profiling deadband.
 
-## Updated
+### Updated
 - Autonomous routes.
 - PID constants.
 
