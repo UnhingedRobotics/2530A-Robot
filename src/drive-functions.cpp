@@ -61,29 +61,29 @@ void IntakeControl::colorSorting() {
               }
           }
       }
-	  if (holding) {
+      if (holding) {
         if (fmod(intake.position(degrees), intakeFullRotation) >= intakeHoldingPos - accuracyIntake) {
           if (ringdetected) {
-            if ((team && !ring) || (!team && ring)) {
-    		  intake.setVelocity(-intakeMaxVelocity, percent);
+            if ((team && !ring) || (!team && ring)) {	  
+              intake.setVelocity(-intakeMaxVelocity, percent);
               updateControllerScreen("ring removed");
               ringdetected = false;
             }
-			else {
-    		  intake.setVelocity(0, percent);
-			  intakeon = false;
+	    else {
+    	      intake.setVelocity(0, percent);
+	      intakeon = false;
               updateControllerScreen("ring held");
               ringdetected = false;
-			}
+	    }
           }
         }     
-	  }
-	  else {
+      }
+      else {
         if (intakeInitPos >= intakeFirstHook) {
           if (fmod(intake.position(degrees), intakeFullRotation) >= intakeSecondHook - accuracyIntake || fmod(intake.position(degrees), intakeFullRotation) <= intakeFirstHook - accuracyIntake) {
             if (ringdetected) {
               if ((team && !ring) || (!team && ring)) {
-    			intake.setVelocity(-intakeMaxVelocity, percent);
+    		intake.setVelocity(-intakeMaxVelocity, percent);
                 updateControllerScreen("ring removed");
                 ringdetected = false;
               }
@@ -94,16 +94,14 @@ void IntakeControl::colorSorting() {
           if (fmod(intake.position(degrees), intakeFullRotation) >= intakeFirstHook - accuracyIntake) {
             if (ringdetected) {
               if ((team && !ring) || (!team && ring)) {
-    			intake.setVelocity(-intakeMaxVelocity, percent);
+    		intake.setVelocity(-intakeMaxVelocity, percent);
                 updateControllerScreen("ring removed");
                 ringdetected = false;
               }
             }
           }     
         }
-	  }
-
-
+      }
     }
     intake.spin(forward);
     intake.setVelocity(intakeVelocity, percent);
