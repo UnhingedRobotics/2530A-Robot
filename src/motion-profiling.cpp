@@ -1,15 +1,20 @@
 #include "motion-profiling.h"
-#include <cmath> // For sqrt() and pow()
 
 // Constructor with initializer list
 MP::MP() :
-  adjust_velocity(6.93641618497), // Conversion factor (m/s to volts)
-  adjust_voltage(0.144166666667),  // Conversion factor for deadband adjustment
-  max_velocity(1.73),              // Max velocity (m/s)
-  max_acceleration(5.61),          // Max acceleration (m/s^2)
-  max_jerk(18.1),                  // Max jerk (m/s^3)
-  deadband(0),                     // Deadband in volts
-  minimum_distance(0),             // Initialize motion profile parameters
+  adjust_velocity(6.93641618497),
+  adjust_voltage(0.144166666667),
+  max_velocity(1.73),
+  max_acceleration(5.61),
+  max_jerk(18.1),
+  max_angular_velocity(2.0), // Maximum angular velocity (rad/s)
+  max_angular_acceleration(6.0), // Maximum angular acceleration (rad/s^2)
+  wheelbase(0.5), // Distance between wheels (meters)
+  x(0), y(0), theta(0), // Initial pose
+  velocity(0), 
+  angular_velocity(0),  
+  deadband(0),
+  minimum_distance(0),
   acceleration_time(0),
   deadband_time(0),
   acceleration_distance(0),
@@ -19,9 +24,137 @@ MP::MP() :
   total_time(0),
   triangular_time(0),
   time(0),
-  velocity(0),
   decel_time(0)
 {}
+void MP::initialize_2d(std::vector<std::pair<double, double>> control_points, double angle) {
+  // Store control points
+  bezier_control_points = control_points;
+
+  // Calculate total path length by discretizing the curve
+  double path_length = 0.0;
+  for (double t = 0; t <= 1.0; t += 0.01) {
+    auto current_point = bezier_point(t);
+    auto next_point = bezier_point(t + 0.01);
+    path_length += std::hypot(next_point.first - current_point.first, next_point.second - current_point.second);
+  }
+
+  // Initialize 1D motion profile with total path length
+  trapezoid_initialize(path_length);
+  angular_initialize(angle); // Angular profile
+}
+
+
+void MP::angular_initialize(double angle) {
+  angle = angle * (M_PI / 180.0); // Convert angle to radians
+  angular_acceleration_time = max_angular_velocity / max_angular_acceleration;
+  angular_acceleration_distance = 0.5 * max_angular_acceleration * pow(angular_acceleration_time, 2);
+  angular_minimum_distance = 2 * angular_acceleration_distance;
+
+  if (abs(angle) > angular_minimum_distance) {
+    angular_constant_distance = abs(angle) - 2 * angular_acceleration_distance;
+    angular_constant_time = angular_constant_distance / max_angular_velocity;
+    angular_total_time = 2 * angular_acceleration_time + angular_constant_time;
+  } else {
+    angular_triangular_time = sqrt(abs(angle) / max_angular_acceleration);
+    angular_total_time = 2 * angular_triangular_time;
+  }
+}
+
+void MP::calculate_2d_velocity(double distance, double angle) {
+  trapezoid_velocity(distance); // Linear velocity
+  angular_velocity = calculate_angular_velocity(angle); // Angular velocity
+}
+
+double MP::calculate_angular_velocity(double angle) {
+  angle = angle * (M_PI / 180.0); // Convert angle to radians
+  double current_time = Brain.Timer.time(seconds);
+
+  if (abs(angle) > angular_minimum_distance) {
+    if (current_time < angular_acceleration_time) {
+      return max_angular_acceleration * current_time * (angle < 0 ? -1 : 1);
+    } else if (current_time < angular_acceleration_time + angular_constant_time) {
+      return max_angular_velocity * (angle < 0 ? -1 : 1);
+    } else if (current_time <= angular_total_time) {
+      double decel_time = angular_total_time - current_time;
+      return max_angular_acceleration * decel_time * (angle < 0 ? -1 : 1);
+    }
+  } else {
+    if (current_time < angular_triangular_time) {
+      return max_angular_acceleration * current_time * (angle < 0 ? -1 : 1);
+    } else if (current_time <= angular_total_time) {
+      double decel_time = angular_total_time - current_time;
+      return max_angular_acceleration * decel_time * (angle < 0 ? -1 : 1);
+    }
+  }
+  return 0;
+}
+std::pair<double, double> MP::velocity_2d() {
+  time = Brain.Timer.time(seconds); // Get current time
+  trapezoid_velocity(1.0);         // Update velocity for current time step
+
+  // Map current time to parameter t based on total_time
+  double t = time / total_time;
+  if (t > 1.0) t = 1.0;
+
+  // Get Bézier curve position and derivative
+  auto position = bezier_point(t);
+  auto derivative = bezier_derivative(t);
+
+  // Calculate heading angle (theta)
+  double theta = std::atan2(derivative.second, derivative.first);
+
+  // Return velocity and heading as a pair
+  return {velocity, theta};
+}
+
+// Bézier curve position at parameter t
+std::pair<double, double> MP::bezier_point(double t) {
+  double x = 0.0, y = 0.0;
+  int n = bezier_control_points.size() - 1;
+  for (int i = 0; i <= n; ++i) {
+    double coefficient = binomial_coefficient(n, i) * pow(1 - t, n - i) * pow(t, i);
+    x += coefficient * bezier_control_points[i].first;
+    y += coefficient * bezier_control_points[i].second;
+  }
+  return {x, y};
+}
+
+// Bézier curve derivative at parameter t
+std::pair<double, double> MP::bezier_derivative(double t) {
+  double dx = 0.0, dy = 0.0;
+  int n = bezier_control_points.size() - 1;
+  for (int i = 0; i < n; ++i) {
+    double coefficient = binomial_coefficient(n - 1, i) * pow(1 - t, n - 1 - i) * pow(t, i);
+    dx += coefficient * (bezier_control_points[i + 1].first - bezier_control_points[i].first);
+    dy += coefficient * (bezier_control_points[i + 1].second - bezier_control_points[i].second);
+  }
+  return {dx, dy};
+}
+
+// Calculate binomial coefficient (n choose k)
+double MP::binomial_coefficient(int n, int k) {
+  if (k == 0 || k == n) return 1;
+  if (k > n) return 0;
+  double result = 1.0;
+  for (int i = 1; i <= k; ++i) {
+    result *= (n - i + 1) / i;
+  }
+  return result;
+}
+
+
+void MP::update_pose() {
+  double dt = Brain.Timer.time(seconds) - time;
+  time = Brain.Timer.time(seconds);
+
+  // Calculate new position based on linear and angular velocity
+  x += velocity * cos(theta) * dt;
+  y += velocity * sin(theta) * dt;
+  theta += angular_velocity * dt;
+
+  // Normalize theta to -pi to pi
+  theta = fmod(theta + M_PI, 2 * M_PI) - M_PI;
+}
 
 void MP::trapezoid_initialize(double distance) {
   Brain.Timer.reset();

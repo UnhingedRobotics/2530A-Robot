@@ -168,7 +168,9 @@
 - README to be much more informational.
 
 ---
+
 # Vexcodetext Changelog
+
 ## [1.0.0] - 2024-12-18
 
 ### Added
@@ -197,7 +199,6 @@
 ### Updated
 - Fixed mkrules to use clang for cc and cxx.
 - Folder locations for vex header file and make files.
-
 
 ---
 
