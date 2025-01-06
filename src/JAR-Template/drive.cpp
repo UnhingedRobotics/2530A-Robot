@@ -351,9 +351,6 @@ void Drive::drive_distance(float distance, float heading, float drive_max_voltag
     float drive_output = drivePID.compute(drive_error);
     float heading_output = headingPID.compute(heading_error);
     task::sleep(10);
-    float time = Brain.Timer.time();
-    float right_position = get_right_position_in();
-    float left_position = get_left_position_in();
     drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos);
   }
 }
@@ -380,8 +377,8 @@ void Drive::drive_velocity(float drive_output, float heading_output, float prev_
   drive_output = driveVelocityPID.compute(drive_velocity_error);
   heading_output = headingVelocityPID.compute(heading_velocity_error);
 
-  drive_output = clamp(drive_output, -drive_max_voltage, drive_max_voltage);
-  heading_output = clamp(heading_output, -heading_max_voltage, heading_max_voltage);
+  drive_output = clamp(drive_output, -v_drive_max_voltage, v_drive_max_voltage);
+  heading_output = clamp(heading_output, -v_heading_max_voltage, v_heading_max_voltage);
   drive_with_voltage(drive_output+heading_output, drive_output-heading_output);
 }
 
@@ -943,6 +940,22 @@ void Drive::control_tank(){
 void Drive::control_tank_squared(){
   float leftthrottle = deadband_squared(controller(primary).Axis3.value(), 5);
   float rightthrottle = deadband_squared(controller(primary).Axis2.value(), 5);
+  DriveL.spin(fwd, to_volt(leftthrottle), volt);
+  DriveR.spin(fwd, to_volt(rightthrottle), volt);
+}
+
+void Drive::control_tank(float prev_time, float prev_right_pos, float prev_left_pos) {
+  float leftthrottle = to_volt(controller(primary).Axis3.value());
+  float rightthrottle = to_volt(controller(primary).Axis2.value());
+  PID leftVelocityPID(leftthrottle, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_drive_settle_error, v_drive_settle_time, v_drive_timeout);
+  PID rightVelocityPID(rightthrottle, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_drive_settle_error, v_drive_settle_time, v_drive_timeout);
+  const float wheelbase = 13.25; // in inches
+  float average_angular_velocity = (get_right_velocity_ins(prev_right_pos, prev_time)-get_left_velocity_ins(prev_left_pos, prev_time))/wheelbase;
+  float left_velocity_error = leftthrottle - get_left_velocity_ins(prev_left_pos, prev_time);
+  float right_velocity_error = rightthrottle - get_right_velocity_ins(prev_left_pos, prev_time);
+  float leftthrottle = driveVelocityPID.compute(drive_velocity_error);
+  float rightthrottle = headingVelocityPID.compute(heading_velocity_error);
+
   DriveL.spin(fwd, to_volt(leftthrottle), volt);
   DriveR.spin(fwd, to_volt(rightthrottle), volt);
 }
