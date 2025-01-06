@@ -944,7 +944,7 @@ void Drive::control_tank_squared(){
   DriveR.spin(fwd, to_volt(rightthrottle), volt);
 }
 
-void Drive::control_tank(float prev_time, float prev_right_pos, float prev_left_pos) {
+void Drive::pid_control_tank(float prev_time, float prev_right_pos, float prev_left_pos) {
   float leftthrottle = to_volt(controller(primary).Axis3.value());
   float rightthrottle = to_volt(controller(primary).Axis2.value());
   PID leftVelocityPID(leftthrottle, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_drive_settle_error, v_drive_settle_time, v_drive_timeout);
@@ -953,8 +953,8 @@ void Drive::control_tank(float prev_time, float prev_right_pos, float prev_left_
   float average_angular_velocity = (get_right_velocity_ins(prev_right_pos, prev_time)-get_left_velocity_ins(prev_left_pos, prev_time))/wheelbase;
   float left_velocity_error = leftthrottle - get_left_velocity_ins(prev_left_pos, prev_time);
   float right_velocity_error = rightthrottle - get_right_velocity_ins(prev_left_pos, prev_time);
-  float leftthrottle = driveVelocityPID.compute(drive_velocity_error);
-  float rightthrottle = headingVelocityPID.compute(heading_velocity_error);
+  leftthrottle = leftVelocityPID.compute(left_velocity_error);
+  rightthrottle = rightVelocityPID.compute(right_velocity_error);
 
   DriveL.spin(fwd, to_volt(leftthrottle), volt);
   DriveR.spin(fwd, to_volt(rightthrottle), volt);

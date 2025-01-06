@@ -191,6 +191,7 @@ public:
   void control_arcade_squared();
   void control_tank();
   void control_tank_squared();
+  void pid_control_tank(float prev_time, float prev_right_pos, float prev_left_pos);
   void control_holonomic();
   void control_holonomic_squared();
 };
