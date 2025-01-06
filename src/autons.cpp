@@ -27,13 +27,13 @@ void default_constants(){
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
-  fishControl.set_arm_constants(12, .12, 0, 0, 15);
+  fishControl.set_arm_constants(12, .13, 0, 0.1, 0);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
-  fishControl.set_arm_exit_conditions(8, 300, 3000);
+  fishControl.set_arm_exit_conditions(6, 100, 100);
 }
 
 /**
@@ -56,24 +56,39 @@ void odom_constants(){
  */
 
 void red_left_elims(){
+  fishMech.resetPosition();
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
   intakeControl.intakeon = false;
-  chassis.drive_distance_mp(17);
+  chassis.drive_distance(18);
   chassis.turn_to_angle(90);
-  wait(0.1, seconds);
-  fishMech.setTimeout(1.5, seconds);
-  fishControl.move_to_angle(110);
-  wait(0.1, seconds);
-  chassis.drive_distance_mp(-5);
+  intakeControl.intakeMaxVelocity = 20;
+  intakeControl.intakeon = true;
   fishControl.move_to_angle(150);
-  chassis.turn_to_angle(45);
-  chassis.drive_distance_mp(-47);
+  intakeControl.intakeon = false;
+  intakeControl.intakeMaxVelocity = 70;
+  fishControl.move_to_angle(90);
+  chassis.drive_distance(-5);
+  chassis.turn_to_angle(50);
+  chassis.drive_distance(-45);
   goalclamp.set(true);
-  wait(0.2, seconds);
+  wait(0.1, seconds);
   chassis.turn_to_angle(180);
   intakeControl.intakeon = true;
-  chassis.drive_distance_mp(30);
+  chassis.drive_distance(28);
+  wait(0.2, seconds);
+  intakeControl.intakeon = false;
+  chassis.turn_to_angle(270);
+  intakeControl.intakeon = true;
+  chassis.drive_distance(22);
+  wait(0.4, seconds);
+  chassis.drive_distance(-13);
+  chassis.turn_to_angle(300);
+  chassis.drive_distance(14);
+  wait(0.4, seconds);
+  chassis.turn_to_angle(0);
+  chassis.drive_distance(20);
+  wait(2, seconds);
   intakeControl.intakeon = false;
 }
 
