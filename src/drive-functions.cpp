@@ -8,13 +8,13 @@ double intakeInitPos;
 // Constructor with initializer list to initialize member variables
 IntakeControl::IntakeControl() :
   hue(0.0),
-  ring(false),
+  ring(true),
   team(true),
   ringdetected(false),
   intakeon(false),
   holding(false),
   intakeVelocity(0),
-  intakeMaxVelocity(80),
+  intakeMaxVelocity(90),
   mode(INTAKE_COLOR_SORT),
   accuracyIntake(125),
   intakeFullRotation(2486.4),
@@ -46,6 +46,8 @@ void IntakeControl::colorSorting() {
       intakeVelocity = intakeMaxVelocity;
       if (!ringdetected) {
           aivisionsensor.takeSnapshot(aivisionsensor__bluering);
+          // updateControllerScreen("take pic");
+          
           if (aivisionsensor.objects[0].exists) {
               ring = false;
               ringdetected = true;
@@ -57,7 +59,7 @@ void IntakeControl::colorSorting() {
                 ring = true;
                 ringdetected = true;
                 intakeInitPos = fmod(intake.position(degrees), intakeFullRotation);
-                updateControllerScreen("red");
+                // updateControllerScreen("red");
               }
           }
       }
@@ -122,39 +124,34 @@ void IntakeControl::intakeMove() {
 
 void healthCheck() {
   while (true) {
-    if (intake.temperature(fahrenheit) >= 100) {
+    if (intake.temperature(fahrenheit) >= 120) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,1);
       Controller1.Screen.print("Intake too hot!");
-      Controller1.rumble("..--");
     }
 
     if (leftdrivefront.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,2);
       Controller1.Screen.print("LeftDriveFront too hot!");
-      Controller1.rumble("..--");
     }
     
     if (leftdriveback.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,3);
       Controller1.Screen.print("LeftDriveBack too hot!");
-      Controller1.rumble("..--");
     }
 
     if (rightdrivefront.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,4);
       Controller1.Screen.print("RightDriveFront too hot!");
-      Controller1.rumble("..--");
     }
 
     if (rightdriveback.temperature(fahrenheit) >= 100) {
       Controller1.Screen.clearScreen();
       Controller1.Screen.setCursor(1,1);
       Controller1.Screen.print("RightDriveBack too hot!");
-      Controller1.rumble("..--");
     }
     wait(1, seconds);
   }
@@ -187,24 +184,19 @@ void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_se
 }
 
 void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
-  float init_angle = 180 - fmod(fishMech.position(degrees), 180) + fishMech.position(degrees);
-  if (angle - fmod(fishMech.position(degrees), 180) < 0) {
-	angle = 180 + init_angle + angle;
-        init_angle = init_angle + 180;
-  }
-  PID fishPID((angle - fmod(fishMech.position(degrees), 180)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
+  PID fishPID((angle - fishMech.position(degrees)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
   while (!fishPID.is_settled()) {
-    float error = angle - fmod(fishMech.position(degrees), 180);
-    if (fishMech.position(degrees) >= init_angle) {
-      error = angle - fishMech.position(degrees) - init_angle + 180;	
-    }
-    else if (fishMech.position(degrees) <= init_angle - 180) {
-      error = angle - fishMech.position(degrees) - init_angle + 180;
-    }
+    float error = angle - fishMech.position(degrees);
     float output = fishPID.compute(error);
     output = clamp(output, -arm_max_voltage, arm_max_voltage);
     fishMech.spin(fwd, output, volt);
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1,1);
+    Controller1.Screen.print(error);
     task::sleep(10);
+  }
+  if (angle > 130) {
+    fishMech.setPosition((fishMech.position(degrees) - 180), degrees);
   }
   fishMech.stop(brake);
   fishMech.spin(forward);

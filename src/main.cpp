@@ -158,17 +158,11 @@ void buttonR1EventHandler() {
 }
 void buttonR2EventHandler() {
     if (fishControl.pos_num == 1) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.print("130");
       fishControl.move_to_angle(130);
       fishControl.pos_num = 2;
     }
     else if (fishControl.pos_num == 2) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.print("180");
-      fishControl.move_to_angle(180);
+      fishControl.move_to_angle(160);
       fishControl.pos_num = 1; 
     }
 }
@@ -192,6 +186,7 @@ void pre_auton() {
   intake.spin(forward);
   fishMech.spin(forward);
   fishMech.setVelocity(0, percent);
+  aivisionsensor.startAwb();
   // opticalsensor.integrationTime(5);
   // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
@@ -282,6 +277,9 @@ void usercontrol(void) {
   Controller1.ButtonR2.pressed(buttonR2EventHandler);
   Controller1.ButtonY.pressed(buttonDoinkYEventHandler);
   while (1) {
+    // Controller1.Screen.clearScreen();
+    // Controller1.Screen.setCursor(1,1);
+    // Controller1.Screen.print(intake.position(degrees));
     // Tank drive control
     chassis.control_tank_squared();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources

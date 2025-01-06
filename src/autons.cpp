@@ -27,13 +27,13 @@ void default_constants(){
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
-  fishControl.set_arm_constants(12, .12, 0, 0, 15);
+  fishControl.set_arm_constants(12, .12, 0, 0.1, 0);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
-  fishControl.set_arm_exit_conditions(8, 300, 3000);
+  fishControl.set_arm_exit_conditions(18, 200, 200);
 }
 
 /**
