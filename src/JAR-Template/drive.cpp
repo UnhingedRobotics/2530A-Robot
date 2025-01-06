@@ -249,7 +249,7 @@ float Drive::get_left_position_in(){
 }
 
 float Drive::get_left_velocity_ins(double prev_left_pos, double prev_time){
-  return( (DriveL.position(deg)*drive_in_to_deg_ratio - prev_left_pos) / (Brain.Timer.time - prev_time) );
+  return( (DriveL.position(deg)*drive_in_to_deg_ratio - prev_left_pos) / (Brain.Timer.time() - prev_time) );
 }
 
 /**
@@ -263,7 +263,7 @@ float Drive::get_right_position_in(){
 }
 
 float Drive::get_right_velocity_ins(double prev_right_pos, double prev_time){
-  return( (DriveR.position(deg)*drive_in_to_deg_ratio - prev_right_pos) / (Brain.Timer.time - prev_time) );
+  return( (DriveR.position(deg)*drive_in_to_deg_ratio - prev_right_pos) / (Brain.Timer.time() - prev_time) );
 }
 
 /**
@@ -342,44 +342,43 @@ void Drive::drive_distance(float distance, float heading, float drive_max_voltag
   float start_average_position = (get_left_position_in()+get_right_position_in())/2.0;
   float average_position = start_average_position;
   while(drivePID.is_settled() == false){
-	float prev_time = time;
-	float time = Brain.Timer.time;
-	float prev_right_pos = right_position;
-	float right_position = get_right_position_in();
-	float prev_left_pos = left_position;
-	float left_position = get_left_position_in();
+    float prev_time = Brain.Timer.time();
+    float prev_right_pos = get_right_position_in();
+    float prev_left_pos = get_left_position_in();
     float average_position = (get_left_position_in()+get_right_position_in())/2.0;
     float drive_error = distance+start_average_position-average_position;
     float heading_error = reduce_negative_180_to_180(heading - get_absolute_heading());
     float drive_output = drivePID.compute(drive_error);
     float heading_output = headingPID.compute(heading_error);
-
-    drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos);
     task::sleep(10);
+    float time = Brain.Timer.time();
+    float right_position = get_right_position_in();
+    float left_position = get_left_position_in();
+    drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos);
   }
 }
 
 void Drive::drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos){
-  drive_distance(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
+  drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
 }
 
 void Drive::drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos, float v_drive_max_voltage, float v_heading_max_voltage){
-  drive_distance(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
+  drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
 }
 
 void Drive::drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos, float v_drive_max_voltage, float v_heading_max_voltage, float v_drive_settle_error, float v_drive_settle_time, float v_drive_timeout){
-  drive_distance(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
+  drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
 }
 void Drive::drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos, float v_drive_max_voltage, float v_heading_max_voltage, float v_drive_settle_error, float v_drive_settle_time, float v_drive_timeout, float v_drive_kp, float v_drive_ki, float v_drive_kd, float v_drive_starti, float v_heading_kp, float v_heading_ki, float v_heading_kd, float v_heading_starti){
   PID driveVelocityPID(drive_output, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_drive_settle_error, v_drive_settle_time, v_drive_timeout);
   PID headingVelocityPID(heading_output, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
   const float wheelbase = 13.25; // in inches
   float average_velocity = (get_left_velocity_ins(prev_left_pos, prev_time)+get_right_velocity_ins(prev_right_pos, prev_time))/2.0;
-  float average_angular_veloicty = (get_right_velocity_ins(prev_right_pos, prev_time)-get_left_velocity_ins(prev_left_pos, prev_time))/wheelbase;
-  float drive_velocity_error = velocity - average_velocity;
-  float heading_velocity_error = angular_velocity - average_angular_velocity;
-  float drive_output = driveVelocityPID.compute(drive_velocity_error);
-  float heading_output = headingVelocityPID.compute(heading_velocity_error);
+  float average_angular_velocity = (get_right_velocity_ins(prev_right_pos, prev_time)-get_left_velocity_ins(prev_left_pos, prev_time))/wheelbase;
+  float drive_velocity_error = drive_output - average_velocity;
+  float heading_velocity_error = heading_output - average_angular_velocity;
+  drive_output = driveVelocityPID.compute(drive_velocity_error);
+  heading_output = headingVelocityPID.compute(heading_velocity_error);
 
   drive_output = clamp(drive_output, -drive_max_voltage, drive_max_voltage);
   heading_output = clamp(heading_output, -heading_max_voltage, heading_max_voltage);
