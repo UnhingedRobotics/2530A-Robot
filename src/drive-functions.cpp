@@ -47,7 +47,11 @@ void IntakeControl::colorSorting() {
       if (!ringdetected) {
           aivisionsensor.takeSnapshot(aivisionsensor__bluering);
           // updateControllerScreen("take pic");
+<<<<<<< HEAD
          
+=======
+          
+>>>>>>> 8959322eb653ff705eaa83418afd620b3e2e75d3
           if (aivisionsensor.objects[0].exists) {
               ring = false;
               ringdetected = true;
@@ -195,7 +199,11 @@ void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_se
     Controller1.Screen.print(error);
     task::sleep(10);
   }
+<<<<<<< HEAD
   if (angle > 160) {
+=======
+  if (angle > 130) {
+>>>>>>> 8959322eb653ff705eaa83418afd620b3e2e75d3
     fishMech.setPosition((fishMech.position(degrees) - 180), degrees);
   }
   fishMech.stop(brake);

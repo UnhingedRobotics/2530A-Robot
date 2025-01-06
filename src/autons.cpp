@@ -27,13 +27,21 @@ void default_constants(){
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
+<<<<<<< HEAD
   fishControl.set_arm_constants(12, .13, 0, 0.1, 0);
+=======
+  fishControl.set_arm_constants(12, .12, 0, 0.1, 0);
+>>>>>>> 8959322eb653ff705eaa83418afd620b3e2e75d3
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
+<<<<<<< HEAD
   fishControl.set_arm_exit_conditions(6, 100, 100);
+=======
+  fishControl.set_arm_exit_conditions(18, 200, 200);
+>>>>>>> 8959322eb653ff705eaa83418afd620b3e2e75d3
 }
 
 /**
@@ -60,6 +68,7 @@ void red_left_elims(){
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
   intakeControl.intakeon = false;
+<<<<<<< HEAD
   chassis.drive_distance(18);
   chassis.turn_to_angle(90);
   intakeControl.intakeMaxVelocity = 20;
@@ -71,10 +80,23 @@ void red_left_elims(){
   chassis.drive_distance(-5);
   chassis.turn_to_angle(50);
   chassis.drive_distance(-45);
+=======
+  chassis.drive_distance(14);
+  chassis.turn_to_angle(90);
+  intakeControl.intakeon = true;
+  fishControl.move_to_angle(150);
+  wait(0.1, seconds);
+  intakeControl.intakeon = false;
+  chassis.drive_distance(-5);
+  fishControl.move_to_angle(160);
+  chassis.turn_to_angle(45);
+  chassis.drive_distance(-47);
+>>>>>>> 8959322eb653ff705eaa83418afd620b3e2e75d3
   goalclamp.set(true);
   wait(0.1, seconds);
   chassis.turn_to_angle(180);
   intakeControl.intakeon = true;
+<<<<<<< HEAD
   chassis.drive_distance(28);
   wait(0.2, seconds);
   intakeControl.intakeon = false;
@@ -89,6 +111,9 @@ void red_left_elims(){
   chassis.turn_to_angle(0);
   chassis.drive_distance(20);
   wait(2, seconds);
+=======
+  chassis.drive_distance(30);
+>>>>>>> 8959322eb653ff705eaa83418afd620b3e2e75d3
   intakeControl.intakeon = false;
 }
 
