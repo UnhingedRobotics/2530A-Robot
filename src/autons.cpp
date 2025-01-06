@@ -56,24 +56,25 @@ void odom_constants(){
  */
 
 void red_left_elims(){
+  fishMech.resetPosition();
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
   intakeControl.intakeon = false;
-  chassis.drive_distance_mp(17);
+  chassis.drive_distance(14);
   chassis.turn_to_angle(90);
-  wait(0.1, seconds);
-  fishMech.setTimeout(1.5, seconds);
-  fishControl.move_to_angle(110);
-  wait(0.1, seconds);
-  chassis.drive_distance_mp(-5);
+  intakeControl.intakeon = true;
   fishControl.move_to_angle(150);
+  wait(0.1, seconds);
+  intakeControl.intakeon = false;
+  chassis.drive_distance(-5);
+  fishControl.move_to_angle(160);
   chassis.turn_to_angle(45);
-  chassis.drive_distance_mp(-47);
+  chassis.drive_distance(-47);
   goalclamp.set(true);
   wait(0.2, seconds);
   chassis.turn_to_angle(180);
   intakeControl.intakeon = true;
-  chassis.drive_distance_mp(30);
+  chassis.drive_distance(30);
   intakeControl.intakeon = false;
 }
 
