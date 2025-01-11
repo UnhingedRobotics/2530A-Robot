@@ -158,11 +158,11 @@ void buttonR1EventHandler() {
 }
 void buttonR2EventHandler() {
     if (fishControl.pos_num == 1) {
-      fishControl.move_to_angle(130);
+      fishControl.move_to_angle(150);
       fishControl.pos_num = 2;
     }
     else if (fishControl.pos_num == 2) {
-      fishControl.move_to_angle(160);
+      fishControl.move_to_angle(170);
       fishControl.pos_num = 1; 
     }
 }

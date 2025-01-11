@@ -195,7 +195,7 @@ void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_se
     Controller1.Screen.print(error);
     task::sleep(10);
   }
-  if (angle > 130) {
+  if (angle > 160) {
     fishMech.setPosition((fishMech.position(degrees) - 180), degrees);
   }
   fishMech.stop(brake);

@@ -130,5 +130,8 @@ bool PID::is_settled(){
   if (time_spent_settled>settle_time){
     return(true);
   }
+  if (fabs(error) < settle_error) {
+    return(true);
+  }
   return(false);
 }
