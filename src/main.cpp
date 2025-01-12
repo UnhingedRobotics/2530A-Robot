@@ -186,7 +186,7 @@ void pre_auton() {
   intake.spin(forward);
   fishMech.spin(forward);
   fishMech.setVelocity(0, percent);
-  aivisionsensor.startAwb();
+  // aivisionsensor.startAwb();
   // opticalsensor.integrationTime(5);
   // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
