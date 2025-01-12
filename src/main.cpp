@@ -186,7 +186,7 @@ void pre_auton() {
   intake.spin(forward);
   fishMech.spin(forward);
   fishMech.setVelocity(0, percent);
-  aivisionsensor.startAwb();
+  // aivisionsensor.startAwb();
   // opticalsensor.integrationTime(5);
   // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
@@ -281,8 +281,11 @@ void usercontrol(void) {
     // Controller1.Screen.setCursor(1,1);
     // Controller1.Screen.print(intake.position(degrees));
     // Tank drive control
-    chassis.control_tank_squared();
+    float prev_time = Brain.Timer.time();
+    float prev_right_pos = chassis.get_right_position_in();
+    float prev_left_pos = chassis.get_left_position_in();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
+    chassis.pid_control_tank(prev_time, prev_right_pos, prev_left_pos);
   }
 }
 

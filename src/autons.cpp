@@ -25,15 +25,18 @@ void default_constants(){
   // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
   chassis.set_drive_constants(10, 1.2, 0, 10, 0);
   chassis.set_heading_constants(6, .4, 0, 1, 0);
+  chassis.set_v_drive_constants(10, 1.2, 0, 10, 0);
+  chassis.set_v_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
   fishControl.set_arm_constants(12, .13, 0, 0.1, 0);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
+  chassis.set_v_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
-  fishControl.set_arm_exit_conditions(6, 100, 100);
+  fishControl.set_arm_exit_conditions(18, 200, 200);
 }
 
 /**
@@ -70,19 +73,31 @@ void red_left_elims(){
   fishControl.move_to_angle(90);
   chassis.drive_distance(-5);
   chassis.turn_to_angle(50);
-  chassis.drive_distance(-44);
-  goalclamp.set(true);
+  chassis.drive_distance(-45);
+  chassis.turn_to_angle(90);
+  intakeControl.intakeMaxVelocity = 20;
+  intakeControl.intakeon = true;
+  fishControl.move_to_angle(150);
+  intakeControl.intakeon = false;
+  intakeControl.intakeMaxVelocity = 70;
+  fishControl.move_to_angle(90);
+  chassis.drive_distance(-5);
+  fishControl.move_to_angle(160);
+  chassis.turn_to_angle(45);
+  chassis.drive_distance(-47);
   wait(0.1, seconds);
   chassis.turn_to_angle(180);
   intakeControl.intakeon = true;
-  chassis.drive_distance(32);
+  chassis.drive_distance(28);
   wait(0.2, seconds);
+  intakeControl.intakeon = false;
   chassis.turn_to_angle(270);
-  chassis.drive_distance(14);
+  intakeControl.intakeon = true;
+  chassis.drive_distance(22);
   wait(0.4, seconds);
   chassis.drive_distance(-13);
-  chassis.turn_to_angle(290);
-  chassis.drive_distance(16);
+  chassis.turn_to_angle(300);
+  chassis.drive_distance(14);
   wait(0.4, seconds);
   chassis.turn_to_angle(0);
   chassis.drive_distance(20);
