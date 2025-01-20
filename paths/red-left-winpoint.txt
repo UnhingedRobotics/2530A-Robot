@@ -1,0 +1,19 @@
+// Path
+
+chassis.turn_to_point(-53.497, -0.895);
+chassis.drive_to_point(-53.497, -0.895);
+chassis.turn_to_point(-23.364, 23.364);
+chassis.drive_to_point(-23.364, 23.364);
+chassis.turn_to_point(-22.985, 50.464);
+chassis.drive_to_point(-22.985, 50.464);
+chassis.turn_to_point(-7.255, 50.654);
+chassis.drive_to_point(-7.255, 50.654);
+chassis.turn_to_point(-16.73, 42.694);
+chassis.drive_to_point(-16.73, 42.694);
+chassis.turn_to_point(-7.255, 42.126);
+chassis.drive_to_point(-7.255, 42.126);
+chassis.turn_to_point(-10.666, 24.311);
+chassis.drive_to_point(-10.666, 24.311);
+
+
+#PATH.JERRYIO-DATA {"appVersion":"0.8.3","format":"Move-to-Point Code Gen v0.1","gc":{"robotWidth":17,"robotHeight":18,"showRobot":true,"uol":2.54,"pointDensity":0.7874015748031495,"controlMagnetDistance":1.968503937007874,"fieldImage":{"displayName":"V5RC 2025 - High Stakes","signature":"V5RC 2025 - High Stakes","origin":{"__type":"built-in"}},"coordinateSystem":"VEX Gaming Positioning System","outputTemplate":"path: `// ${name}\n\n${code}\n`\nmoveToPoint: `chassis.turn_to_point(${x}, ${y});\nchassis.drive_to_point(${x}, ${y});`\n"},"paths":[{"segments":[{"controls":[{"uid":"xwEzi7cT30","x":-53.686,"y":14.646,"lock":false,"visible":true,"heading":180,"__type":"end-point"},{"uid":"D7GztiLJL7","x":-53.496652187418334,"y":-0.8945167859027067,"lock":false,"visible":true,"heading":180,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"xOcBLOYqeh"},{"controls":[{"uid":"D7GztiLJL7","x":-53.496652187418334,"y":-0.8945167859027067,"lock":false,"visible":true,"heading":180,"__type":"end-point"},{"uid":"siEB8l1J20","x":-23.36356554366208,"y":23.36356554366208,"lock":false,"visible":true,"heading":0,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"fvDeial76e"},{"controls":[{"uid":"siEB8l1J20","x":-23.36356554366208,"y":23.36356554366208,"lock":false,"visible":true,"heading":0,"__type":"end-point"},{"uid":"EtinHMVhfh","x":-22.98453300726263,"y":50.464391896222736,"lock":false,"visible":true,"heading":90,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"qzDIL2Fenh"},{"controls":[{"uid":"EtinHMVhfh","x":-22.98453300726263,"y":50.464391896222736,"lock":false,"visible":true,"heading":90,"__type":"end-point"},{"uid":"pxgU704r8G","x":-7.2546827466854635,"y":50.65390816442246,"lock":false,"visible":true,"heading":90,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"9IQDmFPsiW"},{"controls":[{"uid":"pxgU704r8G","x":-7.2546827466854635,"y":50.65390816442246,"lock":false,"visible":true,"heading":90,"__type":"end-point"},{"uid":"rHC4mm9hfD","x":-16.73049615667171,"y":42.694224900034015,"lock":false,"visible":true,"heading":90,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"JAX3WXY8S1"},{"controls":[{"uid":"rHC4mm9hfD","x":-16.73049615667171,"y":42.694224900034015,"lock":false,"visible":true,"heading":90,"__type":"end-point"},{"uid":"a4titsohkw","x":-7.2546827466854635,"y":42.12567609543484,"lock":false,"visible":true,"heading":90,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"B0qM08sgOa"},{"controls":[{"uid":"a4titsohkw","x":-7.2546827466854635,"y":42.12567609543484,"lock":false,"visible":true,"heading":90,"__type":"end-point"},{"uid":"LXLDE5Ldrb","x":-10.666,"y":24.311,"lock":false,"visible":true,"heading":180,"__type":"end-point"}],"speedProfiles":[],"lookaheadKeyframes":[],"uid":"zhOQLXXp9V"}],"pc":{"speed":30},"name":"Path","uid":"7vZS34ncr8","lock":false,"visible":true}]}
