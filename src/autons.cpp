@@ -48,9 +48,9 @@ void default_constants(){
 void odom_constants(){
   default_constants();
   chassis.heading_max_voltage = 10;
-  chassis.drive_max_voltage = 8;
-  chassis.drive_settle_error = 3;
-  chassis.boomerang_lead = .5;
+  chassis.drive_max_voltage = 9.3;
+  // chassis.drive_settle_error = 3;
+  // chassis.boomerang_lead = .5;
   chassis.drive_min_voltage = 0;
 }
 
@@ -112,74 +112,67 @@ void red_left_winpoint(){
   intakeControl.intakeon = false;
   chassis.drive_distance(-45);
   goalclamp.set(true);
+  wait(0.2, seconds);
   fishControl.move_to_angle(90);
   chassis.turn_to_angle(-83);
   intakeControl.intakeMaxVelocity = 70;
   intakeControl.intakeon = true;
-  chassis.drive_distance(30);
-  chassis.turn_to_angle(-26);
-  chassis.drive_distance(43);
+  chassis.drive_distance(20);
+  chassis.turn_to_angle(-20);
+  chassis.drive_distance(40);
+  wait(0.2, seconds);
   doink.set(true);
-  chassis.turn_to_angle(-215);
+  chassis.turn_to_angle(-170);
+  chassis.turn_to_angle(-230);
   chassis.drive_distance(-10);
   intakeControl.intakeon = false;
 }
 
 void blue_left_elims(){
+  chassis.set_coordinates(-53.686, 14.646, 180);
+
   task intakeTask(intakeTaskFunction);
   intakeControl.team = false;
   intakeControl.intakeon = false;
-  chassis.drive_distance_mp(-53);
-  goalclamp.set(true);
-  wait(0.3, seconds);
-  intakeControl.intakeon = true;
-  chassis.drive_distance_mp(8);
-  chassis.turn_to_angle(-90);
-  chassis.drive_distance_mp(30);
-  chassis.drive_distance_mp(4);
-  wait(.5, seconds);
-  chassis.drive_distance_mp(-11);
-  chassis.turn_to_angle(-180);
-  chassis.drive_distance_mp(14);
-  wait(.5, seconds);
-  chassis.turn_to_angle(-255);
-  chassis.drive_distance_mp(15);
-  intakeControl.intakeon = false;
+  odom_constants();
+
+  chassis.drive_to_point(-53.497, -0.895);
+  chassis.turn_to_point(-23.364, 23.364);
+  chassis.drive_to_point(-23.364, 23.364);
+  chassis.turn_to_point(-22.985, 50.464);
+  chassis.drive_to_point(-22.985, 50.464);
+  chassis.turn_to_point(-7.255, 50.654);
+  chassis.drive_to_point(-7.255, 50.654);
+  chassis.turn_to_point(-16.73, 42.694);
+  chassis.drive_to_point(-16.73, 42.694);
+  chassis.turn_to_point(-7.255, 42.126);
+  chassis.drive_to_point(-7.255, 42.126);
+  chassis.turn_to_point(-8.392, 25.448);
+  chassis.drive_to_point(-7.823, 22.795);
+
 }
 
 void blue_left_winpoint(){
-  task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
-  intakeControl.intakeon = false;
-  chassis.drive_distance_mp(-53);
-  goalclamp.set(true);
-  wait(0.3, seconds);
-  intakeControl.intakeon = true;
-  chassis.drive_distance_mp(8);
-  chassis.turn_to_angle(-90);
-  chassis.drive_distance_mp(30);
-  chassis.drive_distance_mp(4);
-  wait(.5, seconds);
-  intakeControl.intakeon = true;
-  chassis.drive_distance_mp(-33);
-  chassis.turn_to_angle(45);
-  goalclamp.set(false);
-  chassis.drive_distance_mp(37);
-  wait(.3, seconds);
-  intakeControl.intakeon = false;
-  intakeControl.intakeon = true;
-  chassis.drive_distance_mp(10);
-  wait(.2, seconds);
-  intakeControl.intakeon = false;
-  chassis.turn_to_angle(90);
-  chassis.drive_distance_mp(25);
-  chassis.turn_to_angle(0);
-  chassis.drive_distance_mp(-40);
-  goalclamp.set(true);
-  intakeControl.intakeon = true;
-  chassis.turn_to_angle(-90);
-  chassis.drive_distance_mp(17);
-  intakeControl.intakeon = false;
+  chassis.set_coordinates(-59.372, 15.783, 180);
+  // chassis.set_coordinates(0, 0, 0);
+
+  chassis.drive_to_point(-150.323, -0.828);
+  chassis.drive_to_point(-59.825, 59.343);
+  chassis.drive_to_point(-59.825, 148.397);
+  chassis.drive_to_point(-8.318, 128.661);
+  chassis.drive_to_point(-36.719, 112.294);
+  chassis.drive_to_point(-7.837, 109.406);
+  chassis.drive_to_point(-7.355, 50.679);
+
+  // Path
+
+  chassis.drive_to_point(-59.182, -0.326);
+  chassis.drive_to_point(-23.553, 23.364);
+  chassis.drive_to_point(-23.553, 58.424);
+  chassis.drive_to_point(-3.275, 50.654);
+  chassis.drive_to_point(-14.456, 44.21);
+  chassis.drive_to_point(-3.085, 43.073);
+  chassis.drive_to_point(-2.896, 19.952);
 }
 
 void skills(){

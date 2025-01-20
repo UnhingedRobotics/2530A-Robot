@@ -58,12 +58,12 @@ motor_group(rightdrivefront,rightdriveback),
 PORT12,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
-3.25,
+3,
 
 //External ratio, must be in decimal, in the format of input teeth/output teeth.
 //If your motor has an 84-tooth gear and your wheel has a 60-tooth gear, this value will be 1.4.
 //If the motor drives the wheel directly, this value is 1:
-2,
+1.6666666666,
 
 //Gyro scale, this is what your gyro reads when you spin the robot 360 degrees.
 //For most cases 360 will do fine here, but this scale factor can be very helpful when precision is necessary.
@@ -180,6 +180,7 @@ void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE
   vexcodeInit();
   default_constants();
+  chassis.set_coordinates(0, 0, 0);
   thread healthTask(healthCheck);
   fishMech.resetPosition();
   fishMech.setStopping(coast);
@@ -199,24 +200,26 @@ void pre_auton() {
     Brain.Screen.printAt(5, 20, "JAR Template v1.2.0");
     Brain.Screen.printAt(5, 40, "Battery Percentage:");
     Brain.Screen.printAt(5, 60, "%d", Brain.Battery.capacity());
-    Brain.Screen.printAt(5, 80, "Chassis Heading Reading:");
-    Brain.Screen.printAt(5, 100, "%f", chassis.get_absolute_heading());
-    Brain.Screen.printAt(5, 120, "Selected Auton:");
+    Brain.Screen.printAt(5, 80, "Chassis X:");
+    Brain.Screen.printAt(5, 100, "%f", chassis.get_X_position());
+    Brain.Screen.printAt(5, 120, "Chassis Y:");
+    Brain.Screen.printAt(5, 140, "%f", chassis.get_Y_position());
+    Brain.Screen.printAt(5, 160, "Selected Auton:");
     switch(current_auton_selection){
       case 0:
-        Brain.Screen.printAt(5, 140, "Red Left Elims");
+        Brain.Screen.printAt(5, 180, "Red Left Elims");
         break;
       case 1:
-        Brain.Screen.printAt(5, 140, "Red Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Red Left Winpoint");
         break;
       case 2:
-        Brain.Screen.printAt(5, 140, "Blue Left Elims");
+        Brain.Screen.printAt(5, 180, "Blue Left Elims");
         break;
       case 3:
-        Brain.Screen.printAt(5, 140, "Blue Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Blue Left Winpoint");
         break;
       case 4:
-        Brain.Screen.printAt(5, 140, "Skills Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Skills Left Winpoint");
         break;
     }
     if(Brain.Screen.pressing()){
@@ -281,11 +284,12 @@ void usercontrol(void) {
     // Controller1.Screen.setCursor(1,1);
     // Controller1.Screen.print(intake.position(degrees));
     // Tank drive control
-    float prev_time = Brain.Timer.time();
-    float prev_right_pos = chassis.get_right_position_in();
-    float prev_left_pos = chassis.get_left_position_in();
+    chassis.control_tank();
+    // float prev_time = Brain.Timer.time();
+    // float prev_right_pos = chassis.get_right_position_in();
+    // float prev_left_pos = chassis.get_left_position_in();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
-    chassis.pid_control_tank(prev_time, prev_right_pos, prev_left_pos);
+    //chassis.pid_control_tank(prev_time, prev_right_pos, prev_left_pos);
   }
 }
 
