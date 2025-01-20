@@ -58,7 +58,7 @@ motor_group(rightdrivefront,rightdriveback),
 PORT12,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
-3,
+3.1,
 
 //External ratio, must be in decimal, in the format of input teeth/output teeth.
 //If your motor has an 84-tooth gear and your wheel has a 60-tooth gear, this value will be 1.4.
