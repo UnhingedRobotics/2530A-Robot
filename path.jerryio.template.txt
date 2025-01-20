@@ -1,0 +1,6 @@
+path: `// ${name}
+
+${code}
+`
+moveToPoint: `chassis.turn_to_point(${x}, ${y});
+chassis.drive_to_point(${x}, ${y});`

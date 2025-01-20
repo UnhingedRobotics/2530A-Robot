@@ -21,9 +21,11 @@ Welcome to the code repository for **Team 2530A**, where we document the develop
 - **Odometry Integration**:  
   Adding support for precise robot position tracking (From Jar Template).
 
-- **Boomerang Controller**
-  Boomerang Controller or Algorithm that comes with Jar Template. Currently from what I have tested it doesn't work.
+- **Move to Point Controller**
+  Move to Point, basic Pure Pursuit controller that I fixed from JAR Template.
 
+- **Path Generation Support**:  
+  Compatibility with tools like [Path Jerry IO](https://path.jerryio/) for autonomous route creation. [Path Jerry IO](https://path.jerryio/) template is in path.jerryio.template.txt. It uses the move to point route generation format.
 
 ### Planned Features  
 - **Pure Pursuit Algorithm**:  
@@ -37,9 +39,6 @@ Welcome to the code repository for **Team 2530A**, where we document the develop
 
 - **Compilation of Mechanism Information to make custom Motion profiles**
   An implementation given weight, gear ratio, and other constants to make an acceleration and velocity motion profile over time of any mechanism.
-
-- **Path Generation Support**:  
-  Future compatibility with tools like [Path Jerry IO](https://path.jerryio/) for autonomous route creation.  
 
 - **Custom Library Development**:  
   A reusable library for motion profiling, odometry, and advanced algorithms, potentially ported to PROS.  
