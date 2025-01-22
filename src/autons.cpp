@@ -152,7 +152,7 @@ void blue_left_elims(){
   chassis.drive_to_point(-7.255, 42.126);
   chassis.turn_to_point(-10.666, 24.311);
   chassis.drive_to_point(-10.666, 24.311);
-  drive_with_voltage(0,0);
+  chassis.drive_with_voltage(0,0);
 
 
 }
@@ -218,7 +218,7 @@ void skills(){
   chassis.drive_to_point(57.56, 45.726);
   chassis.turn_to_point(57.939, 58.424);
   chassis.drive_to_point(57.939, 58.424);
-  drive_with_voltage(0,0);
+  chassis.drive_with_voltage(0,0);
 
 
 }

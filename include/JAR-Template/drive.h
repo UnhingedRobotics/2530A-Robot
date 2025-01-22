@@ -170,8 +170,8 @@ public:
   void drive_to_pose(float X_position, float Y_position, float angle, float lead, float setback, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
   
   void turn_to_point(float X_position, float Y_position);
-  void turn_to_point(float X_position, float Y_position, bool reverse);
-  void turn_to_point(float X_position, float Y_position, bool reverse, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+  void turn_to_point(float X_position, float Y_position, bool reversed);
+  void turn_to_point(float X_position, float Y_position, bool reversed, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
   
   void holonomic_drive_to_pose(float X_position, float Y_position);
   void holonomic_drive_to_pose(float X_position, float Y_position, float angle);
