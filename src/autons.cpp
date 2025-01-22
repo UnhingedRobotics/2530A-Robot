@@ -152,31 +152,12 @@ void blue_left_elims(){
   chassis.drive_to_point(-7.255, 42.126);
   chassis.turn_to_point(-10.666, 24.311);
   chassis.drive_to_point(-10.666, 24.311);
+  drive_with_voltage(0,0);
 
 
 }
 
 void blue_left_winpoint(){
-  chassis.set_coordinates(-59.372, 15.783, 180);
-  // chassis.set_coordinates(0, 0, 0);
-
-  chassis.drive_to_point(-150.323, -0.828);
-  chassis.drive_to_point(-59.825, 59.343);
-  chassis.drive_to_point(-59.825, 148.397);
-  chassis.drive_to_point(-8.318, 128.661);
-  chassis.drive_to_point(-36.719, 112.294);
-  chassis.drive_to_point(-7.837, 109.406);
-  chassis.drive_to_point(-7.355, 50.679);
-
-  // Path
-
-  chassis.drive_to_point(-59.182, -0.326);
-  chassis.drive_to_point(-23.553, 23.364);
-  chassis.drive_to_point(-23.553, 58.424);
-  chassis.drive_to_point(-3.275, 50.654);
-  chassis.drive_to_point(-14.456, 44.21);
-  chassis.drive_to_point(-3.085, 43.073);
-  chassis.drive_to_point(-2.896, 19.952);
 }
 
 void skills(){
@@ -237,7 +218,7 @@ void skills(){
   chassis.drive_to_point(57.56, 45.726);
   chassis.turn_to_point(57.939, 58.424);
   chassis.drive_to_point(57.939, 58.424);
-
+  drive_with_voltage(0,0);
 
 
 }

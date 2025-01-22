@@ -69,12 +69,12 @@ void IntakeControl::colorSorting() {
               updateControllerScreen("ring removed");
               ringdetected = false;
             }
-	    else {
+	    	else {
     	      intake.setVelocity(0, percent);
-	      intakeon = false;
+	      	  intakeon = false;
               updateControllerScreen("ring held");
               ringdetected = false;
-	    }
+	    	}
           }
         }     
       }
@@ -83,7 +83,7 @@ void IntakeControl::colorSorting() {
           if (fmod(intake.position(degrees), intakeFullRotation) >= intakeSecondHook - accuracyIntake || fmod(intake.position(degrees), intakeFullRotation) <= intakeFirstHook - accuracyIntake) {
             if (ringdetected) {
               if ((team && !ring) || (!team && ring)) {
-    		intake.setVelocity(-intakeMaxVelocity, percent);
+    			intake.setVelocity(-intakeMaxVelocity, percent);
                 updateControllerScreen("ring removed");
                 ringdetected = false;
               }
@@ -94,7 +94,7 @@ void IntakeControl::colorSorting() {
           if (fmod(intake.position(degrees), intakeFullRotation) >= intakeFirstHook - accuracyIntake) {
             if (ringdetected) {
               if ((team && !ring) || (!team && ring)) {
-    		intake.setVelocity(-intakeMaxVelocity, percent);
+    			intake.setVelocity(-intakeMaxVelocity, percent);
                 updateControllerScreen("ring removed");
                 ringdetected = false;
               }
