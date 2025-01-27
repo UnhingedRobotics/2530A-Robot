@@ -29,14 +29,12 @@ void default_constants(){
   chassis.set_v_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(12, .4, .03, 3, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
-  fishControl.set_arm_constants(12, .13, 0, 0.1, 0);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_v_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_turn_exit_conditions(1, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
-  fishControl.set_arm_exit_conditions(18, 200, 200);
 }
 
 /**
@@ -62,7 +60,6 @@ void odom_constants(){
  */
 
 void red_left_elims(){
-  fishMech.resetPosition();
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
   intakeControl.intakeon = false;
@@ -70,22 +67,17 @@ void red_left_elims(){
   chassis.turn_to_angle(90);
   intakeControl.intakeMaxVelocity = 20;
   intakeControl.intakeon = true;
-  fishControl.move_to_angle(150);
   intakeControl.intakeon = false;
   intakeControl.intakeMaxVelocity = 70;
-  fishControl.move_to_angle(90);
   chassis.drive_distance(-5);
   chassis.turn_to_angle(50);
   chassis.drive_distance(-45);
   chassis.turn_to_angle(90);
   intakeControl.intakeMaxVelocity = 20;
   intakeControl.intakeon = true;
-  fishControl.move_to_angle(150);
   intakeControl.intakeon = false;
   intakeControl.intakeMaxVelocity = 70;
-  fishControl.move_to_angle(90);
   chassis.drive_distance(-5);
-  fishControl.move_to_angle(160);
   chassis.turn_to_angle(45);
   chassis.drive_distance(-47);
   wait(0.1, seconds);
@@ -109,14 +101,12 @@ void red_left_elims(){
 }
 
 void red_left_winpoint(){
-  fishMech.resetPosition();
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
   intakeControl.intakeon = false;
   chassis.drive_distance(-45);
   goalclamp.set(true);
   wait(0.2, seconds);
-  fishControl.move_to_angle(90);
   chassis.turn_to_angle(-83);
   intakeControl.intakeMaxVelocity = 70;
   intakeControl.intakeon = true;
@@ -124,7 +114,6 @@ void red_left_winpoint(){
   chassis.turn_to_angle(-20);
   chassis.drive_distance(40);
   wait(0.2, seconds);
-  doink.set(true);
   chassis.turn_to_angle(-170);
   chassis.turn_to_angle(-230);
   chassis.drive_distance(-10);

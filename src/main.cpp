@@ -3,7 +3,8 @@
 using namespace vex;
 competition Competition;
 
-bool doink_on = false;
+bool swing_on = false;
+bool goal_on = false;
 
 /*---------------------------------------------------------------------------*/
 /*                             VEXcode Config                                */
@@ -17,7 +18,6 @@ bool doink_on = false;
 /*  motors spin forward.                                                     */
 /*---------------------------------------------------------------------------*/
 IntakeControl intakeControl; // Define Intake Control here
-FishControl fishControl; // Define Intake Control here
 
 /*---------------------------------------------------------------------------*/
 /*                             JAR-Template Config                           */
@@ -49,13 +49,13 @@ ZERO_TRACKER_ODOM,
 //You will input whatever motor names you chose when you configured your robot using the sidebar configurer, they don't have to be "Motor1" and "Motor2".
 
 //Left Motors:
-motor_group(leftdrivefront,leftdriveback),
+motor_group(leftdrivefront,leftdrivemid,leftdriveback),
 
 //Right Motors:
-motor_group(rightdrivefront,rightdriveback),
+motor_group(rightdrivefront,rightdrivemid,rightdriveback),
 
 //Specify the PORT NUMBER of your inertial sensor, in PORT format (i.e. "PORT1", not simply "1"):
-PORT12,
+PORT13,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
 3.15,
@@ -119,34 +119,32 @@ int current_auton_selection = 0;
  * be more descriptive, if you like.
  */
 void buttonAEventHandler() {
-  intakeControl.holding = true;
-  Controller1.Screen.clearScreen();
-  Controller1.Screen.setCursor(1, 1);
-  Controller1.Screen.print("holding");
+  intakeControl.intakeReverse = true;
 }
 void buttonBEventHandler() {
-  intakeControl.holding = false;
-  Controller1.Screen.clearScreen();
-  Controller1.Screen.setCursor(1, 1);
-  Controller1.Screen.print("released");
+  intakeControl.intakeReverse = false;
 }
 
-void buttonDoinkYEventHandler() {
-  if (doink_on == true) {
-    doink_on = false;
-    doink.set(false);
+void buttonYEventHandler() {
+  if (swing_on == true) {
+    swing_on = false;
+    swingarm.set(false);
   }
   else{
-    doink_on = true;
-    doink.set(true);
+    swing_on = true;
+    swingarm.set(true);
   }
 }
 
 void buttonL1EventHandler() {
-  goalclamp.set(true);
-}
-void buttonL2EventHandler() {
-  goalclamp.set(false);
+  if (goal_on == true) {
+    goal_on = false;
+    goalclamp.set(true);
+  }
+  else {
+    goal_on = true;
+    goalclamp.set(false);
+  }
 }
 void buttonR1EventHandler() {
   if (!intakeControl.intakeon) {
@@ -156,15 +154,39 @@ void buttonR1EventHandler() {
     intakeControl.intakeon = false;
   }
 }
-void buttonR2EventHandler() {
-    if (fishControl.pos_num == 1) {
-      fishControl.move_to_angle(150);
-      fishControl.pos_num = 2;
-    }
-    else if (fishControl.pos_num == 2) {
-      fishControl.move_to_angle(170);
-      fishControl.pos_num = 1; 
-    }
+void buttonUpEventHandler() {
+  if (chassis.driveSpeedPercent == 0.6) {
+    chassis.driveSpeedPercent = 0.7;
+  }
+  if (chassis.driveSpeedPercent == 0.7) {
+    chassis.driveSpeedPercent = 0.8;
+  }
+  if (chassis.driveSpeedPercent == 0.8) {
+    chassis.driveSpeedPercent = 0.9;
+  }
+  if (chassis.driveSpeedPercent == 0.9) {
+    chassis.driveSpeedPercent = 1;
+  }
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1, 1);
+  Controller1.Screen.print(chassis.driveSpeedPercent);
+}
+void buttonDownEventHandler() {
+  if (chassis.driveSpeedPercent == 0.7) {
+    chassis.driveSpeedPercent = 0.6;
+  }
+  if (chassis.driveSpeedPercent == 0.8) {
+    chassis.driveSpeedPercent = 0.7;
+  }
+  if (chassis.driveSpeedPercent == 0.9) {
+    chassis.driveSpeedPercent = 0.8;
+  }
+  if (chassis.driveSpeedPercent == 1) {
+    chassis.driveSpeedPercent = 0.9;
+  }
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1, 1);
+  Controller1.Screen.print(chassis.driveSpeedPercent);
 }
 
 int intakeTaskFunctionUser() {
@@ -182,19 +204,9 @@ void pre_auton() {
   default_constants();
   chassis.set_coordinates(0, 0, 0);
   thread healthTask(healthCheck);
-  fishMech.resetPosition();
-  fishMech.setStopping(coast);
   intake.spin(forward);
-  fishMech.spin(forward);
-  fishMech.setVelocity(0, percent);
-  // aivisionsensor.startAwb();
-  // opticalsensor.integrationTime(5);
-  // opticalsensor.gestureDisable();
   intake.setVelocity(0, percent);
   intake.spin(forward);
-  // opticalsensor.setLight(ledState::on);
-  // opticalsensor.setLightPower(100.0, percent);
-  fishControl.pos_num = 1;
   while(!intakeControl.auto_on){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(5, 20, "JAR Template v1.2.0");
@@ -273,23 +285,15 @@ void usercontrol(void) {
   intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
   Controller1.ButtonA.pressed(buttonAEventHandler);
-  Controller1.ButtonA.pressed(buttonBEventHandler);
+  Controller1.ButtonB.pressed(buttonBEventHandler);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
-  Controller1.ButtonL2.pressed(buttonL2EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
-  Controller1.ButtonR2.pressed(buttonR2EventHandler);
-  Controller1.ButtonY.pressed(buttonDoinkYEventHandler);
+  Controller1.ButtonY.pressed(buttonYEventHandler);
+  Controller1.ButtonUp.pressed(buttonUpEventHandler);
+  Controller1.ButtonDown.pressed(buttonDownEventHandler);
   while (1) {
-    // Controller1.Screen.clearScreen();
-    // Controller1.Screen.setCursor(1,1);
-    // Controller1.Screen.print(intake.position(degrees));
-    // Tank drive control
     chassis.control_tank();
-    // float prev_time = Brain.Timer.time();
-    // float prev_right_pos = chassis.get_right_position_in();
-    // float prev_left_pos = chassis.get_left_position_in();
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
-    //chassis.pid_control_tank(prev_time, prev_right_pos, prev_left_pos);
   }
 }
 

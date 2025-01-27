@@ -2,11 +2,9 @@
 #include "JAR-Template/drive.h"
 #include "drive-functions.h"
 
-class FishControl;
 class IntakeControl;
 class Drive;
 
-extern FishControl fishControl;
 extern IntakeControl intakeControl;
 extern Drive chassis;
 

@@ -31,6 +31,7 @@ int gyro_port, float wheel_diameter, float wheel_ratio, float gyro_scale,
 int DriveLF_port, int DriveRF_port, int DriveLB_port, int DriveRB_port, 
 int ForwardTracker_port, float ForwardTracker_diameter, float ForwardTracker_center_distance, 
 int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_center_distance) :
+  driveSpeedPercent(0.6),
   wheel_diameter(wheel_diameter),
   wheel_ratio(wheel_ratio),
   gyro_scale(gyro_scale),
@@ -909,8 +910,8 @@ void Drive::control_holonomic_squared(){
 void Drive::control_tank(){
   float leftthrottle = deadband(controller(primary).Axis3.value(), 5);
   float rightthrottle = deadband(controller(primary).Axis2.value(), 5);
-  DriveL.spin(fwd, to_volt(leftthrottle), volt);
-  DriveR.spin(fwd, to_volt(rightthrottle), volt);
+  DriveL.spin(fwd, to_volt(leftthrottle * driveSpeedPercent), volt);
+  DriveR.spin(fwd, to_volt(rightthrottle * driveSpeedPercent), volt);
 }
 
 /**

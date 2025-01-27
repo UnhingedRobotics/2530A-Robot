@@ -31,6 +31,7 @@ private:
   vex:: triport ThreeWire = vex::triport(vex::PORT22);
 
 public: 
+  float driveSpeedPercent;
   drive_setup drive_setup = ZERO_TRACKER_NO_ODOM;
   motor_group DriveL;
   motor_group DriveR;

@@ -13,6 +13,7 @@ IntakeControl::IntakeControl() :
   ringdetected(false),
   intakeon(false),
   holding(false),
+  intakeReverse(false),
   intakeVelocity(0),
   intakeMaxVelocity(80),
   mode(INTAKE_COLOR_SORT),
@@ -104,7 +105,12 @@ void IntakeControl::colorSorting() {
       }
     }
     intake.spin(forward);
-    intake.setVelocity(intakeVelocity, percent);
+    if (!intakeReverse) {
+      intake.setVelocity(intakeVelocity, percent);
+    }
+    else {
+      intake.setVelocity(-intakeVelocity, percent);
+    }
 }
 
 void IntakeControl::intakeMove() {
@@ -151,47 +157,4 @@ void healthCheck() {
     }
     wait(5, seconds);
   }
-}
-
-void FishControl::set_arm_exit_conditions(float arm_settle_error, float arm_settle_time, float arm_timeout){
-  this->arm_settle_error = arm_settle_error;
-  this->arm_settle_time = arm_settle_time;
-  this->arm_timeout = arm_timeout;
-}
-
-void FishControl::set_arm_constants(float arm_max_voltage, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
-  this->arm_max_voltage = arm_max_voltage;
-  this->arm_kp = arm_kp;
-  this->arm_ki = arm_ki;
-  this->arm_kd = arm_kd;
-  this->arm_starti = arm_starti;
-}
-
-void FishControl::move_to_angle(float angle) {
-  move_to_angle(angle, arm_max_voltage, arm_settle_error, arm_settle_time, arm_timeout, arm_kp, arm_ki, arm_kd, arm_starti);
-}
-
-void FishControl::move_to_angle(float angle, float arm_max_voltage) {
-  move_to_angle(angle, arm_max_voltage, arm_settle_error, arm_settle_time, arm_timeout, arm_kp, arm_ki, arm_kd, arm_starti);
-}
-
-void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout) {
-  move_to_angle(angle, arm_max_voltage, arm_settle_error, arm_settle_time, arm_timeout, arm_kp, arm_ki, arm_kd, arm_starti);
-}
-
-void FishControl::move_to_angle(float angle, float arm_max_voltage, float arm_settle_error, float arm_settle_time, float arm_timeout, float arm_kp, float arm_ki, float arm_kd, float arm_starti) {
-  PID fishPID((angle - fmod(fishMech.position(degrees), 180)), arm_kp, arm_ki, arm_kd, arm_starti, arm_settle_error, arm_settle_time, arm_timeout);
-  while (!fishPID.is_settled()) {
-    float error = angle - fishMech.position(degrees);
-    float output = fishPID.compute(error);
-    output = clamp(output, -arm_max_voltage, arm_max_voltage);
-    fishMech.spin(fwd, output, volt);
-    task::sleep(10);
-  }
-  if (angle > 160) {
-    fishMech.setPosition((fishMech.position(degrees) - 180), degrees);
-  }   
-  fishMech.stop(brake);
-  fishMech.spin(forward);
-  fishMech.setVelocity(0, percent);
 }
