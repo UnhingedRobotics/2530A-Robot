@@ -15,7 +15,7 @@ IntakeControl::IntakeControl() :
   holding(false),
   intakeReverse(false),
   intakeVelocity(0),
-  intakeMaxVelocity(80),
+  intakeMaxVelocity(100),
   mode(INTAKE_COLOR_SORT),
   accuracyIntake(125),
   intakeFullRotation(2486.4),
@@ -41,7 +41,7 @@ void IntakeControl::updateControllerScreen(const char* message) {
 
 void IntakeControl::colorSorting() {
     if (!intakeon) {
-      intakeVelocity = 0;
+      intake.stop(coast);
     }
     else {
       intakeVelocity = intakeMaxVelocity;
@@ -103,25 +103,25 @@ void IntakeControl::colorSorting() {
           }     
         }
       }
-    }
-    intake.spin(forward);
-    if (!intakeReverse) {
-      intake.setVelocity(intakeVelocity, percent);
-    }
-    else {
-      intake.setVelocity(-intakeVelocity, percent);
+      intake.spin(forward);
+      if (!intakeReverse) {
+        intake.setVelocity(intakeVelocity, percent);
+      }
+      else {
+        intake.setVelocity(-intakeVelocity, percent);
+      }
     }
 }
 
 void IntakeControl::intakeMove() {
     if (!intakeon) {
-      intakeVelocity = 0;
+      intake.stop(coast);
     }
     else {
       intakeVelocity = intakeMaxVelocity;
+      intake.spin(forward);
+      intake.setVelocity(intakeVelocity, percent);
     }
-    intake.spin(forward);
-    intake.setVelocity(intakeVelocity, percent);
 }
 
 void healthCheck() {

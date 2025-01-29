@@ -12,15 +12,15 @@ brain  Brain;
 
 //Add your devices below, and don't forget to do the same in robot-config.h:
 controller Controller1 = controller(primary);
-motor intakeMotorA = motor(PORT9, ratio6_1, false);
-motor intakeMotorB = motor(PORT19, ratio6_1, true);
+motor intakeMotorA = motor(PORT9, ratio18_1, false);
+motor intakeMotorB = motor(PORT19, ratio18_1, true);
 motor_group intake = motor_group(intakeMotorA, intakeMotorB);
-motor leftdrivefront = motor(PORT1, ratio18_1, false);
-motor leftdrivemid = motor(PORT5, ratio18_1, false);
-motor leftdriveback = motor(PORT6, ratio18_1, false);
-motor rightdrivefront = motor(PORT11, ratio18_1, true);
-motor rightdrivemid = motor(PORT12, ratio18_1, true);
-motor rightdriveback = motor(PORT14, ratio18_1, true);
+motor leftdrivefront = motor(PORT1, ratio6_1, false);
+motor leftdrivemid = motor(PORT5, ratio6_1, false);
+motor leftdriveback = motor(PORT6, ratio6_1, false);
+motor rightdrivefront = motor(PORT11, ratio6_1, true);
+motor rightdrivemid = motor(PORT12, ratio6_1, true);
+motor rightdriveback = motor(PORT14, ratio6_1, true);
 digital_out goalclamp = digital_out(Brain.ThreeWirePort.G);
 digital_out swingarm = digital_out(Brain.ThreeWirePort.H);
 inertial leftinertialsensor = inertial(PORT7);

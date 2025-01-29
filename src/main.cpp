@@ -58,12 +58,12 @@ motor_group(rightdrivefront,rightdrivemid,rightdriveback),
 PORT13,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
-3.15,
+3.25,
 
 //External ratio, must be in decimal, in the format of input teeth/output teeth.
 //If your motor has an 84-tooth gear and your wheel has a 60-tooth gear, this value will be 1.4.
 //If the motor drives the wheel directly, this value is 1:
-1.6666666666,
+1,
 
 //Gyro scale, this is what your gyro reads when you spin the robot 360 degrees.
 //For most cases 360 will do fine here, but this scale factor can be very helpful when precision is necessary.
@@ -127,12 +127,17 @@ void buttonBEventHandler() {
 
 void buttonYEventHandler() {
   if (swing_on == true) {
+    intakeControl.intakeReverse = false;
     swing_on = false;
     swingarm.set(false);
   }
   else{
+    intakeControl.intakeReverse = true;
+    chassis.driveOveride = true;
+    chassis.turn_to_angle(180);
     swing_on = true;
     swingarm.set(true);
+    chassis.driveOveride = false;
   }
 }
 
@@ -206,7 +211,7 @@ void pre_auton() {
   thread healthTask(healthCheck);
   intake.spin(forward);
   intake.setVelocity(0, percent);
-  intake.spin(forward);
+  intake.setStopping(coast);
   while(!intakeControl.auto_on){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(5, 20, "JAR Template v1.2.0");
@@ -292,7 +297,7 @@ void usercontrol(void) {
   Controller1.ButtonUp.pressed(buttonUpEventHandler);
   Controller1.ButtonDown.pressed(buttonDownEventHandler);
   while (1) {
-    chassis.control_tank();
+    chassis.control_tank(chassis.driveSpeedPercent, chassis.driveOveride);
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
 }

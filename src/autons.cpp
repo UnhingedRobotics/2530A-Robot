@@ -23,11 +23,11 @@ int intakeTaskFunction() {
 
 void default_constants(){
   // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
-  chassis.set_drive_constants(10, 1.2, 0, 10, 0);
-  chassis.set_heading_constants(6, .4, 0, 1, 0);
+  chassis.set_drive_constants(10, 1, 0, 10, 0);
+  chassis.set_heading_constants(7, .1, 0, 1, 0);
   chassis.set_v_drive_constants(10, 1.2, 0, 10, 0);
   chassis.set_v_heading_constants(6, .4, 0, 1, 0);
-  chassis.set_turn_constants(12, .4, .03, 3, 15);
+  chassis.set_turn_constants(7, .17, 0.02, 0.8, 15);
   chassis.set_swing_constants(12, .3, .001, 2, 15);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
@@ -45,11 +45,11 @@ void default_constants(){
 
 void odom_constants(){
   default_constants();
-  chassis.heading_max_voltage = 5;
-  chassis.drive_max_voltage = 7;
-  chassis.drive_kp = 0.8;
-  chassis.drive_kd = 0;
-  chassis.heading_kp = .25;
+  // chassis.heading_max_voltage = 7;
+  // chassis.drive_max_voltage = 10;
+  // chassis.drive_kp = 0.7;
+  // chassis.drive_kd = 0;
+  // chassis.heading_kp = .15;
   // chassis.drive_settle_error = 3;
   // chassis.boomerang_lead = .5;
   chassis.drive_min_voltage = 0;
@@ -122,7 +122,8 @@ void red_left_winpoint(){
 
 void blue_left_elims(){
   chassis.set_coordinates(-53.686, 14.646, 180);
-
+  Controller1.Screen.clearScreen();
+  Controller1.Screen.setCursor(1,1);
   task intakeTask(intakeTaskFunction);
   intakeControl.team = false;
   intakeControl.intakeon = false;

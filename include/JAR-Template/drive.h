@@ -31,6 +31,7 @@ private:
   vex:: triport ThreeWire = vex::triport(vex::PORT22);
 
 public: 
+  float driveOveride;
   float driveSpeedPercent;
   drive_setup drive_setup = ZERO_TRACKER_NO_ODOM;
   motor_group DriveL;
@@ -182,7 +183,7 @@ public:
 
   void control_arcade();
   void control_arcade_squared();
-  void control_tank();
+  void control_tank(float speed, float overide);
   void control_tank_squared();
   void pid_control_tank(float prev_time, float prev_right_pos, float prev_left_pos);
   void control_holonomic();
