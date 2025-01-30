@@ -4,7 +4,10 @@
 
 using namespace vex;
 double intakeInitPos;
-
+// first hook 1230.4 degrees
+// second hook 594.80 degrees
+// third hook 1952.0 degrees
+// fourth hook 2520.4 degrees
 // Constructor with initializer list to initialize member variables
 IntakeControl::IntakeControl() :
   hue(0.0),

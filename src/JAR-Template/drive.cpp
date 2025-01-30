@@ -625,13 +625,13 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
     float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
     float reverse_angle = angle;
     float heading_error = reduce_negative_180_to_180(angle - get_absolute_heading());
-	if (reverse_angle > 0) {
-	  reverse_angle = -(180 - angle);
-	}
-	else {
-	  reverse_angle = (180 + angle);
-	}
-	float reverse_heading_error = reduce_negative_180_to_180(reverse_angle - get_absolute_heading());
+    if (reverse_angle > 0) {
+      reverse_angle = -(180 - angle);
+    }
+    else {
+      reverse_angle = (180 + angle);
+    }
+    float reverse_heading_error = reduce_negative_180_to_180(reverse_angle - get_absolute_heading());
     if (fabs(reverse_heading_error) < fabs(heading_error)) {
       heading_error = reverse_heading_error;
       drive_error = -drive_error;
@@ -646,6 +646,9 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
     drive_output = clamp_min_voltage(drive_output, drive_min_voltage);
     drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
     task::sleep(10);
+    // Controller1.Screen.clearScreen();
+    // Controller1.Screen.setCursor(1, 1);
+    // Controller1.Screen.print(get_Y_position());
   }
 }
 
@@ -755,9 +758,11 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed){
 }
 
 void Drive::turn_to_point(float X_position, float Y_position, bool reversed, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti){
-  PID turnPID(reduce_negative_180_to_180(to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position()))) - get_absolute_heading()), turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
   if (!reversed) {
-    while (!turnPID.is_settled()) {
+    float start_angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
+    float start_error = reduce_negative_180_to_180(start_angle - get_absolute_heading());
+    PID turnPID(start_error, turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
+    while(!turnPID.is_settled()){
       float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
       float error = reduce_negative_180_to_180(angle - get_absolute_heading());
       float output = turnPID.compute(error);
@@ -767,6 +772,15 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed, flo
     }
   }
   else {
+    float start_angle = to_deg(atan2(X_position-get_X_position(), Y_position-get_Y_position()));
+    float start_error = reduce_negative_180_to_180(start_angle - get_absolute_heading());
+    if (start_angle > 0) {
+	  start_angle = -(180 - start_angle);
+    }
+    else {
+	  start_angle = (180 + start_angle);
+    }
+    PID turnPID(start_error, turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
     while(!turnPID.is_settled()){
       float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
 	  if (angle > 0) {
@@ -783,7 +797,6 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed, flo
     }
   }
 }
-
 /**
  * Drives and turns simultaneously to a desired pose.
  * Uses two PID loops, one drive and one heading to drive and turn
