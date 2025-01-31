@@ -121,8 +121,6 @@ void red_left_winpoint(){
   intakeControl.intakeon = false;
   chassis.drive_to_point(-10.266, 24.17);
   chassis.drive_with_voltage(0,0);
-
-
 }
 
 void red_right_2_ring(){
