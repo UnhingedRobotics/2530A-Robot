@@ -227,25 +227,31 @@ void pre_auton() {
     Brain.Screen.printAt(5, 160, "Selected Auton:");
     switch(current_auton_selection){
       case 0:
-        Brain.Screen.printAt(5, 180, "Red Left Elims");
+        Brain.Screen.printAt(5, 180, "Red Left 4 Ring");
         break;
       case 1:
         Brain.Screen.printAt(5, 180, "Red Left Winpoint");
         break;
       case 2:
-        Brain.Screen.printAt(5, 180, "Blue Left Elims");
+        Brain.Screen.printAt(5, 180, "Red Right 2 Ring");
         break;
       case 3:
-        Brain.Screen.printAt(5, 180, "Blue Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Blue Right 4 Ring");
         break;
       case 4:
+        Brain.Screen.printAt(5, 180, "Blue Right Winpoint");
+        break;
+      case 5:
+        Brain.Screen.printAt(5, 180, "Blue Left 2 Ring");
+        break;
+      case 6:
         Brain.Screen.printAt(5, 180, "Skills Left Winpoint");
         break;
     }
     if(Brain.Screen.pressing()){
       while(Brain.Screen.pressing()) {}
       current_auton_selection ++;
-    } else if (current_auton_selection == 5){
+    } else if (current_auton_selection == 7){
       current_auton_selection = 0;
     }
     task::sleep(10);
@@ -263,18 +269,24 @@ void autonomous(void) {
   intakeControl.auto_on = true;
   switch(current_auton_selection){ 
     case 0:
-      red_left_elims();
+      red_left_4_ring();
       break;
     case 1:         
       red_left_winpoint();
       break;
     case 2:
-      blue_left_elims();
+      red_right_2_ring();
       break;
     case 3:
-      blue_left_winpoint();
+      blue_right_4_ring();
       break;
-    case 4:
+    case 4:         
+      blue_right_winpoint();
+      break;
+    case 5:
+      blue_left_2_ring();
+      break;
+    case 6:
       skills();
       break;
  }
