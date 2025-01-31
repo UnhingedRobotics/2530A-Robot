@@ -23,8 +23,8 @@ int intakeTaskFunction() {
 
 void default_constants(){
   // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
-  chassis.set_drive_constants(10, 1.1, 0, 10, 0);
-  chassis.set_heading_constants(7, 1, 0, 2, 0);
+  chassis.set_drive_constants(10, 1.05, 0, 10, 0);
+  chassis.set_heading_constants(7, 1, 0, 4, 0);
   chassis.set_v_drive_constants(10, 1.2, 0, 10, 0);
   chassis.set_v_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(7, .17, 0.02, 0.8, 15);
@@ -59,46 +59,7 @@ void odom_constants(){
  * The expected behavior is to return to the start position.
  */
 
-void red_left_elims(){
-  chassis.set_coordinates(-59.13, -23.701, -90);
-  task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
-  intakeControl.intakeon = false;
-  odom_constants();
-  chassis.turn_to_point(-58.733, -23.701, false);
-  chassis.drive_to_point(-22.78, -23.701);
-  goalclamp.set(true);
-  wait(0.3, seconds);
-  chassis.turn_to_point(-22.78, -46.545);
-  intakeControl.intakeon = true;
-  chassis.drive_to_point(-22.78, -46.545);
-  chassis.turn_to_point(-23.376, -13.372);
-  chassis.drive_to_point(-23.376, -13.372);
-  intakeControl.intakeon = false;
-  chassis.drive_with_voltage(0,0);
-}
-
-void red_left_winpoint(){
-  task intakeTask(intakeTaskFunction);
-  intakeControl.team = true;
-  intakeControl.intakeon = false;
-  chassis.drive_distance(-45);
-  goalclamp.set(true);
-  wait(0.2, seconds);
-  chassis.turn_to_angle(-83);
-  intakeControl.intakeMaxVelocity = 70;
-  intakeControl.intakeon = true;
-  chassis.drive_distance(20);
-  chassis.turn_to_angle(-20);
-  chassis.drive_distance(40);
-  wait(0.2, seconds);
-  chassis.turn_to_angle(-170);
-  chassis.turn_to_angle(-230);
-  chassis.drive_distance(-10);
-  intakeControl.intakeon = false;
-}
-
-void blue_left_elims(){
+void red_left_4_ring(){
   chassis.set_coordinates(-59.13, 24.567, -90);
   task intakeTask(intakeTaskFunction);
   intakeControl.team = false;
@@ -119,13 +80,78 @@ void blue_left_elims(){
   chassis.drive_to_point(-7.485, 43.637);
   chassis.turn_to_point(-10.666, 24.311);
   intakeControl.intakeon = false;
+  chassis.drive_max_voltage = 7;
   chassis.drive_to_point(-10.666, 24.311);
+  chassis.drive_with_voltage(0,0);
+}
+void red_left_winpoint(){
+  chassis.set_coordinates(-52.575, 12.053, 180);
+  task intakeTask(intakeTaskFunction);
+  intakeControl.team = false;
+  intakeControl.intakeon = false;
+  odom_constants();
+
+  chassis.turn_to_point(-52.178, -0.262);
+  chassis.drive_to_point(-52.178, -0.262);
+  chassis.turn_to_point(-59.528, -0.262, true);
+  chassis.drive_max_voltage = 7;
+  chassis.drive_to_point(-59.528, -0.262);
+  intakeControl.intakeon = true;
+  wait(0.5, seconds);
+  intakeControl.intakeReverse = true;
+  wait(0.2, seconds);
+  intakeControl.intakeReverse = false;
+  intakeControl.intakeon = false;
+  chassis.turn_to_point(-45.226, -0.461);
+  chassis.drive_max_voltage = 10;
+  chassis.drive_to_point(-45.226, -0.461);
+  chassis.turn_to_point(-22.978, 23.574, true);
+  chassis.drive_to_point(-22.978, 23.574);
+  goalclamp.set(true);
+  wait(0.3, seconds);
+  chassis.turn_to_point(-23.376, 50.39);
+  intakeControl.intakeon = true;
+  chassis.drive_to_point(-23.376, 50.39);
+  chassis.turn_to_point(-10.067, 50.589);
+  chassis.drive_to_point(-10.067, 50.589);
+  chassis.turn_to_point(-15.232, 41.849, true);
+  chassis.drive_to_point(-15.232, 41.849);
+  chassis.turn_to_point(-10.266, 24.17);
+  chassis.drive_max_voltage = 7;
+  intakeControl.intakeon = false;
+  chassis.drive_to_point(-10.266, 24.17);
   chassis.drive_with_voltage(0,0);
 
 
 }
 
-void blue_left_winpoint(){
+void red_right_2_ring(){
+  chassis.set_coordinates(-59.13, -23.701, -90);
+  task intakeTask(intakeTaskFunction);
+  intakeControl.team = false;
+  intakeControl.intakeon = false;
+  odom_constants();
+  chassis.turn_to_point(-23.773, -23.503, true);
+  chassis.drive_to_point(-23.773, -23.503);
+  goalclamp.set(true);
+  wait(0.3, seconds);
+  chassis.turn_to_point(-23.972, -46.743);
+  intakeControl.intakeon = true;
+  chassis.drive_to_point(-23.972, -46.743);
+  chassis.turn_to_point(-23.376, -10.194);
+  chassis.drive_max_voltage = 7;
+  chassis.drive_to_point(-23.376, -10.194);
+  intakeControl.intakeon = false;
+  chassis.drive_with_voltage(0, 0);
+}
+
+void blue_right_4_ring(){
+}
+
+void blue_right_winpoint(){
+}
+
+void blue_left_2_ring(){
 }
 
 void skills(){
@@ -187,6 +213,4 @@ void skills(){
   chassis.turn_to_point(57.939, 58.424);
   chassis.drive_to_point(57.939, 58.424);
   chassis.drive_with_voltage(0,0);
-
-
 }
