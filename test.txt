@@ -1,0 +1,50 @@
+if button pressed:
+	if (ringdetected) {
+    		rotate intake 900 degrees
+		stop intake
+	if button pressed again
+		raise arm
+		set intake velocity -1
+	if button pressed again
+		time out 3sec
+		reeverse intake to score
+		arm down
+		intake velocity -1
+
+	
+}
+
+hook1 = 1200 deg;
+hook2 = 600 deg;
+hook3 = 2400 deg;
+hook4 = 2000 deg;
+aisensor = 600 deg;
+accuracy = 50 degrees;
+hook full rotation = 2600;
+
+array hooks [ hook1, hook2, hook3, hook4 ];
+holding () {
+	for i = 0 (i in hooks.length) {
+		if (ringdetected) {
+			if (hooks.i ~~ mod(intake.position, hook full rotation)) {
+				intake.stop; 
+			}
+		}
+	}
+}
+sort () {
+	for i = 0 (i in hooks.length) {
+		if (!ringdetected) {
+			if (hooks.i >= mod(intake.position, hook full rotation) - accurac) {
+				intake.reverse;
+				intake.start;
+			}
+		}
+	}
+}
+
+
+buttonA.pressed() {
+  holding(); 
+}
+

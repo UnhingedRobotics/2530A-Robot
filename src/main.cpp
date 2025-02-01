@@ -119,20 +119,20 @@ int current_auton_selection = 0;
  * be more descriptive, if you like.
  */
 void buttonAEventHandler() {
-  intakeControl.intakeReverse = true;
+  intakeControl.reverse = true;
 }
 void buttonBEventHandler() {
-  intakeControl.intakeReverse = false;
+  intakeControl.reverse = false;
 }
 
 void buttonYEventHandler() {
   if (swing_on == true) {
-    intakeControl.intakeReverse = false;
+    intakeControl.reverse = false;
     swing_on = false;
     swingarm.set(false);
   }
   else{
-    intakeControl.intakeReverse = true;
+    intakeControl.reverse = true;
     chassis.driveOveride = true;
     chassis.turn_to_angle(180);
     swing_on = true;
@@ -152,11 +152,11 @@ void buttonL1EventHandler() {
   }
 }
 void buttonR1EventHandler() {
-  if (!intakeControl.intakeon) {
-    intakeControl.intakeon = true;
+  if (!intakeControl.on) {
+    intakeControl.on = true;
   }
   else {
-    intakeControl.intakeon = false;
+    intakeControl.on = false;
   }
 }
 void buttonUpEventHandler() {
