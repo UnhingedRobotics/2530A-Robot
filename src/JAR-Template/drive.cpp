@@ -620,7 +620,7 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
   }
   PID headingPID(start_heading_error, heading_kp, heading_ki, heading_kd, heading_starti);
   PID drivePID(start_drive_error, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
-  while(hypot(X_position - get_X_position(), Y_position - get_Y_position()) > 1.2){
+  while(hypot(X_position - get_X_position(), Y_position - get_Y_position()) > 1.5){
     float drive_error = hypot(X_position-get_X_position(), Y_position-get_Y_position());
     float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
     float reverse_angle = angle;

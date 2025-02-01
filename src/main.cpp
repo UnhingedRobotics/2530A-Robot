@@ -58,7 +58,7 @@ motor_group(rightdrivefront,rightdrivemid,rightdriveback),
 PORT13,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
-3.15,
+3.2,
 
 //External ratio, must be in decimal, in the format of input teeth/output teeth.
 //If your motor has an 84-tooth gear and your wheel has a 60-tooth gear, this value will be 1.4.
@@ -119,10 +119,13 @@ int current_auton_selection = 0;
  * be more descriptive, if you like.
  */
 void buttonAEventHandler() {
+  if (intakeControl.reverse) {
+    intakeControl.reverse = false;
+  }
+  else {
+    intakeControl.reverse = true;
+  }
   intakeControl.reverse = true;
-}
-void buttonBEventHandler() {
-  intakeControl.reverse = false;
 }
 
 void buttonYEventHandler() {
@@ -130,14 +133,24 @@ void buttonYEventHandler() {
     intakeControl.reverse = false;
     swing_on = false;
     swingarm.set(false);
+    leftdrivefront.stop(coast);
+    leftdrivemid.stop(coast);
+    leftdriveback.stop(coast);
+    rightdrivefront.stop(coast);
+    rightdrivemid.stop(coast);
+    rightdriveback.stop(coast);
   }
   else{
     intakeControl.reverse = true;
-    chassis.driveOveride = true;
-    chassis.turn_to_angle(180);
     swing_on = true;
     swingarm.set(true);
-    chassis.driveOveride = false;
+    intakeControl.holding = false;
+    leftdrivefront.stop(hold);
+    leftdrivemid.stop(hold);
+    leftdriveback.stop(hold);
+    rightdrivefront.stop(hold);
+    rightdrivemid.stop(hold);
+    rightdriveback.stop(hold);
   }
 }
 
@@ -197,10 +210,10 @@ void buttonDownEventHandler() {
 int intakeTaskFunctionUser() {
     while (true) {
       intakeControl.colorSorting();
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1, 1);
-      Controller1.Screen.print(intake.position(degrees));
-      wait(20, msec); // Small delay to avoid resource overuse
+      // Controller1.Screen.clearScreen();
+      // Controller1.Screen.setCursor(1, 1);
+      // Controller1.Screen.print(intake.position(degrees));
+      wait(10, msec); // Small delay to avoid resource overuse
     }
 
     return 0; // End of the task
@@ -230,28 +243,34 @@ void pre_auton() {
         Brain.Screen.printAt(5, 180, "Red Left 4 Ring");
         break;
       case 1:
-        Brain.Screen.printAt(5, 180, "Red Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Red Left 2 Ring");
         break;
       case 2:
-        Brain.Screen.printAt(5, 180, "Red Right 2 Ring");
+        Brain.Screen.printAt(5, 180, "Red Left Winpoint");
         break;
       case 3:
-        Brain.Screen.printAt(5, 180, "Blue Right 4 Ring");
+        Brain.Screen.printAt(5, 180, "Red Right 2 Ring");
         break;
       case 4:
-        Brain.Screen.printAt(5, 180, "Blue Right Winpoint");
+        Brain.Screen.printAt(5, 180, "Blue Right 4 Ring");
         break;
       case 5:
-        Brain.Screen.printAt(5, 180, "Blue Left 2 Ring");
+        Brain.Screen.printAt(5, 180, "Blue Right 2 Ring");
         break;
       case 6:
-        Brain.Screen.printAt(5, 180, "Skills Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Blue Right Winpoint");
+        break;
+      case 7:
+        Brain.Screen.printAt(5, 180, "Blue Left 2 Ring");
+        break;
+      case 8:
+        Brain.Screen.printAt(5, 180, "Skills");
         break;
     }
     if(Brain.Screen.pressing()){
       while(Brain.Screen.pressing()) {}
       current_auton_selection ++;
-    } else if (current_auton_selection == 7){
+    } else if (current_auton_selection == 9){
       current_auton_selection = 0;
     }
     task::sleep(10);
@@ -271,22 +290,28 @@ void autonomous(void) {
     case 0:
       red_left_4_ring();
       break;
-    case 1:         
+    case 1:
+      red_left_2_ring();
+      break;
+    case 2:         
       red_left_winpoint();
       break;
-    case 2:
+    case 3:
       red_right_2_ring();
       break;
-    case 3:
+    case 4:
       blue_right_4_ring();
       break;
-    case 4:         
+    case 5:
+      blue_right_2_ring();
+      break;
+    case 6:         
       blue_right_winpoint();
       break;
-    case 5:
+    case 7:
       blue_left_2_ring();
       break;
-    case 6:
+    case 8:
       skills();
       break;
  }
@@ -305,7 +330,6 @@ void usercontrol(void) {
   intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
   Controller1.ButtonA.pressed(buttonAEventHandler);
-  Controller1.ButtonB.pressed(buttonBEventHandler);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonY.pressed(buttonYEventHandler);
