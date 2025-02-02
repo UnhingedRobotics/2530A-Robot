@@ -26,6 +26,7 @@ IntakeControl::IntakeControl() :
   thirdHook(1822.40),
   fourthHook(2470.80),
   holdingPos(1000),
+  stuckOveride(true),
   hookPositions{firstHook, secondHook, thirdHook, fourthHook}
 {}
 
@@ -65,20 +66,30 @@ void IntakeControl::colorSorting() {
             }
           }
         }
-        if (holding) {
-          for (size_t i = 0; i < hookPositions.size(); i++) {
-            if (fabs(fmod(intake.position(degrees), fullRotation) - hookPositions[i]) <= accuracy) {
-              on = false;
+        else {
+          if (holding) {
+            for (size_t i = 0; i < hookPositions.size(); i++) {
+              if (fabs(fmod(intake.position(degrees), fullRotation) - hookPositions[i]) <= accuracy) {
+                on = false;
+              }
             }
           }
         }
       }
       intake.spin(forward);
-      if (!reverse) {
+      if (reverse) {
+        velocity = -velocity;
+      }
+      if (fabs(intake.velocity(rpm)) > 50) {
         intake.setVelocity(velocity, percent);
       }
       else {
-        intake.setVelocity(-velocity, percent);
+        if (!stuckOveride) {
+          intake.setVelocity(-velocity, percent);
+        }
+        else {
+          intake.setVelocity(velocity, percent);
+        }
       }
     }
 }

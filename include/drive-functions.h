@@ -23,7 +23,7 @@ public:
   const double thirdHook;
   const double fourthHook;
   const double holdingPos; 
-  
+  bool stuckOveride; 
   const std::array<double, 4> hookPositions;
 
   IntakeControl(); // Constructor with an initializer list

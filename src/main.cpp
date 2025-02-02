@@ -119,13 +119,21 @@ int current_auton_selection = 0;
  * be more descriptive, if you like.
  */
 void buttonAEventHandler() {
-  if (intakeControl.reverse) {
+  if (!swing_on) {
     intakeControl.reverse = false;
   }
   else {
     intakeControl.reverse = true;
   }
-  intakeControl.reverse = true;
+}
+
+void buttonBEventHandler() {
+  if (!swing_on) {
+    intakeControl.reverse = true;
+  }
+  else {
+    intakeControl.reverse = false;
+  }
 }
 
 void buttonYEventHandler() {
@@ -330,6 +338,7 @@ void usercontrol(void) {
   intakeControl.auto_on = false;
   thread intakeTask(intakeTaskFunctionUser);
   Controller1.ButtonA.pressed(buttonAEventHandler);
+  Controller1.ButtonB.pressed(buttonBEventHandler);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
   Controller1.ButtonY.pressed(buttonYEventHandler);
