@@ -54,8 +54,11 @@ motor_group(leftdrivefront,leftdrivemid,leftdriveback),
 //Right Motors:
 motor_group(rightdrivefront,rightdrivemid,rightdriveback),
 
+TWO,
 //Specify the PORT NUMBER of your inertial sensor, in PORT format (i.e. "PORT1", not simply "1"):
 PORT13,
+
+PORT7,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
 3.2,
@@ -67,6 +70,8 @@ PORT13,
 
 //Gyro scale, this is what your gyro reads when you spin the robot 360 degrees.
 //For most cases 360 will do fine here, but this scale factor can be very helpful when precision is necessary.
+358.2,
+
 360,
 
 /*---------------------------------------------------------------------------*/

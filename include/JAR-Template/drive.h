@@ -8,6 +8,7 @@ extern MP mp;
 enum drive_setup {ZERO_TRACKER_NO_ODOM, ZERO_TRACKER_ODOM, TANK_ONE_FORWARD_ENCODER, TANK_ONE_FORWARD_ROTATION, 
 TANK_ONE_SIDEWAYS_ENCODER, TANK_ONE_SIDEWAYS_ROTATION, TANK_TWO_ENCODER, TANK_TWO_ROTATION, 
 HOLONOMIC_TWO_ENCODER, HOLONOMIC_TWO_ROTATION};
+enum gyro_setup {ONE, TWO};
 
 /**
  * Drive class supporting tank and holo drive, with or without odom.
@@ -19,7 +20,8 @@ class Drive
 private:
   float wheel_diameter;
   float wheel_ratio;
-  float gyro_scale;
+  float gyro_one_scale;
+  float gyro_two_scale;
   float drive_in_to_deg_ratio;
   float ForwardTracker_center_distance;
   float ForwardTracker_diameter;
@@ -36,7 +38,9 @@ public:
   drive_setup drive_setup = ZERO_TRACKER_NO_ODOM;
   motor_group DriveL;
   motor_group DriveR;
-  inertial Gyro;
+  gyro_setup gyro_setup = ONE;
+  inertial GyroOne;
+  inertial GyroTwo;
   motor DriveLF;
   motor DriveRF;
   motor DriveLB;
@@ -100,7 +104,7 @@ public:
   float boomerang_lead;
   float boomerang_setback;
 
-  Drive(enum::drive_setup drive_setup, motor_group DriveL, motor_group DriveR, int gyro_port, float wheel_diameter, float wheel_ratio, float gyro_scale, int DriveLF_port, int DriveRF_port, int DriveLB_port, int DriveRB_port, int ForwardTracker_port, float ForwardTracker_diameter, float ForwardTracker_center_distance, int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_center_distance);
+  Drive(enum::drive_setup drive_setup, motor_group DriveL, motor_group DriveR, enum::gyro_setup gyro_setup, int gyro_one_port, int gyro_two_port, float wheel_diameter, float wheel_ratio, float gyro_one_scale, float gyro_two_scale, int DriveLF_port, int DriveRF_port, int DriveLB_port, int DriveRB_port, int ForwardTracker_port, float ForwardTracker_diameter, float ForwardTracker_center_distance, int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_center_distance);
 
   void drive_with_voltage(float leftVoltage, float rightVoltage);
 

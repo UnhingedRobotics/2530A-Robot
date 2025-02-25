@@ -26,8 +26,8 @@ MP mp;
  * @param SidewaysTracker_center_distance Vertical distance in inches.
  */
 
-Drive::Drive(enum::drive_setup drive_setup, motor_group DriveL, motor_group DriveR, 
-int gyro_port, float wheel_diameter, float wheel_ratio, float gyro_scale, 
+Drive::Drive(enum::drive_setup drive_setup, motor_group DriveL, motor_group DriveR, enum::gyro_setup gyro_setup, 
+int gyro_one_port,  int gyro_two_port, float wheel_diameter, float wheel_ratio, float gyro_one_scale, float gyro_two_scale, 
 int DriveLF_port, int DriveRF_port, int DriveLB_port, int DriveRB_port, 
 int ForwardTracker_port, float ForwardTracker_diameter, float ForwardTracker_center_distance, 
 int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_center_distance) :
@@ -35,7 +35,8 @@ int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_
   driveOveride(false),
   wheel_diameter(wheel_diameter),
   wheel_ratio(wheel_ratio),
-  gyro_scale(gyro_scale),
+  gyro_one_scale(gyro_one_scale),
+  gyro_two_scale(gyro_two_scale),
   drive_in_to_deg_ratio(wheel_ratio/360.0*M_PI*wheel_diameter),
   ForwardTracker_center_distance(ForwardTracker_center_distance),
   ForwardTracker_diameter(ForwardTracker_diameter),
@@ -46,7 +47,9 @@ int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_
   drive_setup(drive_setup),
   DriveL(DriveL),
   DriveR(DriveR),
-  Gyro(inertial(gyro_port)),
+  gyro_setup(gyro_setup),
+  GyroOne(inertial(gyro_one_port)),
+  GyroTwo(inertial(gyro_two_port)),
   DriveLF(abs(DriveLF_port), is_reversed(DriveLF_port)),
   DriveRF(abs(DriveRF_port), is_reversed(DriveRF_port)),
   DriveLB(abs(DriveLB_port), is_reversed(DriveLB_port)),
@@ -235,7 +238,12 @@ void Drive::set_swing_exit_conditions(float swing_settle_error, float swing_sett
  */
 
 float Drive::get_absolute_heading(){ 
-  return( reduce_0_to_360( Gyro.rotation()*360.0/gyro_scale ) ); 
+  if (gyro_setup==ONE){
+    return(reduce_0_to_360(GyroOne.rotation()*360.0/gyro_one_scale));
+  }
+  else {
+    return( reduce_0_to_360( (GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale) / 2 ) );
+  }
 }
 
 /**
@@ -306,6 +314,7 @@ void Drive::turn_to_angle(float angle, float turn_max_voltage, float turn_settle
     drive_with_voltage(output, -output);
     task::sleep(10);
   }
+  drive_with_voltage(0,0);
 }
 
 /**
@@ -544,7 +553,12 @@ void Drive::position_track(){
  */
 
 void Drive::set_heading(float orientation_deg){
-  Gyro.setRotation(orientation_deg*gyro_scale/360.0, deg);
+  if (gyro_setup==ONE){
+    GyroOne.setRotation(orientation_deg*gyro_one_scale/360.0, deg);
+  }
+  else {
+    GyroTwo.setRotation(orientation_deg*gyro_two_scale/360.0, deg);
+  }
 }
 
 /**

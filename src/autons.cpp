@@ -23,12 +23,12 @@ int intakeTaskFunction() {
 
 void default_constants(){
   // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
-  chassis.set_drive_constants(10, 1.05, 0.002, 10, 15);
+  chassis.set_drive_constants(10, 1.05, 0, 10, 0);
   chassis.set_heading_constants(6.5, 0.8, 0, 9, 0);
   chassis.set_v_drive_constants(10, 1.2, 0, 10, 0);
   chassis.set_v_heading_constants(6, .4, 0, 1, 0);
   chassis.set_turn_constants(6.5, 0.8, 0, 9, 0);
-  chassis.set_swing_constants(12, .3, .001, 0, 15);
+  chassis.set_swing_constants(12, .3, .0013, 0, 15);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_drive_exit_conditions(0.6, 300, 5000);
@@ -58,12 +58,13 @@ void testing(){
   default_constants();
   chassis.heading_max_voltage = 12;
   chassis.drive_max_voltage = 12;
-  chassis.drive_kp = 0.55;
-  chassis.drive_kd = 0.05;
+  chassis.turn_max_voltage = 12;
+  chassis.drive_kp = 2;
+  chassis.drive_kd = 1.4;
   chassis.heading_kp = .05;
   chassis.heading_kd = 0;
   chassis.turn_kp = .25;
-  chassis.turn_kd = 0.8;
+  chassis.turn_kd = 2.2;
   chassis.drive_min_voltage = 0;
 }
 void test() {
