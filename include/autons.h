@@ -10,6 +10,7 @@ extern Drive chassis;
 
 void default_constants();
 
+void test();
 void red_left_4_ring();
 void red_left_winpoint();
 void red_left_2_ring();

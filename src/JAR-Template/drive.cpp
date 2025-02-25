@@ -646,10 +646,8 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
     drive_output = clamp_min_voltage(drive_output, drive_min_voltage);
     drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
     task::sleep(10);
-    // Controller1.Screen.clearScreen();
-    // Controller1.Screen.setCursor(1, 1);
-    // Controller1.Screen.print(get_Y_position());
   }
+  chassis.drive_with_voltage(0,0);
 }
 
 /**
@@ -796,6 +794,7 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed, flo
       task::sleep(10);
     }
   }
+  chassis.drive_with_voltage(0,0);
 }
 /**
  * Drives and turns simultaneously to a desired pose.

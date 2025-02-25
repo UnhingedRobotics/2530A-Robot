@@ -248,37 +248,40 @@ void pre_auton() {
     Brain.Screen.printAt(5, 160, "Selected Auton:");
     switch(current_auton_selection){
       case 0:
-        Brain.Screen.printAt(5, 180, "Red Left 4 Ring");
+        Brain.Screen.printAt(5, 180, "Test");
         break;
       case 1:
-        Brain.Screen.printAt(5, 180, "Red Left 2 Ring");
+        Brain.Screen.printAt(5, 180, "Red Left 4 Ring");
         break;
       case 2:
-        Brain.Screen.printAt(5, 180, "Red Left Winpoint");
+        Brain.Screen.printAt(5, 180, "Red Left 2 Ring");
         break;
       case 3:
-        Brain.Screen.printAt(5, 180, "Red Right 2 Ring");
+        Brain.Screen.printAt(5, 180, "Red Left Winpoint");
         break;
       case 4:
-        Brain.Screen.printAt(5, 180, "Blue Right 4 Ring");
+        Brain.Screen.printAt(5, 180, "Red Right 2 Ring");
         break;
       case 5:
-        Brain.Screen.printAt(5, 180, "Blue Right 2 Ring");
+        Brain.Screen.printAt(5, 180, "Blue Right 4 Ring");
         break;
       case 6:
-        Brain.Screen.printAt(5, 180, "Blue Right Winpoint");
+        Brain.Screen.printAt(5, 180, "Blue Right 2 Ring");
         break;
       case 7:
-        Brain.Screen.printAt(5, 180, "Blue Left 2 Ring");
+        Brain.Screen.printAt(5, 180, "Blue Right Winpoint");
         break;
       case 8:
+        Brain.Screen.printAt(5, 180, "Blue Left 2 Ring");
+        break;
+      case 9:
         Brain.Screen.printAt(5, 180, "Skills");
         break;
     }
     if(Brain.Screen.pressing()){
       while(Brain.Screen.pressing()) {}
       current_auton_selection ++;
-    } else if (current_auton_selection == 9){
+    } else if (current_auton_selection == 10){
       current_auton_selection = 0;
     }
     task::sleep(10);
@@ -296,30 +299,33 @@ void autonomous(void) {
   intakeControl.auto_on = true;
   switch(current_auton_selection){ 
     case 0:
-      red_left_4_ring();
+      test();
       break;
     case 1:
+      red_left_4_ring();
+      break;
+    case 2:
       red_left_2_ring();
       break;
-    case 2:         
+    case 3:         
       red_left_winpoint();
       break;
-    case 3:
+    case 4:
       red_right_2_ring();
       break;
-    case 4:
+    case 5:
       blue_right_4_ring();
       break;
-    case 5:
+    case 6:
       blue_right_2_ring();
       break;
-    case 6:         
+    case 7:         
       blue_right_winpoint();
       break;
-    case 7:
+    case 8:
       blue_left_2_ring();
       break;
-    case 8:
+    case 9:
       skills();
       break;
  }
