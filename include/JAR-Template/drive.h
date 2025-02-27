@@ -108,13 +108,14 @@ public:
 
   void drive_with_voltage(float leftVoltage, float rightVoltage);
 
-  float get_absolute_heading();
+  float get_rotation();
+  float get_heading();
 
   float get_left_position_in();
-  float get_left_velocity_ins(double prev_left_pos, double prev_time);
+  float get_left_velocity_ins();
 
   float get_right_position_in();
-  float get_right_velocity_ins(double prev_right_pos, double prev_time);
+  float get_right_velocity_ins();
 
   void set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti); 
   void set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti);
@@ -129,22 +130,21 @@ public:
   void set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_timeout);
 
   void turn_to_angle(float angle);
-  void turn_to_angle(float angle, float turn_max_voltage);
-  void turn_to_angle(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout);
   void turn_to_angle(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+  void turn_to_heading(float angle);
+  void turn_to_heading(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+  void turn_to_absolute_rotation(float angle);
+  void turn_to_absolute_rotation(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+  void turn_to_localized_rotation(float angle);
+  void turn_to_localized_rotation(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
 
   void drive_distance(float distance);
   void drive_distance(float distance, float heading);
-  void drive_distance(float distance, float heading, float drive_max_voltage, float heading_max_voltage);
-  void drive_distance(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout);
   void drive_distance(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
-  void drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos);
-  void drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos, float v_drive_max_voltage, float v_heading_max_voltage);
-  void drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos, float v_drive_max_voltage, float v_heading_max_voltage, float v_drive_settle_error, float v_drive_settle_time, float v_drive_timeout);
-  void drive_velocity(float drive_output, float heading_output, float prev_time, float prev_right_pos, float prev_left_pos, float v_drive_max_voltage, float v_heading_max_voltage, float v_drive_settle_error, float v_drive_settle_time, float v_drive_timeout, float v_drive_kp, float v_drive_ki, float v_drive_kd, float v_drive_starti, float v_heading_kp, float v_heading_ki, float v_heading_kd, float v_heading_starti);
+  void drive_velocity(float drive_output, float heading_output);
+  void drive_velocity(float drive_output, float heading_output, float v_drive_max_voltage, float v_heading_max_voltage, float v_drive_settle_error, float v_drive_settle_time, float v_drive_timeout, float v_drive_kp, float v_drive_ki, float v_drive_kd, float v_drive_starti, float v_heading_kp, float v_heading_ki, float v_heading_kd, float v_heading_starti);
   void drive_distance_mp(float distance);
   void drive_distance_mp(float distance, float heading);
-  void drive_distance_mp(float distance, float heading, float heading_max_voltage);
   void drive_distance_mp(float distance, float heading, float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
   
   void left_swing_to_angle(float angle);
@@ -168,6 +168,8 @@ public:
 
   void drive_to_point(float X_position, float Y_position);
   void drive_to_point(float X_position, float Y_position, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
+  void drive_to_point_velocity(float X_position, float Y_position);
+  void drive_to_point_velocity(float X_position, float Y_position, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
   
   void drive_to_pose(float X_position, float Y_position, float angle);
   void drive_to_pose(float X_position, float Y_position, float angle, float lead, float setback, float drive_min_voltage);
@@ -189,7 +191,7 @@ public:
   void control_arcade_squared();
   void control_tank(float speed, float overide);
   void control_tank_squared();
-  void pid_control_tank(float prev_time, float prev_right_pos, float prev_left_pos);
+  void pid_control_tank();
   void control_holonomic();
   void control_holonomic_squared();
 };
