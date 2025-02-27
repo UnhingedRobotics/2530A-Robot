@@ -248,10 +248,10 @@ float Drive::get_rotation(){
 
 float Drive::get_heading(){ 
   if (gyro_setup==ONE){
-    return(mod(GyroOne.rotation()*360.0/gyro_one_scale, 360));
+    return(fmod(GyroOne.rotation()*360.0/gyro_one_scale, 360));
   }
   else {
-    return(mod((GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale)/2, 360));
+    return(fmod((GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale)/2, 360));
   }
 }
 
@@ -266,7 +266,7 @@ float Drive::get_left_position_in(){
 }
 
 float Drive::get_left_velocity_ins(){
-  return( (DriveL.position(dps)*drive_in_to_deg_ratio * M_PI * wheel_diameter) / 360 );
+  return( (DriveL.velocity(dps)*drive_in_to_deg_ratio * M_PI * wheel_diameter) / 360 );
 }
 
 /**
@@ -323,9 +323,9 @@ void Drive::turn_to_heading(float angle){
 }
 
 void Drive::turn_to_heading(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti){
-  PID turnPID(reduce_negative_180_to_180(mod(angle - get_rotation(), 360)), turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
+  PID turnPID(reduce_negative_180_to_180(fmod(angle - get_rotation(), 360)), turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
   while( !turnPID.is_settled() ){
-    float error = reduce_negative_180_to_180(mod(angle - get_rotation(), 360));
+    float error = reduce_negative_180_to_180(fmod(angle - get_rotation(), 360));
     float output = turnPID.compute(error);
     output = clamp(output, -turn_max_voltage, turn_max_voltage);
     drive_with_voltage(output, -output);
@@ -359,7 +359,7 @@ void Drive::turn_to_localized_rotation(float angle, float turn_max_voltage, floa
   float initAngle = get_rotation();
   PID turnPID(angle, turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
   while( !turnPID.is_settled() ){
-    float error = get_rotation - initAngle - angle;
+    float error = get_rotation() - initAngle - angle;
     float output = turnPID.compute(error);
     output = clamp(output, -turn_max_voltage, turn_max_voltage);
     drive_with_voltage(output, -output);
@@ -395,9 +395,6 @@ void Drive::drive_distance(float distance, float heading, float drive_max_voltag
   float start_average_position = (get_left_position_in()+get_right_position_in())/2.0;
   float average_position = start_average_position;
   while(drivePID.is_settled() == false){
-    float prev_time = Brain.Timer.time();
-    float prev_right_pos = get_right_position_in();
-    float prev_left_pos = get_left_position_in();
     float average_position = (get_left_position_in()+get_right_position_in())/2.0;
     float drive_error = distance+start_average_position-average_position;
     float heading_error = reduce_negative_180_to_180(heading - get_rotation());
@@ -411,7 +408,7 @@ void Drive::drive_distance(float distance, float heading, float drive_max_voltag
 }
 
 void Drive::drive_velocity(float drive_output, float heading_output){
-  drive_velocity(drive_output, heading_output, prev_time, prev_right_pos, prev_left_pos, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
+  drive_velocity(drive_output, heading_output, v_drive_max_voltage, v_heading_max_voltage, v_drive_settle_error, v_drive_settle_time, v_drive_timeout, v_drive_kp, v_drive_ki, v_drive_kd, v_drive_starti, v_heading_kp, v_heading_ki, v_heading_kd, v_heading_starti);
 }
 
 void Drive::drive_velocity(float drive_output, float heading_output, float v_drive_max_voltage, float v_heading_max_voltage, float v_drive_settle_error, float v_drive_settle_time, float v_drive_timeout, float v_drive_kp, float v_drive_ki, float v_drive_kd, float v_drive_starti, float v_heading_kp, float v_heading_ki, float v_heading_kd, float v_heading_starti){
