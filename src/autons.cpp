@@ -54,7 +54,7 @@ void odom_constants(){
   // chassis.boomerang_lead = .5;
   chassis.drive_min_voltage = 0;
 }
-void testing(){
+void fast(){
   default_constants();
   chassis.heading_max_voltage = 12;
   chassis.drive_max_voltage = 12;
@@ -67,9 +67,26 @@ void testing(){
   chassis.turn_kd = 2.2;
   chassis.drive_min_voltage = 0;
 }
+void fast_vel(){
+  default_constants();
+  chassis.heading_max_voltage = 12;
+  chassis.drive_max_voltage = 12;
+  chassis.turn_max_voltage = 12;
+  chassis.drive_kp = 2;
+  chassis.drive_kd = 1.4;
+  chassis.heading_kp = .05;
+  chassis.heading_kd = 0;
+  chassis.turn_kp = .25;
+  chassis.turn_kd = 2.2;
+  chassis.v_drive_kp = 2;
+  chassis.v_drive_kd = 0;
+  chassis.v_heading_kp = 40;
+  chassis.v_heading_kd = 0;
+  chassis.drive_min_voltage = 0;
+}
 void test() {
   chassis.set_coordinates(0, 0, 0);
-  testing();
+  fast();
   chassis.drive_to_point(0, 20);
   chassis.turn_to_angle(90);
   chassis.turn_to_angle(0);
