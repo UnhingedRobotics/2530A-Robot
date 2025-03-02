@@ -852,11 +852,11 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed){
 void Drive::turn_to_point(float X_position, float Y_position, bool reversed, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti){
   if (!reversed) {
     float start_angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
-    float start_error = reduce_negative_180_to_180(start_angle - get_rotation());
+    float start_error = reduce_negative_180_to_180(fmod(start_angle - get_rotation(), 360));
     PID turnPID(start_error, turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
     while(!turnPID.is_settled()){
       float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
-      float error = reduce_negative_180_to_180(angle - get_rotation());
+      float error = reduce_negative_180_to_180(fmod(angle - get_rotation(), 360));
       float output = turnPID.compute(error);
       output = clamp(output, -turn_max_voltage, turn_max_voltage);
       drive_with_voltage(output, -output);

@@ -19,10 +19,10 @@ IntakeControl::IntakeControl() :
   reverse(false),
   velocity(0),
   maxVelocity(100),
-  accuracy(50),
-  fullRotation(2556.0),
-  firstHook(1186.80),
-  secondHook(623.60),
+  accuracy(10),
+  fullRotation(2496.0),
+  firstHook(1156.80),
+  secondHook(657.60),
   thirdHook(1822.40),
   fourthHook(2470.80),
   holdingPos(1000),
@@ -59,7 +59,6 @@ void IntakeControl::colorSorting() {
         if (wrongRing) { 
           for (size_t i = 0; i < hookPositions.size(); i++) {
             if (fabs(fmod(intake.position(degrees), fullRotation) - hookPositions[i]) <= accuracy) {
-              wait(0.1,seconds); 
               velocity = -1 * velocity;
               ringDetected = false;
               wrongRing = false;
@@ -79,6 +78,12 @@ void IntakeControl::colorSorting() {
       intake.spin(forward);
       if (reverse) {
         velocity = -velocity;
+      }
+      else {
+        if (velocity < 0) {
+          intake.setVelocity(velocity, percent);
+          wait(0.1,seconds); 
+        }
       }
       if (fabs(intake.velocity(rpm)) > 50) {
         intake.setVelocity(velocity, percent);
