@@ -56,6 +56,19 @@ void fast(){
   chassis.turn_kd = 2.2;
   chassis.drive_min_voltage = 0;
 }
+void slow(){
+  default_constants();
+  chassis.heading_max_voltage = 6;
+  chassis.drive_max_voltage = 6;
+  chassis.turn_max_voltage = 6;
+  chassis.drive_kp = 1;
+  chassis.drive_kd = 0;
+  chassis.heading_kp = .05;
+  chassis.heading_kd = 0;
+  chassis.turn_kp = .125;
+  chassis.turn_kd = 0;
+  chassis.drive_min_voltage = 0;
+}
 void fast_vel(){
   default_constants();
   chassis.heading_max_voltage = 12;
@@ -245,6 +258,30 @@ void red_right_2_ring(){
   intakeControl.on = false;
   chassis.drive_with_voltage(0, 0);
 }
+
+void blue_right_4_ring(){
+  chassis.set_coordinates(59.076, 22.985, 90);
+  task intakeTask(intakeTaskFunction);
+  intakeControl.team = false;
+  intakeControl.on = false;
+  fast();
+  chassis.turn_to_point(23.636, 23.932);
+  chassis.drive_to_point(23.636, 23.932);
+  chassis.turn_to_point(24.016, 50.843);
+  chassis.drive_to_point(24.016, 50.843);
+  chassis.turn_to_point(10.56, 50.843);
+  chassis.drive_to_point(10.56, 50.843);
+  chassis.turn_to_point(18.14, 51.033);
+  chassis.drive_to_point(18.14, 51.033);
+  chassis.turn_to_point(18.33, 43.073);
+  chassis.drive_to_point(18.33, 43.073);
+  chassis.turn_to_point(10.56, 43.642);
+  chassis.drive_to_point(10.56, 43.642);
+  chassis.turn_to_point(9.991, 26.017);
+  chassis.drive_to_point(9.991, 26.017);
+
+
+}
 void blue_right_2_ring() {
   chassis.set_coordinates(60.024, 23.743, 90);
   task intakeTask(intakeTaskFunction);
@@ -346,7 +383,7 @@ void skills(){
   chassis.drive_to_point(-46.854, 58.905);
   chassis.turn_to_point(-57.083, 56.663, false);
   chassis.drive_to_point(-57.083, 56.663);
-  turn_to_heading(135);
+  chassis.turn_to_heading(135);
   goalclamp.set(false);
   intakeControl.on = false;
   chassis.turn_to_point(-47.274, -23.491, false);
@@ -363,7 +400,7 @@ void skills(){
   chassis.drive_to_point(-47.274, -58.944);
   chassis.turn_to_point(-56.243, -56.142, false);
   chassis.drive_to_point(-56.243, -56.142);
-  turn_to_heading(45);
+  chassis.turn_to_heading(45);
   goalclamp.set(false);
   intakeControl.holding = true;
   chassis.turn_to_point(23.772, -23.491);
@@ -380,14 +417,14 @@ void skills(){
   chassis.drive_to_point(47.033, -59.084);
   chassis.turn_to_point(56.282, -55.581, false);
   chassis.drive_to_point(56.282, -55.581);
-  turn_to_heading(315);
+  chassis.turn_to_heading(315);
   goalclamp.set(false);
   intakeControl.holding = true;
   chassis.turn_to_point(23.491, 23.592);
   chassis.drive_to_point(23.491, 23.592);
   chassis.turn_to_point(57.263, -1.211, false);
   chassis.drive_to_point(57.263, -1.211);
-  turn_to_heading(270);
+  chassis.turn_to_heading(270);
   intakeControl.holding = false;
   wait(0.5, seconds);
   intakeControl.on = false;
@@ -396,7 +433,7 @@ void skills(){
   goalclamp.set(true);
   chassis.turn_to_point(57.403, 56.243, false);
   chassis.drive_to_point(57.403, 56.243);
-  turn_to_heading(270);
+  chassis.turn_to_heading(270);
   goalclamp.set(false);
   chassis.turn_to_point(41.428, 39.988);
   chassis.drive_to_point(41.428, 39.988);

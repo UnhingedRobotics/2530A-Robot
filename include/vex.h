@@ -19,6 +19,7 @@
 #include "v5_vcs.h"
 
 #include "robot-config.h"
+#include "intake.h"
 #include "drive-functions.h"
 #include "motion-profiling.h"
 #include "JAR-Template/odom.h"
