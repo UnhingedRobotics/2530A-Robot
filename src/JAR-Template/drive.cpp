@@ -248,10 +248,10 @@ float Drive::get_rotation(){
 
 float Drive::get_heading(){ 
   if (gyro_setup==ONE){
-    return(fmod(GyroOne.rotation()*360.0/gyro_one_scale, 360));
+    return(reduce_0_to_360(GyroOne.rotation()*360.0/gyro_one_scale));
   }
   else {
-    return(fmod((GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale)/2, 360));
+    return(reduce_0_to_360((GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale)/2));
   }
 }
 
@@ -323,9 +323,9 @@ void Drive::turn_to_heading(float angle){
 }
 
 void Drive::turn_to_heading(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti){
-  PID turnPID(reduce_negative_180_to_180(fmod(angle - get_rotation(), 360)), turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
+  PID turnPID(reduce_negative_180_to_180(angle - get_rotation()), turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
   while( !turnPID.is_settled() ){
-    float error = reduce_negative_180_to_180(fmod(angle - get_rotation(), 360));
+    float error = reduce_negative_180_to_180(angle - get_rotation());
     float output = turnPID.compute(error);
     output = clamp(output, -turn_max_voltage, turn_max_voltage);
     drive_with_voltage(output, -output);
@@ -649,14 +649,14 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
   float start_drive_error = hypot(X_position - get_X_position(), Y_position - get_Y_position());
   float start_angle = to_deg(atan2(X_position-get_X_position(), Y_position-get_Y_position()));
   float start_reverse_angle = start_angle;
-  float start_heading_error = reduce_negative_180_to_180(start_angle - get_rotation());
+  float start_heading_error = reduce_negative_180_to_180(start_angle - get_heading());
   if (start_reverse_angle > 0) {
 	start_reverse_angle = -(180 - start_reverse_angle);
   }
   else {
 	start_reverse_angle = (180 + start_reverse_angle);
   }
-  float start_reverse_heading_error = reduce_negative_180_to_180(start_reverse_angle - get_rotation());
+  float start_reverse_heading_error = reduce_negative_180_to_180(start_reverse_angle - get_heading());
   if (fabs(start_reverse_heading_error) < fabs(start_heading_error)) {
     start_heading_error = start_reverse_heading_error;
     start_drive_error = -start_drive_error;
@@ -667,14 +667,14 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
     float drive_error = hypot(X_position-get_X_position(), Y_position-get_Y_position());
     float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
     float reverse_angle = angle;
-    float heading_error = reduce_negative_180_to_180(angle - get_rotation());
+    float heading_error = reduce_negative_180_to_180(angle - get_heading());
     if (reverse_angle > 0) {
       reverse_angle = -(180 - angle);
     }
     else {
       reverse_angle = (180 + angle);
     }
-    float reverse_heading_error = reduce_negative_180_to_180(reverse_angle - get_rotation());
+    float reverse_heading_error = reduce_negative_180_to_180(reverse_angle - get_heading());
     if (fabs(reverse_heading_error) < fabs(heading_error)) {
       heading_error = reverse_heading_error;
       drive_error = -drive_error;
@@ -693,6 +693,49 @@ void Drive::drive_to_point(float X_position, float Y_position, float drive_min_v
   chassis.drive_with_voltage(0,0);
 }
 
+void Drive::drive_to_point_non_adjust(float X_position, float Y_position){
+  drive_to_point(X_position, Y_position, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
+void Drive::drive_to_point_non_adjust(float X_position, float Y_position, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti){
+  float start_drive_error = hypot(X_position - get_X_position(), Y_position - get_Y_position());
+  float start_angle = to_deg(atan2(X_position-get_X_position(), Y_position-get_Y_position()));
+  float start_reverse_angle = start_angle;
+  float start_heading_error = reduce_negative_180_to_180(start_angle - get_heading());
+  if (start_reverse_angle > 0) {
+	start_reverse_angle = -(180 - start_reverse_angle);
+  }
+  else {
+	start_reverse_angle = (180 + start_reverse_angle);
+  }
+  float start_reverse_heading_error = reduce_negative_180_to_180(start_reverse_angle - get_heading());
+  if (fabs(start_reverse_heading_error) < fabs(start_heading_error)) {
+    start_heading_error = start_reverse_heading_error;
+    start_drive_error = -start_drive_error;
+  }
+  PID headingPID(start_heading_error, heading_kp, heading_ki, heading_kd, heading_starti);
+  PID drivePID(start_drive_error, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
+  while(!drivePID.is_settled()){
+    float drive_error = hypot(X_position-get_X_position(), Y_position-get_Y_position());
+    float heading_error = reduce_negative_180_to_180(start_angle - get_heading());
+    float reverse_heading_error = reduce_negative_180_to_180(start_reverse_angle - get_heading());
+    if (fabs(reverse_heading_error) < fabs(heading_error)) {
+      heading_error = reverse_heading_error;
+      drive_error = -drive_error;
+    }
+    float drive_output = drivePID.compute(drive_error);
+    float heading_scale_factor = cos(to_rad(heading_error));
+    drive_output*=heading_scale_factor;
+    heading_error = reduce_negative_90_to_90(heading_error);
+    float heading_output = headingPID.compute(heading_error);
+    drive_output = clamp(drive_output, -fabs(heading_scale_factor)*drive_max_voltage, fabs(heading_scale_factor)*drive_max_voltage);
+    heading_output = clamp(heading_output, -heading_max_voltage, heading_max_voltage);
+    drive_output = clamp_min_voltage(drive_output, drive_min_voltage);
+    drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
+    task::sleep(10);
+  }
+  chassis.drive_with_voltage(0,0);
+}
 void Drive::drive_to_point_velocity(float X_position, float Y_position){
   drive_to_point(X_position, Y_position, drive_min_voltage, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
 }
@@ -701,14 +744,14 @@ void Drive::drive_to_point_velocity(float X_position, float Y_position, float dr
   float start_drive_error = hypot(X_position - get_X_position(), Y_position - get_Y_position());
   float start_angle = to_deg(atan2(X_position-get_X_position(), Y_position-get_Y_position()));
   float start_reverse_angle = start_angle;
-  float start_heading_error = reduce_negative_180_to_180(start_angle - get_rotation());
+  float start_heading_error = reduce_negative_180_to_180(start_angle - get_heading());
   if (start_reverse_angle > 0) {
 	start_reverse_angle = -(180 - start_reverse_angle);
   }
   else {
 	start_reverse_angle = (180 + start_reverse_angle);
   }
-  float start_reverse_heading_error = reduce_negative_180_to_180(start_reverse_angle - get_rotation());
+  float start_reverse_heading_error = reduce_negative_180_to_180(start_reverse_angle - get_heading());
   if (fabs(start_reverse_heading_error) < fabs(start_heading_error)) {
     start_heading_error = start_reverse_heading_error;
     start_drive_error = -start_drive_error;
@@ -719,14 +762,14 @@ void Drive::drive_to_point_velocity(float X_position, float Y_position, float dr
     float drive_error = hypot(X_position-get_X_position(), Y_position-get_Y_position());
     float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
     float reverse_angle = angle;
-    float heading_error = reduce_negative_180_to_180(angle - get_rotation());
+    float heading_error = reduce_negative_180_to_180(angle - get_heading());
     if (reverse_angle > 0) {
       reverse_angle = -(180 - angle);
     }
     else {
       reverse_angle = (180 + angle);
     }
-    float reverse_heading_error = reduce_negative_180_to_180(reverse_angle - get_rotation());
+    float reverse_heading_error = reduce_negative_180_to_180(reverse_angle - get_heading());
     if (fabs(reverse_heading_error) < fabs(heading_error)) {
       heading_error = reverse_heading_error;
       drive_error = -drive_error;
@@ -852,11 +895,11 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed){
 void Drive::turn_to_point(float X_position, float Y_position, bool reversed, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti){
   if (!reversed) {
     float start_angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
-    float start_error = reduce_negative_180_to_180(fmod(start_angle - get_rotation(), 360));
+    float start_error = reduce_negative_180_to_180(start_angle - get_heading());
     PID turnPID(start_error, turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
     while(!turnPID.is_settled()){
       float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
-      float error = reduce_negative_180_to_180(fmod(angle - get_rotation(), 360));
+      float error = reduce_negative_180_to_180(angle - get_heading());
       float output = turnPID.compute(error);
       output = clamp(output, -turn_max_voltage, turn_max_voltage);
       drive_with_voltage(output, -output);
@@ -865,22 +908,22 @@ void Drive::turn_to_point(float X_position, float Y_position, bool reversed, flo
   }
   else {
     float start_angle = to_deg(atan2(X_position-get_X_position(), Y_position-get_Y_position()));
-    float start_error = reduce_negative_180_to_180(start_angle - get_rotation());
     if (start_angle > 0) {
 	  start_angle = -(180 - start_angle);
     }
     else {
 	  start_angle = (180 + start_angle);
     }
+    float start_error = reduce_negative_180_to_180(start_angle - get_rotation());
     PID turnPID(start_error, turn_kp, turn_ki, turn_kd, turn_starti, turn_settle_error, turn_settle_time, turn_timeout);
     while(!turnPID.is_settled()){
       float angle = to_deg(atan2((X_position-get_X_position()),(Y_position-get_Y_position())));
-	  if (angle > 0) {
-	    angle = -(180 - angle);
- 	  }
-	  else {
-	    angle = (180 + angle);
-	  }
+      if (angle > 0) {
+	angle = -(180 - angle);
+      }
+      else {
+	angle = (180 + angle);
+      }
       float error = reduce_negative_180_to_180(angle - get_rotation());
       float output = turnPID.compute(error);
       output = clamp(output, -turn_max_voltage, turn_max_voltage);

@@ -219,19 +219,6 @@ void red_right_2_ring(){
   chassis.turn_to_point(-23.376, -10.194);
   chassis.drive_max_voltage = 12;
   chassis.drive_to_point(-23.376, -10.194);
-  intakeControl.on = false;
-  chassis.drive_with_voltage(0, 0);
-}
-
-void blue_right_4_ring(){
-  chassis.set_coordinates(59.076, 23.553, 90);
-  task intakeTask(intakeTaskFunction);
-  intakeControl.team = true;
-  intakeControl.on = false;
-  fast();
-  intakeControl.reverse = true;
-  intakeControl.maxVelocity = 30;
-  intakeControl.on = true;
   wait(0.5, seconds);
   intakeControl.on = false;
   intakeControl.reverse = false;
@@ -250,7 +237,7 @@ void blue_right_4_ring(){
   chassis.drive_to_point(18.899, 50.843);
   chassis.turn_to_point(19.088, 42.126);
   chassis.drive_to_point(19.088, 42.126);
-  chassis.turn_to_point(10.37, 42.126);315
+  chassis.turn_to_point(10.37, 42.126);
   chassis.drive_to_point(10.37, 42.126);
   chassis.turn_to_point(9.612, 22.226);
   chassis.drive_max_voltage = 7;
@@ -321,22 +308,35 @@ void blue_left_2_ring(){
 }
 
 void skills(){
-  chassis.set_coordinates(-56.943, -0.23, 90);
+  chassis.set_coordinates(-60.13, -0.705, 90);
   task intakeTask(intakeTaskFunction);
   intakeControl.team = true;
   intakeControl.on = false;
   fast();
-  chassis.drive_with_voltage(0,0);
   intakeControl.on = true;
   wait(0.5, seconds);
-  chassis.turn_to_point(-47.414, -0.09);
-  chassis.drive_to_point(-47.414, -0.09);
+  intakeControl.reverse = true;
+  wait(0.5, seconds);
+  intakeControl.reverse = false;
   intakeControl.on = false;
-  chassis.turn_to_point(-47.274, 23.732, false);
-  chassis.drive_to_point(-47.274, 23.732);
+  chassis.turn_to_point(-44.779, -0.895);
+  chassis.drive_to_point(-44.779, -0.895);
+  slow();
+  chassis.turn_to_point(-45.158, 23.553, true);
+  chassis.drive_to_point(-45.158, 23.364);
+  fast();
   goalclamp.set(true);
+  chassis.drive_to_point(-45.537, 28.86);
   intakeControl.on = true;
-  chassis.turn_to_point(-23.452, 23.592);
+  chassis.drive_to_point(-23.452, 23.592);
+  chassis.turn_to_point(-23.032, 47.274);
+  chassis.drive_to_point(-23.032, 47.274);
+  chassis.turn_to_point(-58.905, 47.414);
+  chassis.drive_to_point(-58.905, 47.414);
+  chassis.turn_to_point(-46.854, 58.905);
+  chassis.drive_to_point(-46.854, 58.905);
+  chassis.turn_to_point(-57.083, 56.663, false);
+  chassis.drive_to_point(-57.083, 56.663);
   chassis.drive_to_point(-23.452, 23.592);
   chassis.turn_to_point(-23.032, 47.274);
   chassis.drive_to_point(-23.032, 47.274);
