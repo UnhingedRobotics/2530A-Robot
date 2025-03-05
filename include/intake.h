@@ -4,13 +4,13 @@
 
 class IntakeControl {
 public:
+  enum Colors { blue, red, none };
+  Colors curRing;
+  Colors alliance;
   bool auto_on = false;
   int time_waited;
   double hue;
-  bool ring;          // true = red, false = blue
-  bool team;          // true = red team, false = blue team
   bool wrongRing;
-  bool ringDetected;
   bool on;
   bool holding;
   bool reverse;
@@ -29,5 +29,6 @@ public:
   IntakeControl(); // Constructor with an initializer list
 
   // Functions for controlling intake behavior
+  void detectColor();              // Uses Sensors to detect color
   void colorSorting();              // Color-sorting logic
 };

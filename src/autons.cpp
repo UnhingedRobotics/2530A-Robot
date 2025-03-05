@@ -100,7 +100,7 @@ void test() {
 void red_left_4_ring(){
   chassis.set_coordinates(-59.13, 24.567, -90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
+  intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
   fast();
   intakeControl.reverse = true;
@@ -138,7 +138,7 @@ void red_left_4_ring(){
 void red_left_2_ring(){
   chassis.set_coordinates(-59.372, 23.364, -90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
+  intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
   fast();
   intakeControl.reverse = true;
@@ -167,7 +167,7 @@ void red_left_2_ring(){
 void red_left_winpoint(){
   chassis.set_coordinates(-52.575, 12.053, 180);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
+  intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
   fast();
   intakeControl.reverse = true;
@@ -215,7 +215,7 @@ void red_left_winpoint(){
 void red_right_2_ring(){
   chassis.set_coordinates(-59.13, -23.701, -90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
+  intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
   fast();
   intakeControl.maxVelocity = 100;
@@ -262,7 +262,7 @@ void red_right_2_ring(){
 void blue_right_4_ring(){
   chassis.set_coordinates(59.076, 22.985, 90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = false;
+  intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
   fast();
   chassis.turn_to_point(23.636, 23.932);
@@ -285,7 +285,7 @@ void blue_right_4_ring(){
 void blue_right_2_ring() {
   chassis.set_coordinates(60.024, 23.743, 90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = true;
+  intakeControl.alliance = intakeControl.blue;
   intakeControl.on = false;
   fast();
   intakeControl.reverse = true;
@@ -318,7 +318,7 @@ void blue_right_winpoint(){
 void blue_left_2_ring(){
   chassis.set_coordinates(58.886, -23.636, 90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = true;
+  intakeControl.alliance = intakeControl.blue;
   intakeControl.on = false;
   fast();
   intakeControl.reverse = true;
@@ -347,7 +347,7 @@ void blue_left_2_ring(){
 void skills(){
   chassis.set_coordinates(-60.13, -0.705, 90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.team = true;
+  intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
   fast();
   intakeControl.on = true;
