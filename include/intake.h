@@ -31,4 +31,5 @@ public:
   // Functions for controlling intake behavior
   void detectColor();              // Uses Sensors to detect color
   void colorSorting();              // Color-sorting logic
+  void antiJam();              // Detects if there is a jam and reverses
 };
