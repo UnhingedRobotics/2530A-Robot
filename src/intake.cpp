@@ -3,6 +3,7 @@
 
 using namespace vex;
 
+int aivisionsensor_objectIndex = 0;
 // Constructor with initializer list to initialize member variables
 
 IntakeControl::IntakeControl() :
@@ -11,14 +12,18 @@ IntakeControl::IntakeControl() :
   hue(0.0),
   wrongRing(false),
   on(false),
+  roller_on(false),
   holding(false),
   reverse(false),
   velocity(0),
   maxVelocity(100),
   accuracy(10),
-  fullRotation(2496.0),
-  firstHook(1156.80),
-  secondHook(657.60),
+  chainLinks(73),
+  gearDiameter(1.2896161417),
+  gearRatio(2),
+  fullRotation((360 * (chainLinks * 65.5 / 170) / M_PI * gearDiameter) / gearRatio),
+  firstHook(1056.80),
+  secondHook(557.60),
   thirdHook(1822.40),
   fourthHook(2470.80),
   holdingPos(1000),
@@ -27,22 +32,23 @@ IntakeControl::IntakeControl() :
 {}
 
 void IntakeControl::detectColor() {
-  aivisionsensor.takeSnapshot(aivisionsensor__bluering);
-  if (aivisionsensor.objects[0].exists) {
+  aivisionsensor.takeSnapshot(aivision::ALL_AIOBJS);
+  if (aivisionsensor.objects[aivisionsensor_objectIndex].id == blueRing) {
       curRing = blue;
       if (alliance == red) {
         wrongRing = true;
       }
-    
-  } else {
-    aivisionsensor.takeSnapshot(aivisionsensor__redring);
-    if (aivisionsensor.objects[0].exists) {
+
+  }
+  else {
+    if (aivisionsensor.objects[aivisionsensor_objectIndex].id == blueRing) {
       curRing = red;
       if (alliance == blue) {
         wrongRing = true;
       }
     }
   }
+    
 }
 void IntakeControl::colorSorting() {
   if (!on) {
@@ -89,6 +95,13 @@ void IntakeControl::colorSorting() {
     else {
       intake.setVelocity(velocity, percent);
     }
+  }
+  if (roller_on) {
+    roller.spin(forward);
+    roller.setVelocity(100, percent);
+  }
+  else {
+    roller.stop(coast);
   }
 }
 void IntakeControl::antiJam() {

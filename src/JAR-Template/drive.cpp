@@ -31,7 +31,6 @@ int gyro_one_port,  int gyro_two_port, float wheel_diameter, float wheel_ratio, 
 int DriveLF_port, int DriveRF_port, int DriveLB_port, int DriveRB_port, 
 int ForwardTracker_port, float ForwardTracker_diameter, float ForwardTracker_center_distance, 
 int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_center_distance) :
-  driveSpeedPercent(0.6),
   driveOveride(false),
   wheel_diameter(wheel_diameter),
   wheel_ratio(wheel_ratio),
@@ -248,10 +247,10 @@ float Drive::get_rotation(){
 
 float Drive::get_heading(){ 
   if (gyro_setup==ONE){
-    return(reduce_0_to_360(GyroOne.rotation()*360.0/gyro_one_scale));
+    return(fmod(GyroOne.rotation()*360.0/gyro_one_scale, 360));
   }
   else {
-    return(reduce_0_to_360((GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale)/2));
+    return(fmod((GyroOne.rotation()*360.0/gyro_one_scale + GyroTwo.rotation()*360.0/gyro_two_scale)/2, 360));
   }
 }
 
@@ -1045,12 +1044,12 @@ void Drive::control_holonomic_squared(){
  * Default deadband is 5.
  */
 
-void Drive::control_tank(float speed, float overide){
+void Drive::control_tank(float overide){
   if (!overide) {
     float leftthrottle = deadband(controller(primary).Axis3.value(), 5);
     float rightthrottle = deadband(controller(primary).Axis2.value(), 5);
-    DriveL.spin(fwd, to_volt(leftthrottle * speed), volt);
-    DriveR.spin(fwd, to_volt(rightthrottle * speed), volt);
+    DriveL.spin(fwd, to_volt(leftthrottle), volt);
+    DriveR.spin(fwd, to_volt(rightthrottle), volt);
   }
 }
 

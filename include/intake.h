@@ -1,6 +1,11 @@
 #pragma once
 
 #include <array> // For std:array
+enum gameElements {
+  mobileGoal,
+  redRing,
+  blueRing,
+};
 
 class IntakeControl {
 public:
@@ -12,11 +17,15 @@ public:
   double hue;
   bool wrongRing;
   bool on;
+  bool roller_on;
   bool holding;
   bool reverse;
   int velocity;
   int maxVelocity;
   double accuracy;
+  int chainLinks;
+  float gearDiameter;
+  float gearRatio;
   double fullRotation;
   const double firstHook;
   const double secondHook;

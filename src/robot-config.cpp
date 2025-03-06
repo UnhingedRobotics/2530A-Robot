@@ -24,9 +24,7 @@ digital_out goalclamp = digital_out(Brain.ThreeWirePort.G);
 digital_out swingarm = digital_out(Brain.ThreeWirePort.H);
 inertial leftinertialsensor = inertial(PORT7);
 inertial rightinertialsensor = inertial(PORT13);
-aivision::colordesc aivisionsensor__bluering(1, 27, 47, 104, 10, 0.2);
-aivision::colordesc aivisionsensor__redring(2, 161, 13, 72, 31, 0.34);
-aivision aivisionsensor(PORT4, aivisionsensor__bluering, aivisionsensor__redring);
+aivision aivisionsensor(PORT4, aivision::ALL_AIOBJS);
 
 void vexcodeInit( void ) {
   // nothing to initialize

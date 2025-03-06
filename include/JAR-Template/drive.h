@@ -34,7 +34,6 @@ private:
 
 public: 
   float driveOveride;
-  float driveSpeedPercent;
   drive_setup drive_setup = ZERO_TRACKER_NO_ODOM;
   motor_group DriveL;
   motor_group DriveR;
@@ -191,7 +190,7 @@ public:
 
   void control_arcade();
   void control_arcade_squared();
-  void control_tank(float speed, float overide);
+  void control_tank(float overide);
   void control_tank_squared();
   void pid_control_tank();
   void control_holonomic();

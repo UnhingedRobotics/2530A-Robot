@@ -4,7 +4,7 @@ using namespace vex;
 competition Competition;
 
 bool swing_on = false;
-bool goal_on = false;
+bool goal_on = true;
 
 /*---------------------------------------------------------------------------*/
 /*                             VEXcode Config                                */
@@ -185,39 +185,13 @@ void buttonR1EventHandler() {
     intakeControl.on = false;
   }
 }
-void buttonUpEventHandler() {
-  if (chassis.driveSpeedPercent == 0.6) {
-    chassis.driveSpeedPercent = 0.7;
+void buttonR2EventHandler() {
+  if (!intakeControl.roller_on) {
+    intakeControl.roller_on = true;
   }
-  if (chassis.driveSpeedPercent == 0.7) {
-    chassis.driveSpeedPercent = 0.8;
+  else {
+    intakeControl.roller_on = false;
   }
-  if (chassis.driveSpeedPercent == 0.8) {
-    chassis.driveSpeedPercent = 0.9;
-  }
-  if (chassis.driveSpeedPercent == 0.9) {
-    chassis.driveSpeedPercent = 1;
-  }
-  Controller1.Screen.clearScreen();
-  Controller1.Screen.setCursor(1, 1);
-  Controller1.Screen.print(chassis.driveSpeedPercent);
-}
-void buttonDownEventHandler() {
-  if (chassis.driveSpeedPercent == 0.7) {
-    chassis.driveSpeedPercent = 0.6;
-  }
-  if (chassis.driveSpeedPercent == 0.8) {
-    chassis.driveSpeedPercent = 0.7;
-  }
-  if (chassis.driveSpeedPercent == 0.9) {
-    chassis.driveSpeedPercent = 0.8;
-  }
-  if (chassis.driveSpeedPercent == 1) {
-    chassis.driveSpeedPercent = 0.9;
-  }
-  Controller1.Screen.clearScreen();
-  Controller1.Screen.setCursor(1, 1);
-  Controller1.Screen.print(chassis.driveSpeedPercent);
 }
 
 int intakeTaskFunctionUser() {
@@ -352,11 +326,10 @@ void usercontrol(void) {
   Controller1.ButtonB.pressed(buttonBEventHandler);
   Controller1.ButtonL1.pressed(buttonL1EventHandler);
   Controller1.ButtonR1.pressed(buttonR1EventHandler);
+  Controller1.ButtonR2.pressed(buttonR2EventHandler);
   Controller1.ButtonY.pressed(buttonYEventHandler);
-  Controller1.ButtonUp.pressed(buttonUpEventHandler);
-  Controller1.ButtonDown.pressed(buttonDownEventHandler);
   while (1) {
-    chassis.control_tank(chassis.driveSpeedPercent, chassis.driveOveride);
+    chassis.control_tank(chassis.driveOveride);
     wait(10, msec); // Sleep the task for a short amount of time to prevent wasted resources
   }
 }
