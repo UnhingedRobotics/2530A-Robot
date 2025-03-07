@@ -6,9 +6,10 @@ using namespace vex;
 
 void healthCheck() {
   while (true) {
-      Controller1.Screen.clearScreen();
-      Controller1.Screen.setCursor(1,1);
-      Controller1.Screen.print(opticalsensor.hue());
+    Controller1.Screen.clearScreen();
+    Controller1.Screen.setCursor(1,1);
+    // Controller1.Screen.print(opticalsensor.hue());
+    Controller1.Screen.print(intake.position(degrees));
     if (intake.temperature(fahrenheit) >= 110) {
       // Controller1.Screen.clearScreen();
       // Controller1.Screen.setCursor(1,1);

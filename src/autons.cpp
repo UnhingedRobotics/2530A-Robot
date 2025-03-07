@@ -24,16 +24,16 @@ int intakeTaskFunction() {
 void default_constants(){
   // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
   chassis.set_drive_constants(10, 1.05, 0, 10, 0);
-  chassis.set_heading_constants(6.5, 0.8, 0, 9, 0);
+  chassis.set_heading_constants(6.5, 0.1, 0, 0.1, 0);
   chassis.set_v_drive_constants(10, 1.2, 0, 10, 0);
   chassis.set_v_heading_constants(6, .4, 0, 1, 0);
-  chassis.set_turn_constants(6.5, 0.8, 0, 9, 0);
+  chassis.set_turn_constants(7, 0.16, 0.01, 0.8, 15);
   chassis.set_swing_constants(12, .3, .0013, 0, 15);
 
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
-  chassis.set_drive_exit_conditions(0.6, 300, 5000);
+  chassis.set_drive_exit_conditions(1.5, 300, 5000);
   chassis.set_v_drive_exit_conditions(1.5, 300, 5000);
-  chassis.set_turn_exit_conditions(0.5, 300, 3000);
+  chassis.set_turn_exit_conditions(1.5, 300, 3000);
   chassis.set_swing_exit_conditions(1, 300, 3000);
 }
 
@@ -49,7 +49,7 @@ void fast(){
   chassis.drive_max_voltage = 12;
   chassis.turn_max_voltage = 12;
   chassis.drive_kp = 2;
-  chassis.drive_kd = 1.4;
+  chassis.drive_kd = 1.8;
   chassis.heading_kp = .05;
   chassis.heading_kd = 0;
   chassis.turn_kp = .25;
@@ -58,13 +58,13 @@ void fast(){
 }
 void medium(){
   default_constants();
-  chassis.heading_max_voltage = 8;
+  chassis.heading_max_voltage = 10;
   chassis.drive_max_voltage = 10;
-  chassis.turn_max_voltage = 8;
+  chassis.turn_max_voltage = 10;
   chassis.drive_kp = 2;
-  chassis.drive_kd = 1.4;
-  chassis.heading_kp = 0.1;
-  chassis.heading_kd = 0.08;
+  chassis.drive_kd = 1.8;
+  chassis.heading_kp = 0.05;
+  chassis.heading_kd = 0.00;
   chassis.turn_kp = .25;
   chassis.turn_kd = 2.2;
   chassis.drive_min_voltage = 0;
@@ -74,7 +74,7 @@ void slow(){
   chassis.heading_max_voltage = 6;
   chassis.drive_max_voltage = 6;
   chassis.turn_max_voltage = 6;
-  chassis.drive_kp = 0.8;
+  chassis.drive_kp = 1.2;
   chassis.drive_kd = 0;
   chassis.heading_kp = .05;
   chassis.heading_kd = 0;
@@ -116,22 +116,25 @@ void red_left_4_ring(){
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
-  fast();
-  intakeControl.reverse = true;
-  intakeControl.maxVelocity = 30;
+  default_constants();
+  intakeControl.maxVelocity = 50;
   intakeControl.on = true;
-  wait(0.5, seconds);
+  wait(0.2, seconds);
   intakeControl.on = false;
-  intakeControl.reverse = false;
   intakeControl.maxVelocity = 100;
-  intakeControl.stuckOveride = false;
   chassis.turn_to_point(-22.364, 23.553, true);
   chassis.drive_max_voltage = 9;
   chassis.drive_to_point(-22.364, 23.553);
+  slow();
+  chassis.turn_to_point(-19.573, 23.174, true);
+  chassis.drive_to_point(-19.573, 23.174);
   wait(0.3, seconds);
   goalclamp.set(true);
+  wait(0.3, seconds);
+  default_constants();
   chassis.turn_to_point(-23.364, 50.464);
   intakeControl.on = true;
+  intakeControl.roller_on = true;
   chassis.drive_to_point(-23.364, 50.464);
   chassis.turn_to_point(-9.15, 50.654);
   chassis.drive_to_point(-9.15, 50.654);
@@ -139,7 +142,7 @@ void red_left_4_ring(){
   chassis.drive_to_point(-17.678, 51.033);
   chassis.turn_to_point(-17.299, 43.263);
   chassis.drive_to_point(-17.299, 43.263);
-  chassis.turn_to_point(-9.15, 43.263, true);
+  chassis.turn_to_point(-9.15, 43.263);
   chassis.drive_to_point(-9.15, 43.263);
   chassis.turn_to_point(-9.718, 25.448);
   intakeControl.on = false;
@@ -154,15 +157,12 @@ void red_left_2_ring(){
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
-  fast();
-  intakeControl.reverse = true;
-  intakeControl.maxVelocity = 30;
+  default_constants();
+  intakeControl.maxVelocity = 50;
   intakeControl.on = true;
-  wait(0.5, seconds);
+  wait(0.2, seconds);
   intakeControl.on = false;
-  intakeControl.reverse = false;
   intakeControl.maxVelocity = 100;
-  intakeControl.stuckOveride = false;
   chassis.turn_to_point(-22.795, 23.364, true);
   chassis.drive_to_point(-22.795, 23.364);
   goalclamp.set(true);
@@ -183,15 +183,12 @@ void red_left_winpoint(){
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
-  fast();
-  intakeControl.reverse = true;
-  intakeControl.maxVelocity = 30;
+  default_constants();
+  intakeControl.maxVelocity = 50;
   intakeControl.on = true;
-  wait(0.5, seconds);
+  wait(0.2, seconds);
   intakeControl.on = false;
-  intakeControl.reverse = false;
   intakeControl.maxVelocity = 100;
-  intakeControl.stuckOveride = false;
   chassis.turn_to_point(-52.178, -0.262);
   chassis.drive_to_point(-52.178, -0.262);
   chassis.turn_to_point(-59.528, -0.262, true);
@@ -231,9 +228,12 @@ void red_right_2_ring(){
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
-  fast();
+  default_constants();
+  intakeControl.maxVelocity = 50;
+  intakeControl.on = true;
+  wait(0.2, seconds);
+  intakeControl.on = false;
   intakeControl.maxVelocity = 100;
-  intakeControl.stuckOveride = true;
   chassis.turn_to_point(-23.773, -23.503, true);
   chassis.drive_to_point(-23.773, -23.503);
   chassis.drive_max_voltage = 10;
@@ -276,9 +276,14 @@ void red_right_2_ring(){
 void blue_right_4_ring(){
   chassis.set_coordinates(59.076, 22.985, 90);
   task intakeTask(intakeTaskFunction);
-  intakeControl.alliance = intakeControl.red;
+  intakeControl.alliance = intakeControl.blue;
   intakeControl.on = false;
-  fast();
+  default_constants();
+  intakeControl.maxVelocity = 50;
+  intakeControl.on = true;
+  wait(0.2, seconds);
+  intakeControl.on = false;
+  intakeControl.maxVelocity = 100;
   chassis.turn_to_point(23.636, 23.932);
   chassis.drive_to_point(23.636, 23.932);
   chassis.turn_to_point(24.016, 50.843);
@@ -301,15 +306,12 @@ void blue_right_2_ring() {
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.blue;
   intakeControl.on = false;
-  fast();
-  intakeControl.reverse = true;
-  intakeControl.maxVelocity = 30;
+  default_constants();
+  intakeControl.maxVelocity = 50;
   intakeControl.on = true;
-  wait(0.5, seconds);
+  wait(0.2, seconds);
   intakeControl.on = false;
-  intakeControl.reverse = false;
   intakeControl.maxVelocity = 100;
-  intakeControl.stuckOveride = false;
   chassis.turn_to_point(21.931, 23.553, true);
   chassis.drive_to_point(21.931, 23.553);
   goalclamp.set(true);
@@ -326,6 +328,15 @@ void blue_right_2_ring() {
 }
 
 void blue_right_winpoint(){
+  task intakeTask(intakeTaskFunction);
+  intakeControl.alliance = intakeControl.blue;
+  intakeControl.on = false;
+  default_constants();
+  intakeControl.maxVelocity = 50;
+  intakeControl.on = true;
+  wait(0.2, seconds);
+  intakeControl.on = false;
+  intakeControl.maxVelocity = 100;
 
 }
 
@@ -334,15 +345,12 @@ void blue_left_2_ring(){
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.blue;
   intakeControl.on = false;
-  fast();
-  intakeControl.reverse = true;
-  intakeControl.maxVelocity = 30;
+  default_constants();
+  intakeControl.maxVelocity = 50;
   intakeControl.on = true;
-  wait(0.5, seconds);
+  wait(0.2, seconds);
   intakeControl.on = false;
-  intakeControl.reverse = false;
   intakeControl.maxVelocity = 100;
-  intakeControl.stuckOveride = false;
   chassis.turn_to_point(22.636, -23.257, true);
   chassis.drive_to_point(22.636, -23.257);
   goalclamp.set(true);
@@ -363,7 +371,7 @@ void skills(){
   task intakeTask(intakeTaskFunction);
   intakeControl.alliance = intakeControl.red;
   intakeControl.on = false;
-  medium();
+  default_constants();
   intakeControl.on = true;
   wait(0.5, seconds);
   intakeControl.reverse = true;
@@ -374,13 +382,14 @@ void skills(){
   chassis.drive_to_point(-44.779, -0.895);
   slow();
   chassis.turn_to_point(-45.158, 23.553, true);
-  chassis.drive_to_point(-45.158, 23.553);
+  chassis.drive_to_point_non_adjust(-45.158, 23.553);
   chassis.turn_to_point(-45.537, 28.86, true);
   chassis.drive_to_point(-45.537, 28.86);
   goalclamp.set(true);
+  wait(0.5, seconds);
   intakeControl.on = true;
   intakeControl.roller_on = true;
-  medium();
+  default_constants();
   chassis.turn_to_point(-23.452, 23.592);
   chassis.drive_to_point(-23.452, 23.592);
   chassis.turn_to_point(-23.032, 47.274);
@@ -393,14 +402,16 @@ void skills(){
   chassis.drive_to_point(-57.083, 56.663);
   chassis.turn_to_heading(135);
   goalclamp.set(false);
+  wait(0.5, seconds);
   intakeControl.on = false;
   chassis.turn_to_point(-45.726, -22.689, true);
   chassis.drive_to_point(-45.726, -22.689);
   slow();
   chassis.turn_to_point(-45.916, -27.616, true);
   chassis.drive_to_point(-45.916, -27.616);
-  medium();
+  default_constants();
   goalclamp.set(true);
+  wait(0.5, seconds);
   intakeControl.on = true;
   chassis.turn_to_point(-23.312, -23.491);
   chassis.drive_to_point(-23.312, -23.491);

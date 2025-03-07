@@ -61,7 +61,7 @@ PORT13,
 PORT7,
 
 //Input your wheel diameter. (4" omnis are actually closer to 4.125"):
-3.18,
+3.02,
 
 //External ratio, must be in decimal, in the format of input teeth/output teeth.
 //If your motor has an 84-tooth gear and your wheel has a 60-tooth gear, this value will be 1.4.
@@ -213,7 +213,7 @@ void pre_auton() {
   opticalsensor.integrationTime(5);
   opticalsensor.setLight(ledState::on);
   opticalsensor.setLightPower(100, percent);
-  chassis.set_coordinates(0, 0, 0);
+  // chassis.set_coordinates(0, 0, 0);
   thread healthTask(healthCheck);
   intake.spin(forward);
   intake.setVelocity(0, percent);
