@@ -48,6 +48,20 @@ void IntakeControl::detectColor() {
       }
     }
   }
+  if (reduce_0_to_360(fabs(opticalsensor.hue() - 10)) <= 0) {
+      curRing = red;
+      if (alliance == blue) {
+        wrongRing = true;
+      }
+  }
+  else {
+    if (fabs(opticalsensor.hue() - 10) <= 240) {
+      curRing = red;
+      if (alliance == blue) {
+        wrongRing = true;
+      }
+    }
+  }
     
 }
 void IntakeControl::colorSorting() {

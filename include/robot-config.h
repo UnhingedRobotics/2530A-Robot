@@ -19,5 +19,6 @@ extern inertial rightinertialsensor;
 extern digital_out goalclamp;
 extern digital_out swingarm; 
 extern aivision aivisionsensor;
+extern optical opticalsensor;
 
 void  vexcodeInit( void );

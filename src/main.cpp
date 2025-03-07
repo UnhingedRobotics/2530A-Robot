@@ -210,6 +210,9 @@ void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE
   vexcodeInit();
   default_constants();
+  opticalsensor.integrationTime(5);
+  opticalsensor.setLight(ledState::on);
+  opticalsensor.setLightPower(100, percent);
   chassis.set_coordinates(0, 0, 0);
   thread healthTask(healthCheck);
   intake.spin(forward);

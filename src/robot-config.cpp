@@ -25,6 +25,7 @@ digital_out swingarm = digital_out(Brain.ThreeWirePort.H);
 inertial leftinertialsensor = inertial(PORT7);
 inertial rightinertialsensor = inertial(PORT13);
 aivision aivisionsensor(PORT4, aivision::ALL_AIOBJS);
+optical opticalsensor = optical(PORT7);
 
 void vexcodeInit( void ) {
   // nothing to initialize
